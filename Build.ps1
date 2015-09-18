@@ -1,1 +1,1 @@
-Write-Host 'Hello, World!'
+Write-Host 'Hello, World from Build.ps1!'
