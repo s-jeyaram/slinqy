@@ -23,3 +23,11 @@ Task Build -depends InstallDependencies -description "Compiles all source code."
 
 	Write-Host "MsBuildSucceeded: $MsBuildSucceeded"
 }
+
+Task Pull -description "Pulls the latest source from master to the local repo" {
+	exec { git pull origin master }
+}
+
+Task Push -depends Pull,Build -description "Performs pre-push actions before actually pushing to the remote repo." {
+	exec { git push }
+}
