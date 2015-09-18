@@ -4,3 +4,6 @@ if (-not ($env:Path -ilike "*chocolatey*")) {
     
     iex ((New-Object Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 }
+
+# Make sure all other required dependencies are installed...
+cinst psake --version 4.4.1 --confirm
