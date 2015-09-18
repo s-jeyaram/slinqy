@@ -1,2 +1,2 @@
 build_script:
-	- ps: Build.ps1
+	- ps: "Write-Host 'Hello, World!'"
