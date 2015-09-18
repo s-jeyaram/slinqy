@@ -1,6 +1,8 @@
-# Define input properties
+# Define path parameters
+$BasePath = "Uninitialized" # Caller must specify.
+
 properties {
-	$BasePath = "Uninitialized" # Caller must specify.
+	$SourcePath = Join-Path $BasePath "Source"
 }
 
 # Define the Task to call when none was specified by the caller.
@@ -13,7 +15,10 @@ Task InstallDependencies -description "Installs all dependencies required to exe
 }
 
 Task Build -depends InstallDependencies -description "Compiles all source code." {
-	$SolutionPath = Join-Path $BasePath "Source\Slinqy.sln"
+	$SolutionPath = Join-Path $SourcePath "Slinqy.sln"
+
+	Write-Host "Building $SolutionPath"
+
 	$MsBuildSucceeded = Invoke-MsBuild $SolutionPath
 
 	Write-Host "MsBuildSucceeded: $MsBuildSucceeded"
