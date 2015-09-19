@@ -41,7 +41,7 @@ Task Build -depends Clean,InstallDependencies -description "Compiles all source 
 	Write-Host "MsBuildSucceeded: $MsBuildSucceeded"
 }
 
-Task Pull -description "Pulls the latest source from master to the local repo" {
+Task Pull -description "Pulls the latest source from master to the local repo." {
 	exec { git pull origin master }
 }
 
