@@ -1,2 +1,6 @@
 build_script:
   - ps: .\CI.ps1 Build
+
+artifacts:
+  - name: Logs
+    path: Artifacts\Logs
