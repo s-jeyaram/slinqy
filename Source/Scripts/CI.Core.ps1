@@ -2,7 +2,9 @@
 $BasePath = "Uninitialized" # Caller must specify.
 
 properties {
-	$SourcePath = Join-Path $BasePath "Source"
+	$SourcePath    = Join-Path $BasePath "Source"
+	$ArtifactsPath = Join-Path $BasePath "Artifacts"
+	$LogsPath      = Join-Path $ArtifactsPath "Logs"
 }
 
 # Define the Task to call when none was specified by the caller.
@@ -18,8 +20,17 @@ Task Build -depends InstallDependencies -description "Compiles all source code."
 	$SolutionPath = Join-Path $SourcePath "Slinqy.sln"
 
 	Write-Host "Building $SolutionPath"
+	
+	# Make sure the path exists, or the logs won't be written.
+	New-Item `
+		-ItemType Directory `
+		-Path $LogsPath |
+			Out-Null
 
-	$MsBuildSucceeded = Invoke-MsBuild $SolutionPath
+	$MsBuildSucceeded = Invoke-MsBuild `
+		-Path $SolutionPath `
+		-BuildLogDirectoryPath $LogsPath `
+		-KeepBuildLogOnSuccessfulBuilds
 
 	Write-Host "MsBuildSucceeded: $MsBuildSucceeded"
 }
