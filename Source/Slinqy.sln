@@ -15,7 +15,36 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\LICENSE = ..\LICENSE
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "ExampleApp", "ExampleApp\", "{BCCA7BBE-DB08-4B6B-BE3C-19B180EC44DC}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.6"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_60596"
+		Debug.AspNetCompiler.PhysicalPath = "ExampleApp\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_60596\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_60596"
+		Release.AspNetCompiler.PhysicalPath = "ExampleApp\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_60596\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "60596"
+		SlnRelativePath = "ExampleApp\"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BCCA7BBE-DB08-4B6B-BE3C-19B180EC44DC}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCCA7BBE-DB08-4B6B-BE3C-19B180EC44DC}.Release|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
