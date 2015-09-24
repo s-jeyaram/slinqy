@@ -76,6 +76,8 @@ Task Build -depends Clean,InstallDependencies -description "Compiles all source 
 }
 
 Task ProvisionEnvironment -description "Ensures the needed resources are set up in the target runtime environment." {
+	Get-ChildItem Env:
+
 	$AzureResourceGroupScriptPath   = Join-Path $ScriptsPath   "Deploy-AzureResourceGroup.ps1"
 	$TemplatesPath					= Join-Path $ArtifactsPath "Templates"
 	$TemplateFilePath				= Join-Path $TemplatesPath "$ExampleAppName.json"
@@ -96,8 +98,6 @@ Task ProvisionEnvironment -description "Ensures the needed resources are set up 
 }
 
 Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from the last build that occurred to the target environment." {
-	Get-ChildItem Env:
-
 	$ExampleAppWebsiteName = "$ProductName$ExampleAppName"
 	$ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "${ExampleAppName}_Package\$ExampleAppName.zip"
 
