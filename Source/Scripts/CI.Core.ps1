@@ -75,6 +75,9 @@ Task Build -depends Clean,InstallDependencies -description "Compiles all source 
 }
 
 Task ProvisionEnvironment -description "Ensures the needed resources are set up in the target runtime environment." {
+	# Ensure the Azure PowerShell cmdlets are available
+	Import-Module Azure
+	
 	$AzureResourceGroupScriptPath   = Join-Path $ScriptsPath   "Deploy-AzureResourceGroup.ps1"
 	$TemplatesPath					= Join-Path $ArtifactsPath "Templates"
 	$TemplateFilePath				= Join-Path $TemplatesPath "$ExampleAppName.json"
