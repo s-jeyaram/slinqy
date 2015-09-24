@@ -16,4 +16,4 @@ cinst psake --version 4.4.1 --confirm
 #########################
 
 # Then run the actual CI script using psake
-psake .\Source\Scripts\CI.Core.ps1 $args -parameters "@{BasePath='$PSScriptRoot'}"
+psake .\Source\Scripts\CI.Core.ps1 $args -parameters "@{BasePath='$PSScriptRoot'}" -nologo
