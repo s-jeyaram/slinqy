@@ -96,6 +96,8 @@ Task ProvisionEnvironment -description "Ensures the needed resources are set up 
 }
 
 Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from the last build that occurred to the target environment." {
+	Get-ChildItem Env:
+
 	$ExampleAppWebsiteName = "$ProductName$ExampleAppName"
 	$ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "${ExampleAppName}_Package\$ExampleAppName.zip"
 
