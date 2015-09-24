@@ -140,6 +140,16 @@ Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from t
 	Write-Host "done!"
 }
 
+Task DestroyEnvironment -description "Permanently deletes and removes all services and data from the target environment." {
+	$answer = Read-Host `
+		-Prompt 'This will permanently delete all services and data from the target environment, are you sure? (y/n)'
+
+	if ($answer -eq 'y'){
+		Switch-AzureMode AzureResourceManager
+		Remove-AzureResourceGroup $ProductName
+	}
+}
+
 Task Pull -description "Pulls the latest source from master to the local repo." {
 	exec { git pull origin master }
 }
