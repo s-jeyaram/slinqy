@@ -15,39 +15,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\LICENSE = ..\LICENSE
 	EndProjectSection
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "ExampleApp", "ExampleApp\", "{BCCA7BBE-DB08-4B6B-BE3C-19B180EC44DC}"
-	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.6"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_60596"
-		Debug.AspNetCompiler.PhysicalPath = "ExampleApp\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_60596\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_60596"
-		Release.AspNetCompiler.PhysicalPath = "ExampleApp\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_60596\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "60596"
-		SlnRelativePath = "ExampleApp\"
-		DefaultWebSiteLanguage = "Visual C#"
-	EndProjectSection
-EndProject
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "ExampleApp.ResourceGroup", "ExampleApp.ResourceGroup\ExampleApp.ResourceGroup.deployproj", "{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleApp", "ExampleApp\ExampleApp.csproj", "{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BCCA7BBE-DB08-4B6B-BE3C-19B180EC44DC}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{BCCA7BBE-DB08-4B6B-BE3C-19B180EC44DC}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

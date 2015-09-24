@@ -27,7 +27,8 @@ Task InstallDependencies -description "Installs all dependencies required to exe
 }
 
 Task Build -depends Clean,InstallDependencies -description "Compiles all source code." {
-	$SolutionPath = Join-Path $SourcePath "Slinqy.sln"
+	$SolutionFileName = "Slinqy.sln"
+	$SolutionPath     = Join-Path $SourcePath $SolutionFileName
 
 	Write-Host "Building $SolutionPath"
 	
@@ -37,13 +38,37 @@ Task Build -depends Clean,InstallDependencies -description "Compiles all source 
 		-Path $LogsPath |
 			Out-Null
 
+	# Compile the whole solution according to how the solution file is configured.
 	$MsBuildSucceeded = Invoke-MsBuild `
-		-Path $SolutionPath `
+		-Path                  $SolutionPath `
 		-BuildLogDirectoryPath $LogsPath `
-		-MsBuildParameters "/p:OutDir=$ArtifactsPath\" `
+		-MsBuildParameters     "/p:OutDir=$ArtifactsPath\" `
 		-KeepBuildLogOnSuccessfulBuilds
 
-	Write-Host "MsBuildSucceeded: $MsBuildSucceeded"
+	if (-not $MsBuildSucceeded) {
+		$BuildFilePath = Join-Path $LogsPath "$SolutionFileName.msbuild.log"
+		Get-Content $BuildFilePath
+		throw "Build Failed!"
+	}
+
+	Write-Host "Compilation completed, packaging..." -NoNewline
+
+	# Package up deployables
+	$WebProjectFileName = "ExampleApp.csproj"
+	$WebProjectPath     = Join-Path $SourcePath "ExampleApp\$WebProjectFileName"
+	$MsBuildSucceeded   = Invoke-MsBuild `
+		-Path                  $WebProjectPath `
+		-BuildLogDirectoryPath $LogsPath `
+		-MsBuildParameters     "/p:OutDir=$ArtifactsPath\ /t:Package" `
+		-KeepBuildLogOnSuccessfulBuilds
+
+	if (-not $MsBuildSucceeded) {
+		$BuildFilePath = Join-Path $LogsPath "$WebProjectFileName.msbuild.log"
+		Get-Content $BuildFilePath
+		throw "Build Failed!"
+	}
+
+	Write-Host "done!"
 }
 
 Task ProvisionEnvironment -description "Ensures the needed resources are set up in the target runtime environment." {

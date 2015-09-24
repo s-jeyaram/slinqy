@@ -2,3 +2,5 @@
 Artifacts
 bin
 obj
+packages
+*.user
