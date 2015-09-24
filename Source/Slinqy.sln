@@ -37,6 +37,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "ExampleApp", "ExampleApp\",
 		DefaultWebSiteLanguage = "Visual C#"
 	EndProjectSection
 EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "ExampleApp.ResourceGroup", "ExampleApp.ResourceGroup\ExampleApp.ResourceGroup.deployproj", "{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Any CPU = Release|Any CPU
@@ -44,6 +46,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BCCA7BBE-DB08-4B6B-BE3C-19B180EC44DC}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{BCCA7BBE-DB08-4B6B-BE3C-19B180EC44DC}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
