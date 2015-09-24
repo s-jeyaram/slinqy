@@ -2,11 +2,15 @@
 $BasePath = "Uninitialized" # Caller must specify.
 
 properties {
-	$SourcePath    = Join-Path $BasePath "Source"
-	$ArtifactsPath = Join-Path $BasePath "Artifacts"
-	$LogsPath      = Join-Path $ArtifactsPath "Logs"
-	$ScriptsPath   = Join-Path $ArtifactsPath "Scripts"
-	$EnvLocation   = "West US"
+	$EnvName               = $null # Caller must specify.
+	$EnvLocation           = "West US"
+	$ProductName           = "Slinqy"
+	$ExampleAppName        = "ExampleApp"
+	$SourcePath            = Join-Path $BasePath "Source"
+	$ArtifactsPath         = Join-Path $BasePath "Artifacts"
+	$LogsPath              = Join-Path $ArtifactsPath "Logs"
+	$ScriptsPath           = Join-Path $ArtifactsPath "Scripts"
+	$PublishedWebsitesPath = Join-Path $ArtifactsPath "_PublishedWebsites"
 }
 
 # Define the Task to call when none was specified by the caller.
@@ -27,7 +31,7 @@ Task InstallDependencies -description "Installs all dependencies required to exe
 }
 
 Task Build -depends Clean,InstallDependencies -description "Compiles all source code." {
-	$SolutionFileName = "Slinqy.sln"
+	$SolutionFileName = "$ProductName.sln"
 	$SolutionPath     = Join-Path $SourcePath $SolutionFileName
 
 	Write-Host "Building $SolutionPath"
@@ -54,8 +58,8 @@ Task Build -depends Clean,InstallDependencies -description "Compiles all source 
 	Write-Host "Compilation completed, packaging..." -NoNewline
 
 	# Package up deployables
-	$WebProjectFileName = "ExampleApp.csproj"
-	$WebProjectPath     = Join-Path $SourcePath "ExampleApp\$WebProjectFileName"
+	$WebProjectFileName = "$ExampleAppName.csproj"
+	$WebProjectPath     = Join-Path $SourcePath "$ExampleAppName\$WebProjectFileName"
 	$MsBuildSucceeded   = Invoke-MsBuild `
 		-Path                  $WebProjectPath `
 		-BuildLogDirectoryPath $LogsPath `
@@ -74,8 +78,8 @@ Task Build -depends Clean,InstallDependencies -description "Compiles all source 
 Task ProvisionEnvironment -description "Ensures the needed resources are set up in the target runtime environment." {
 	$AzureResourceGroupScriptPath   = Join-Path $ScriptsPath   "Deploy-AzureResourceGroup.ps1"
 	$TemplatesPath					= Join-Path $ArtifactsPath "Templates"
-	$TemplateFilePath				= Join-Path $TemplatesPath "ExampleApp.json"
-	$TemplateParametersFilePath		= Join-Path $TemplatesPath "ExampleApp.param.env.json"
+	$TemplateFilePath				= Join-Path $TemplatesPath "$ExampleAppName.json"
+	$TemplateParametersFilePath		= Join-Path $TemplatesPath "$ExampleAppName.param.env.json"
 	
 	Write-Host "Provisioning Location: $EnvLocation"
 
@@ -89,6 +93,21 @@ Task ProvisionEnvironment -description "Ensures the needed resources are set up 
 		-ResourceGroupLocation  $EnvLocation `
 		-TemplateFile           $TemplateFilePath `
 		-TemplateParametersFile $TemplateParametersFilePath
+}
+
+Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from the last build that occurred to the target environment." {
+	$ExampleAppWebsiteName = "$ProductName$ExampleAppName"
+	$ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "${ExampleAppName}_Package\$ExampleAppName.zip"
+
+	Switch-AzureMode AzureServiceManagement
+
+	Write-Host "Deploying $ExampleAppPackagePath to $ExampleAppWebsiteName..." -NoNewline
+
+	Publish-AzureWebsiteProject `
+		-Package $ExampleAppPackagePath `
+		-Name    $ExampleAppWebsiteName
+
+	Write-Host "done!"
 }
 
 Task Pull -description "Pulls the latest source from master to the local repo." {
