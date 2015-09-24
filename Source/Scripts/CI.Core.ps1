@@ -76,16 +76,42 @@ Task Build -depends Clean,InstallDependencies -description "Compiles all source 
 }
 
 Task ProvisionEnvironment -description "Ensures the needed resources are set up in the target runtime environment." {
-	Get-ChildItem Env:
-
 	$AzureResourceGroupScriptPath   = Join-Path $ScriptsPath   "Deploy-AzureResourceGroup.ps1"
 	$TemplatesPath					= Join-Path $ArtifactsPath "Templates"
 	$TemplateFilePath				= Join-Path $TemplatesPath "$ExampleAppName.json"
 	$TemplateParametersFilePath		= Join-Path $TemplatesPath "$ExampleAppName.param.env.json"
-	
+
 	Write-Host "Provisioning Location: $EnvLocation"
 
-	# WARNING: 
+	# First, make sure some Azure credentials are loaded
+	$AzureAccount = Get-AzureAccount
+
+	if (-not $AzureAccount) {
+		$AzureSubscription = Get-AzureSubscription -Current -ErrorAction SilentlyContinue
+
+		if (-not $AzureSubscription) {
+			# Check environment variables for credentials
+			$AzureDeployUser = $env:AzureDeployUser
+			$AzureDeployPass = $env:AzureDeployPass
+
+			if ($AzureDeployUser -and $AzureDeployPass) {
+				$AzureDeployPassSecure = $AzureDeployPass | ConvertTo-SecureString -AsPlainText -Force
+				$AzureCredential       = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AzureDeployUser,$AzureDeployPassSecure
+
+				$Account = Add-AzureAccount -Credential $AzureCredential
+			} else {
+				Write-Host "Could not find any Azure credentials on the local machine, prompting console user..."
+				# Prompt the console user for credentials
+				$Account = Add-AzureAccount
+			}
+
+			if (-not $Account){
+				throw 'No Azure account found or specified!'
+			}
+		}
+	}
+
+	# WARNING:
 	#	If the following call fails, the error doesn't bubble up and the build script will continue on. :(
 	#	But the impact of this occurring should be minimal.  The script is likely to fail in subsequent 
 	#	tasks if changes have been made to the template files and they fail to be applied.
