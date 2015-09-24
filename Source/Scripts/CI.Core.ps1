@@ -2,7 +2,6 @@
 $BasePath = "Uninitialized" # Caller must specify.
 
 properties {
-	$EnvName               = $null # Caller must specify.
 	$EnvLocation           = "West US"
 	$ProductName           = "Slinqy"
 	$ExampleAppName        = "ExampleApp"
