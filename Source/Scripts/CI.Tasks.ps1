@@ -1,3 +1,5 @@
+cinst powershell    --version 5.0.10514-ProductionPreview --confirm
+
 # Include additional scripts
 Include "CI.Settings.ps1"
 
@@ -27,7 +29,7 @@ Task Clean -description "Removes any artifacts that may be present from prior ru
 Task InstallDependencies -description "Installs all dependencies required to execute the tasks in this script." {
 	exec { 
 		cinst invokemsbuild --version 1.5.17 --confirm
-		cinst powershell    --version 5.0.10514-ProductionPreview --confirm
+		#cinst powershell    --version 5.0.10514-ProductionPreview --confirm
 	}
 }
 
