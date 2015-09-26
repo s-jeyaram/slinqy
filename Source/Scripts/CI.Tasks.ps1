@@ -1,10 +1,11 @@
+# Include additional scripts
+Include "CI.Settings.ps1"
+
 # Define path parameters
 $BasePath = "Uninitialized" # Caller must specify.
 
+# Define the input properties and their default values.
 properties {
-	$EnvLocation           = "West US"
-	$ProductName           = "Slinqy"
-	$ExampleAppName        = "ExampleApp"
 	$SourcePath            = Join-Path $BasePath "Source"
 	$ArtifactsPath         = Join-Path $BasePath "Artifacts"
 	$LogsPath              = Join-Path $ArtifactsPath "Logs"
@@ -29,8 +30,16 @@ Task InstallDependencies -description "Installs all dependencies required to exe
 	}
 }
 
-Task Build -depends Clean,InstallDependencies -description "Compiles all source code." {
-	$SolutionFileName = "$ProductName.sln"
+Task LoadSettings -description "Loads the environment specific settings." {
+	# Search for a settings file
+	$TemplateParametersFileName = 'environment-settings.json'
+	$TemplateParametersFilePath = Join-Path $BasePath $TemplateParametersFileName
+	
+	$Script:Settings = [Settings]::new($TemplateParametersFilePath)
+}
+
+Task Build -depends Clean,InstallDependencies,LoadSettings -description "Compiles all source code." {
+	$SolutionFileName = "$($Settings.ProductName).sln"
 	$SolutionPath     = Join-Path $SourcePath $SolutionFileName
 
 	Write-Host "Building $SolutionPath"
@@ -57,8 +66,8 @@ Task Build -depends Clean,InstallDependencies -description "Compiles all source 
 	Write-Host "Compilation completed, packaging..." -NoNewline
 
 	# Package up deployables
-	$WebProjectFileName = "$ExampleAppName.csproj"
-	$WebProjectPath     = Join-Path $SourcePath "$ExampleAppName\$WebProjectFileName"
+	$WebProjectFileName = "ExampleApp.csproj"
+	$WebProjectPath     = Join-Path $SourcePath "ExampleApp\$WebProjectFileName"
 	$MsBuildSucceeded   = Invoke-MsBuild `
 		-Path                  $WebProjectPath `
 		-BuildLogDirectoryPath $LogsPath `
@@ -74,16 +83,11 @@ Task Build -depends Clean,InstallDependencies -description "Compiles all source 
 	Write-Host "done!"
 }
 
-Task ProvisionEnvironment -description "Ensures the needed resources are set up in the target runtime environment." {
+Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed resources are set up in the target runtime environment." {
 	# Ensure the Azure PowerShell cmdlets are available
 	Import-Module Azure
-	
-	$AzureResourceGroupScriptPath   = Join-Path $ScriptsPath   "Deploy-AzureResourceGroup.ps1"
-	$TemplatesPath					= Join-Path $ArtifactsPath "Templates"
-	$TemplateFilePath				= Join-Path $TemplatesPath "$ExampleAppName.json"
-	$TemplateParametersFilePath		= Join-Path $TemplatesPath "$ExampleAppName.param.env.json"
 
-	Write-Host "Provisioning Location: $EnvLocation"
+	Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation))..."
 
 	# First, make sure some Azure credentials are loaded
 	$AzureAccount = Get-AzureAccount
@@ -113,40 +117,46 @@ Task ProvisionEnvironment -description "Ensures the needed resources are set up 
 		}
 	}
 
+	# Set up paths to the Resource Manager template
+	$TemplatesPath	  = Join-Path $ArtifactsPath "Templates"
+	$TemplateFilePath = Join-Path $TemplatesPath "ExampleApp.json"
+
+	Switch-AzureMode AzureResourceManager
+
 	# WARNING:
 	#	If the following call fails, the error doesn't bubble up and the build script will continue on. :(
 	#	But the impact of this occurring should be minimal.  The script is likely to fail in subsequent 
 	#	tasks if changes have been made to the template files and they fail to be applied.
 
 	# TODO: Find a way to end the script if this call fails
-	. $AzureResourceGroupScriptPath `
-		-ResourceGroupLocation  $EnvLocation `
-		-TemplateFile           $TemplateFilePath `
-		-TemplateParametersFile $TemplateParametersFilePath
+	New-AzureResourceGroupDeployment `
+		-ResourceGroupName			$Settings.ResourceGroupName `
+		-TemplateParameterObject    $Settings.GetSettings() `
+		-TemplateFile               $TemplateFilePath
 }
 
 Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from the last build that occurred to the target environment." {
-	$ExampleAppWebsiteName = "$ProductName$ExampleAppName"
-	$ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "${ExampleAppName}_Package\$ExampleAppName.zip"
+	$ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "ExampleApp_Package\ExampleApp.zip"
+
+	Write-Host "Deploying $ExampleAppPackagePath to $($Settings.ExampleAppSiteName)..." -NoNewline
 
 	Switch-AzureMode AzureServiceManagement
-
-	Write-Host "Deploying $ExampleAppPackagePath to $ExampleAppWebsiteName..." -NoNewline
-
 	Publish-AzureWebsiteProject `
 		-Package $ExampleAppPackagePath `
-		-Name    $ExampleAppWebsiteName
+		-Name    $Settings.ExampleAppSiteName
 
 	Write-Host "done!"
+
+	# TODO: Test host after deployment.
 }
 
-Task DestroyEnvironment -description "Permanently deletes and removes all services and data from the target environment." {
+Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
 	$answer = Read-Host `
 		-Prompt 'This will permanently delete all services and data from the target environment, are you sure? (y/n)'
 
 	if ($answer -eq 'y'){
 		Switch-AzureMode AzureResourceManager
-		Remove-AzureResourceGroup $ProductName
+		Remove-AzureResourceGroup $Settings.ResourceGroupName
 	}
 }
 
