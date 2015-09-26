@@ -1,3 +1,4 @@
+$PSVersionTable.PSVersion
 cinst powershell    --version 5.0.10514-ProductionPreview --confirm
 
 # Include additional scripts
