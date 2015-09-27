@@ -1,3 +1,5 @@
+os: unstable
+
 build_script:
   - ps: .\CI Build
 
