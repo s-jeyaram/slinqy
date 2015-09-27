@@ -8,17 +8,21 @@ class Settings {
 	[PSCustomObject] $SettingsFileContent = $null;
 
 	Settings($settingsFilePath) {
-		Write-Host "Loading settings from $settingsFilePath..."
+		if (Test-Path $settingsFilePath) {
+			Write-Host "Loading settings from $settingsFilePath..."
 
-		# Load the specified settings
-		$this.settingsFileContent = Get-Content `
-			-Path $settingsFilePath `
-			-Raw | 
-				ConvertFrom-Json
+			# Load the specified settings
+			$this.settingsFileContent = Get-Content `
+				-Path $settingsFilePath `
+				-Raw | 
+					ConvertFrom-Json
 
-		# Load settings from either local file or environment variables.
-		$params = $this.SettingsFileContent.parameters
-		
+			# Load settings from either local file or environment variables.
+			$params = $this.SettingsFileContent.parameters
+		} else {
+			$params = New-Object PSCustomObject
+		}
+
 		$this.ProductName         = if ($params.productName)         { $params.productName.value }         else { $this.GetSetting("ProductName",         "Slinqy")  }
 		$this.EnvironmentName     = if ($params.environmentName)     { $params.environmentName.value }     else { $this.GetSetting("EnvironmentName",     "Dev")     }
 		$this.EnvironmentLocation = if ($params.environmentLocation) { $params.environmentLocation.value } else { $this.GetSetting("EnvironmentLocation", "West US") }
