@@ -129,8 +129,9 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 	#	tasks if changes have been made to the template files and they fail to be applied.
 
 	# TODO: Find a way to end the script if this call fails
-	New-AzureResourceGroupDeployment `
-		-ResourceGroupName			$Settings.ResourceGroupName `
+	New-AzureResourceGroup `
+		-Name			            $Settings.ResourceGroupName `
+		-Location                   $Settings.EnvironmentLocation `
 		-TemplateParameterObject    $Settings.GetSettings() `
 		-TemplateFile               $TemplateFilePath
 }
