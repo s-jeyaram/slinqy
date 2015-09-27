@@ -5,6 +5,7 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{5EF54597-E1C7-4A1E-A903-70B6BBBEBBF2}"
 	ProjectSection(SolutionItems) = preProject
+		Scripts\CI.Settings.ps1 = Scripts\CI.Settings.ps1
 		Scripts\CI.Tasks.ps1 = Scripts\CI.Tasks.ps1
 	EndProjectSection
 EndProject
