@@ -1,7 +1,7 @@
 os: unstable
 
 build_script:
-  - ps: .\Source\Scripts\CI.InstallPrereqs.ps1;.\CI Build
+  - ps: .\Source\Scripts\CI.InstallSystemPrereqs.ps1;.\CI Build
 
 artifacts:
   - name: Logs
