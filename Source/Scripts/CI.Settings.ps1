@@ -44,7 +44,7 @@ class Settings {
 
 		if (-not $SettingValue) {
 			# Ask console user
-			$SettingValue = Read-Host -Prompt "What should the value be for setting ${settingName}?"
+			$SettingValue = Read-Host -Prompt "What should the value be for setting '${settingName}'?"
 		} 
 
 		return $SettingValue
