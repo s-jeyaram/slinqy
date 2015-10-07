@@ -7,5 +7,6 @@ if (-not ($env:Path -ilike "*chocolatey*")) {
     iex ((New-Object Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 }
 
-cinst powershell --version '5.0.10514-ProductionPreview' --confirm
-cinst psake      --version 4.4.1 --confirm
+cinst powershell --version 5.0.10514-ProductionPreview --confirm
+cinst dotnet4.6  --version 4.6.00081.20150925          --confirm
+cinst psake      --version 4.4.1                       --confirm
