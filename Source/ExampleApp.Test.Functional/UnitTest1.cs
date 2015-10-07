@@ -1,4 +1,6 @@
-﻿using Xunit;
+﻿using System;
+using System.Diagnostics;
+using Xunit;
 
 namespace ExampleApp.Test.Functional
 {
@@ -7,6 +9,8 @@ namespace ExampleApp.Test.Functional
         [Fact]
         public void TestMethod1()
         {
+            Console.WriteLine("CONSOLE: TestMethod1");
+            Trace.TraceError("TRACE: ERROR!");
         }
     }
 }
