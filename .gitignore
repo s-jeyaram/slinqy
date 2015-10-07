@@ -1,2 +1,8 @@
 .vs
 Artifacts
+bin
+obj
+packages
+*.user
+environment-settings.json
+*.suo

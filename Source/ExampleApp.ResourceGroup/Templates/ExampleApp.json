@@ -1,0 +1,90 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "type": "string"
+    },
+    "environmentLocation": {
+      "type": "string"
+    },
+    "sku": {
+      "type": "string",
+      "allowedValues": [
+        "Free",
+        "Shared",
+        "Basic",
+        "Standard",
+        "Premium"
+      ],
+      "defaultValue": "Free"
+    },
+    "workerSize": {
+      "type": "string",
+      "allowedValues": [
+        "0",
+        "1",
+        "2"
+      ],
+      "defaultValue": "0"
+    },
+    "exampleAppSiteName": {
+      "type": "string",
+      "defaultValue": "ExampleApp"      
+    }
+  },
+  "variables": {
+    "hostingPlanName": "[concat(parameters('exampleAppSiteName'), 'HostingPlan')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2014-06-01",
+      "name": "[variables('hostingPlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[parameters('environmentLocation')]",
+      "tags": {
+        "displayName": "HostingPlan"
+      },
+      "properties": {
+        "name": "[variables('hostingPlanName')]",
+        "sku": "[parameters('sku')]",
+        "workerSize": "[parameters('workerSize')]",
+        "numberOfWorkers": 1
+      }
+    },
+    {
+      "apiVersion": "2014-06-01",
+      "name": "[parameters('exampleAppSiteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[parameters('environmentLocation')]",
+      "tags": {
+        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]": "Resource",
+        "displayName": "Website"
+
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
+      ],
+      "properties": {
+        "name": "[parameters('exampleAppSiteName')]",
+        "serverFarm": "[variables('hostingPlanName')]"
+      }
+    },
+    {
+      "apiVersion": "2014-04-01",
+      "name": "[parameters('exampleAppSiteName')]",
+      "type": "Microsoft.Insights/components",
+      "location": "Central US",
+      "dependsOn": [
+        "[concat('Microsoft.Web/sites/', parameters('exampleAppSiteName'))]"
+      ],
+      "tags": {
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('exampleAppSiteName'))]": "Resource",
+        "displayName": "AppInsightsComponent"
+      },
+      "properties": {
+        "applicationId": "[parameters('exampleAppSiteName')]"
+      }
+    }
+  ]
+}
