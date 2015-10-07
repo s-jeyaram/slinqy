@@ -133,13 +133,14 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 		-Name			            $Settings.ResourceGroupName `
 		-Location                   $Settings.EnvironmentLocation `
 		-TemplateParameterObject    $Settings.GetSettings() `
-		-TemplateFile               $TemplateFilePath
+		-TemplateFile               $TemplateFilePath `
+		-Force
 }
 
 Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from the last build that occurred to the target environment." {
 	$ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "ExampleApp_Package\ExampleApp.zip"
 
-	Write-Host "Deploying $ExampleAppPackagePath to $($Settings.ExampleAppSiteName)..." -NoNewline
+	Write-Host "Deploying $ExampleAppPackagePath to $($Settings.ExampleAppSiteName)..."
 
 	Switch-AzureMode AzureServiceManagement
 	Publish-AzureWebsiteProject `
@@ -148,12 +149,30 @@ Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from t
 
 	Write-Host "done!"
 
-	# TODO: Test host after deployment.
+	# Hit the Example App website to make sure it's alive
+	$ExampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
+
+	Write-Host "Checking $ExampleWebsiteHostName..." -NoNewline
+
+	$Response = Invoke-WebRequest $ExampleWebsiteHostName -UseBasicParsing
+	$StatusCode = $Response.StatusCode
+
+	Write-Host "Response Code: $StatusCode"
+
+	if (-not ($StatusCode -eq 200)) {
+		throw "Unexpected response: $Response"
+	}
+
+	Write-Host "Deployment Completed"
+}
+
+Task FunctionalTest -description "Tests that the required features and use cases are working in the target environment." {
+
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
 	$answer = Read-Host `
-		-Prompt 'This will permanently delete all services and data from the target environment, are you sure? (y/n)'
+		-Prompt "Are you use you want to permanently delete all services and data from the target environment $($Settings.EnvironmentName)? (y/n)"
 
 	if ($answer -eq 'y'){
 		Switch-AzureMode AzureResourceManager
