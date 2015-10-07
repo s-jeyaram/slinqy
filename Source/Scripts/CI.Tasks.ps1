@@ -1,5 +1,6 @@
 # Include additional scripts
 Include "CI.Settings.ps1"
+Include "CI.Functions.ps1"
 
 # Define path parameters
 $BasePath = "Uninitialized" # Caller must specify.
@@ -27,6 +28,7 @@ Task Clean -description "Removes any artifacts that may be present from prior ru
 Task InstallDependencies -description "Installs all dependencies required to execute the tasks in this script." {
 	exec { 
 		cinst invokemsbuild --version 1.5.17 --confirm
+		cinst xunit         --version 2.0.0  --confirm
 	}
 }
 
@@ -42,7 +44,9 @@ Task Build -depends Clean,InstallDependencies,LoadSettings -description "Compile
 	$SolutionFileName = "$($Settings.ProductName).sln"
 	$SolutionPath     = Join-Path $SourcePath $SolutionFileName
 
-	Write-Host "Building $SolutionPath"
+	$BuildVersion = Get-BuildVersion
+
+	Write-Host "Building $($Settings.ProductName) $BuildVersion from $SolutionPath"
 	
 	# Make sure the path exists, or the logs won't be written.
 	New-Item `
@@ -166,8 +170,14 @@ Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from t
 	Write-Host "Deployment Completed"
 }
 
-Task FunctionalTest -description "Tests that the required features and use cases are working in the target environment." {
+Task FunctionalTest -description 'Tests that the required features and use cases are working in the target environment.' {
+	$TestDlls = @(
+		(Join-Path $ArtifactsPath 'ExampleApp.Test.Functional.dll')
+	)
+	
+	Write-Host "Running tests in $TestDlls"
 
+	exec { xunit.console $TestDlls }
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {

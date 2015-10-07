@@ -1,10 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{5EF54597-E1C7-4A1E-A903-70B6BBBEBBF2}"
 	ProjectSection(SolutionItems) = preProject
+		Scripts\AppVeyor.Functions.ps1 = Scripts\AppVeyor.Functions.ps1
+		Scripts\CI.Functions.ps1 = Scripts\CI.Functions.ps1
 		Scripts\CI.InstallSystemPrereqs.ps1 = Scripts\CI.InstallSystemPrereqs.ps1
 		Scripts\CI.Settings.ps1 = Scripts\CI.Settings.ps1
 		Scripts\CI.Tasks.ps1 = Scripts\CI.Tasks.ps1
@@ -21,6 +23,8 @@ Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "ExampleApp.ResourceGroup", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleApp", "ExampleApp\ExampleApp.csproj", "{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleApp.Test.Functional", "ExampleApp.Test.Functional\ExampleApp.Test.Functional.csproj", "{5FB77DEA-B800-42CC-9A5F-673608CF9D12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Any CPU = Release|Any CPU
@@ -30,6 +34,8 @@ Global
 		{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FB77DEA-B800-42CC-9A5F-673608CF9D12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FB77DEA-B800-42CC-9A5F-673608CF9D12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
