@@ -186,7 +186,9 @@ Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes 
 
 	if ($answer -eq 'y'){
 		Switch-AzureMode AzureResourceManager
-		Remove-AzureResourceGroup $Settings.ResourceGroupName
+		Remove-AzureResourceGroup `
+			-Name $Settings.ResourceGroupName `
+			-Force
 	}
 }
 
