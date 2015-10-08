@@ -1,5 +1,6 @@
 # Include additional scripts
 Include "CI.Settings.ps1"
+Include "CI.Functions.ps1"
 
 # Define path parameters
 $BasePath = "Uninitialized" # Caller must specify.
@@ -27,6 +28,7 @@ Task Clean -description "Removes any artifacts that may be present from prior ru
 Task InstallDependencies -description "Installs all dependencies required to execute the tasks in this script." {
 	exec { 
 		cinst invokemsbuild --version 1.5.17 --confirm
+		cinst xunit         --version 2.0.0  --confirm
 	}
 }
 
@@ -35,14 +37,19 @@ Task LoadSettings -description "Loads the environment specific settings." {
 	$TemplateParametersFileName = 'environment-settings.json'
 	$TemplateParametersFilePath = Join-Path $BasePath $TemplateParametersFileName
 	
-	$Script:Settings = [Settings]::new($TemplateParametersFilePath)
+	$Script:Settings = Get-EnvironmentSettings `
+		-SettingsFilePath $TemplateParametersFilePath
 }
 
 Task Build -depends Clean,InstallDependencies,LoadSettings -description "Compiles all source code." {
 	$SolutionFileName = "$($Settings.ProductName).sln"
 	$SolutionPath     = Join-Path $SourcePath $SolutionFileName
 
-	Write-Host "Building $SolutionPath"
+	$BuildVersion = Get-BuildVersion
+
+	exec { nuget restore $SolutionPath }
+
+	Write-Host "Building $($Settings.ProductName) $BuildVersion from $SolutionPath"
 	
 	# Make sure the path exists, or the logs won't be written.
 	New-Item `
@@ -123,6 +130,11 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 
 	Switch-AzureMode AzureResourceManager
 
+	$templateParameters                     = @{}
+	$templateParameters.environmentName     = $Settings.EnvironmentName
+	$templateParameters.environmentLocation = $Settings.EnvironmentLocation
+	$templateParameters.exampleAppSiteName  = $Settings.ExampleAppSiteName
+
 	# WARNING:
 	#	If the following call fails, the error doesn't bubble up and the build script will continue on. :(
 	#	But the impact of this occurring should be minimal.  The script is likely to fail in subsequent 
@@ -132,9 +144,12 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 	New-AzureResourceGroup `
 		-Name			            $Settings.ResourceGroupName `
 		-Location                   $Settings.EnvironmentLocation `
-		-TemplateParameterObject    $Settings.GetSettings() `
+		-TemplateParameterObject    $templateParameters `
 		-TemplateFile               $TemplateFilePath `
-		-Force
+		-Force |
+			Out-Null
+
+	Write-Host "Provisioning completed!"
 }
 
 Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from the last build that occurred to the target environment." {
@@ -166,8 +181,14 @@ Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from t
 	Write-Host "Deployment Completed"
 }
 
-Task FunctionalTest -description "Tests that the required features and use cases are working in the target environment." {
+Task FunctionalTest -description 'Tests that the required features and use cases are working in the target environment.' {
+	$TestDlls = @(
+		(Join-Path $ArtifactsPath 'ExampleApp.Test.Functional.dll')
+	)
+	
+	Write-Host "Running tests in $TestDlls"
 
+	exec { xunit.console $TestDlls }
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
@@ -176,7 +197,9 @@ Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes 
 
 	if ($answer -eq 'y'){
 		Switch-AzureMode AzureResourceManager
-		Remove-AzureResourceGroup $Settings.ResourceGroupName
+		Remove-AzureResourceGroup `
+			-Name $Settings.ResourceGroupName `
+			-Force
 	}
 }
 
@@ -184,6 +207,6 @@ Task Pull -description "Pulls the latest source from master to the local repo." 
 	exec { git pull origin master }
 }
 
-Task Push -depends Pull,Build,Deploy -description "Performs pre-push actions before actually pushing to the remote repo." {
+Task Push -depends Pull,Build,Deploy,FunctionalTest -description "Performs pre-push actions before actually pushing to the remote repo." {
 	exec { git push }
 }
