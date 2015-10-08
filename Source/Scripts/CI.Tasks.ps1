@@ -37,7 +37,8 @@ Task LoadSettings -description "Loads the environment specific settings." {
 	$TemplateParametersFileName = 'environment-settings.json'
 	$TemplateParametersFilePath = Join-Path $BasePath $TemplateParametersFileName
 	
-	$Script:Settings = [Settings]::new($TemplateParametersFilePath)
+	$Script:Settings = Get-EnvironmentSettings `
+		-SettingsFilePath $TemplateParametersFilePath
 }
 
 Task Build -depends Clean,InstallDependencies,LoadSettings -description "Compiles all source code." {
@@ -129,6 +130,11 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 
 	Switch-AzureMode AzureResourceManager
 
+	$templateParameters                     = @{}
+	$templateParameters.environmentName     = $Settings.EnvironmentName
+	$templateParameters.environmentLocation = $Settings.EnvironmentLocation
+	$templateParameters.exampleAppSiteName  = $Settings.ExampleAppSiteName
+
 	# WARNING:
 	#	If the following call fails, the error doesn't bubble up and the build script will continue on. :(
 	#	But the impact of this occurring should be minimal.  The script is likely to fail in subsequent 
@@ -138,7 +144,7 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 	New-AzureResourceGroup `
 		-Name			            $Settings.ResourceGroupName `
 		-Location                   $Settings.EnvironmentLocation `
-		-TemplateParameterObject    $Settings.GetSettings() `
+		-TemplateParameterObject    $templateParameters `
 		-TemplateFile               $TemplateFilePath `
 		-Force
 }
