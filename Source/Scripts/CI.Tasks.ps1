@@ -146,7 +146,10 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 		-Location                   $Settings.EnvironmentLocation `
 		-TemplateParameterObject    $templateParameters `
 		-TemplateFile               $TemplateFilePath `
-		-Force
+		-Force |
+			Out-Null
+
+	Write-Host "Provisioning completed!"
 }
 
 Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from the last build that occurred to the target environment." {
