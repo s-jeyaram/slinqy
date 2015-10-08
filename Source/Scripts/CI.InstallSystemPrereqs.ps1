@@ -9,10 +9,13 @@ if (-not ($env:Path -ilike "*chocolatey*")) {
 }
 
 # PowerShell is used to run scripts.
-cinst powershell --version 5.0.10514-ProductionPreview --confirm
+cinst powershell        --version 5.0.10514-ProductionPreview --confirm
 
 # .NET 4.6 is the Framework that compiles and runs compiled code.
-cinst dotnet4.6  --version 4.6.00081.20150925          --confirm
+cinst dotnet4.6         --version 4.6.00081.20150925          --confirm
+
+# Used to install .net packages.
+cinst nuget.commandline --version 2.8.6                       --confirm
 
 # PSake is a tool that coordinates CI tasks.
-cinst psake      --version 4.4.1                       --confirm
+cinst psake             --version 4.4.1                       --confirm

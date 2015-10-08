@@ -46,6 +46,8 @@ Task Build -depends Clean,InstallDependencies,LoadSettings -description "Compile
 
 	$BuildVersion = Get-BuildVersion
 
+	exec { nuget restore $SolutionPath }
+
 	Write-Host "Building $($Settings.ProductName) $BuildVersion from $SolutionPath"
 	
 	# Make sure the path exists, or the logs won't be written.
