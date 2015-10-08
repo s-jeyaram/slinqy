@@ -9,3 +9,5 @@ artifacts:
 
 deploy_script:
   - ps: .\CI "Deploy,FunctionalTest"
+
+test: off

@@ -189,9 +189,9 @@ Task FunctionalTest -description 'Tests that the required features and use cases
 	Write-Host "Running tests in $TestDlls"
 
 	if ($Env:APPVEYOR) {
-		xunit.console $TestDlls /appveyor
+		xunit.console.x86 $TestDlls -appveyor
 	} else {
-		xunit.console $TestDlls
+		xunit.console.x86 $TestDlls
 	}	
 }
 
