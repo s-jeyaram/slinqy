@@ -188,7 +188,11 @@ Task FunctionalTest -description 'Tests that the required features and use cases
 	
 	Write-Host "Running tests in $TestDlls"
 
-	exec { xunit.console $TestDlls }
+	if ($Env:APPVEYOR) {
+		xunit.console $TestDlls /appveyor
+	} else {
+		xunit.console $TestDlls
+	}	
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {

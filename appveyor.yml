@@ -8,4 +8,4 @@ artifacts:
     path: Artifacts\Logs
 
 deploy_script:
-  - ps: .\CI Deploy
+  - ps: .\CI "Deploy,FunctionalTest"
