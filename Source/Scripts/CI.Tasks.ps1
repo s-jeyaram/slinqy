@@ -192,7 +192,7 @@ Task FunctionalTest -description 'Tests that the required features and use cases
 
 	$XUnitPath = Join-Path $Env:ChocolateyInstall 'bin\xunit.console.exe'
 
-	. $XUnitPath $TestDlls
+	exec { . $XUnitPath $TestDlls }
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
