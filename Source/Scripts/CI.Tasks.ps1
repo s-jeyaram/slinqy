@@ -190,7 +190,7 @@ Task FunctionalTest -description 'Tests that the required features and use cases
 	
 	Write-Host "Running tests in $TestDlls"
 
-	xunit.console.x86 $TestDlls -appveyor
+	xunit.console $TestDlls
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
