@@ -94,8 +94,6 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 	# Ensure the Azure PowerShell cmdlets are available
 	Import-Module Azure
 
-	Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation))..."
-
 	# First, make sure some Azure credentials are loaded
 	$AzureAccount = Get-AzureAccount
 
@@ -123,6 +121,10 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 			}
 		}
 	}
+
+	$AzureSubscription = (Get-AzureSubscription -Current).SubscriptionName
+
+	Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $AzureSubscription..."
 
 	# Set up paths to the Resource Manager template
 	$TemplatesPath	  = Join-Path $ArtifactsPath "Templates"
