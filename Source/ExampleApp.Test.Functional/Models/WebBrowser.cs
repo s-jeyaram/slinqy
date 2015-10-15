@@ -74,10 +74,7 @@ namespace ExampleApp.Test.Functional.Models
             _webBrowserDriver
                 .Navigate()
                 .GoToUrl(fullyQualifiedUri);
-            
-            // TODO: Verify that we actually ended up on the target page before performing InitElements
-            //       since it is possible that the browser got redirected to a different page entirely.
-            
+
             return GetCurrentPageAs<TPage>();
         }
 
