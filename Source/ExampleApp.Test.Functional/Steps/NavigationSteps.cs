@@ -1,14 +1,28 @@
-﻿using TechTalk.SpecFlow;
+﻿using System;
+using ExampleApp.Test.Functional.Models;
+using TechTalk.SpecFlow;
 
 namespace ExampleApp.Test.Functional.Steps
 {
     [Binding]
     public class NavigationSteps
     {
-        [Given(@"I navigate to the Home page")]
+        private readonly WebBrowser _webBrowser;
+
+        public 
+        NavigationSteps(
+            WebBrowser webBrowser)
+        {
+            _webBrowser = webBrowser;
+        }
+
+        [Given]
         public void GivenINavigateToTheHomePage()
         {
-            ScenarioContext.Current.Pending();
+            // Attempt to navigate to the Home page.
+            _webBrowser.NavigateTo<HomePage>(
+                baseUri: new Uri("http://localhost:17057") // TODO: Make configurable.
+            ); 
         }
     }
 }
