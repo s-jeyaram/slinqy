@@ -11,18 +11,20 @@ namespace ExampleApp.Test.Functional.Models
     {
         private const string WebPageRelativePathConstantName = "RelativePath";
 
-        private static readonly Dictionary<string, Type> _wellKnownPages;
+        private static readonly Dictionary<string, Type> WellKnownPages;
 
         private readonly IWebDriver _webBrowserDriver;
+        private readonly Uri        _baseUri;
 
         static WebBrowser()
         {
-            _wellKnownPages = GetWellKnownPages();
+            WellKnownPages = GetWellKnownPages();
         }
 
         public 
-        WebBrowser()
+        WebBrowser(Uri baseUri)
         {
+            _baseUri          = baseUri;
             _webBrowserDriver = new ChromeDriver(); // TODO: Inject
         }
 
@@ -61,13 +63,12 @@ namespace ExampleApp.Test.Functional.Models
         }
 
         public 
-        TPage NavigateTo<TPage>(
-            Uri baseUri) where TPage: WebPage
+        TPage NavigateTo<TPage>() where TPage: WebPage
         {
-            var relativeUri = _wellKnownPages.Single(pair => pair.Value == typeof (TPage)).Key;
+            var relativeUri = WellKnownPages.Single(pair => pair.Value == typeof (TPage)).Key;
 
             var fullyQualifiedUri = new Uri(
-                baseUri,
+                _baseUri,
                 relativeUri
             );
 
@@ -83,7 +84,7 @@ namespace ExampleApp.Test.Functional.Models
             var uri = new Uri(_webBrowserDriver.Url);
             var path = uri.AbsolutePath;
 
-            var match = _wellKnownPages.FirstOrDefault(kvp => kvp.Key == path);
+            var match = WellKnownPages.FirstOrDefault(kvp => kvp.Key == path);
 
             if (match.Key == null)
                 throw new Exception("Could not find a matching page for path " + path);

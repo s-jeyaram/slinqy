@@ -1,5 +1,4 @@
-﻿using System;
-using ExampleApp.Test.Functional.Models;
+﻿using ExampleApp.Test.Functional.Models;
 using TechTalk.SpecFlow;
 
 namespace ExampleApp.Test.Functional.Steps
@@ -20,9 +19,7 @@ namespace ExampleApp.Test.Functional.Steps
         public void GivenINavigateToTheHomePage()
         {
             // Attempt to navigate to the Home page.
-            _webBrowser.NavigateTo<HomePage>(
-                baseUri: new Uri("http://localhost:17057") // TODO: Make configurable.
-            ); 
+            _webBrowser.NavigateTo<HomePage>(); 
         }
     }
 }

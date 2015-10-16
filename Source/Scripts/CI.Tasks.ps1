@@ -183,7 +183,16 @@ Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from t
 	Write-Host "Deployment Completed"
 }
 
-Task FunctionalTest -description 'Tests that the required features and use cases are working in the target environment.' {
+Task FunctionalTest -depends LoadSettings -description 'Tests that the required features and use cases are working in the target environment.' {
+	Write-Host 'Getting Base URI...' -NoNewline
+
+	$ExampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
+	$ExampleWebsiteBaseUri = "http://$ExampleWebsiteHostName"
+
+	Write-Host $ExampleWebsiteBaseUri
+
+	${env:ExampleApp.BaseUri} = $ExampleWebsiteBaseUri
+
 	$TestDlls = @(
 		(Join-Path $ArtifactsPath 'ExampleApp.Test.Functional.dll')
 	)

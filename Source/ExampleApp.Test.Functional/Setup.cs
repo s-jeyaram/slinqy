@@ -1,4 +1,6 @@
-﻿using BoDi;
+﻿using System;
+using System.Configuration;
+using BoDi;
 using ExampleApp.Test.Functional.Models;
 using TechTalk.SpecFlow;
 
@@ -17,11 +19,29 @@ namespace ExampleApp.Test.Functional
         }
 
         [BeforeScenario]
-        public void InitializeWebBrowser()
+        public
+        void 
+        InitializeWebBrowser()
         {
-            var webBrowser = new WebBrowser();
+            // Get the base url from configuration
+            var exampleAppBaseUri = new Uri(GetSetting("ExampleApp.BaseUri"));
+            var webBrowser        = new WebBrowser(exampleAppBaseUri);
 
             _objectContainer.RegisterInstanceAs(webBrowser);
+        }
+
+        private 
+        static 
+        string 
+        GetSetting(
+            string settingName)
+        {
+            var settingValue = Environment.GetEnvironmentVariable(settingName);
+
+            if (string.IsNullOrWhiteSpace(settingValue))
+                settingValue = ConfigurationManager.AppSettings[settingName];
+
+            return settingValue;
         }
     }
 }
