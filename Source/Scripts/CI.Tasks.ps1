@@ -7,23 +7,18 @@ $BasePath = "Uninitialized" # Caller must specify.
 
 # Define the input properties and their default values.
 properties {
+	$ProductName           = "Slinqy"
 	$SourcePath            = Join-Path $BasePath "Source"
 	$ArtifactsPath         = Join-Path $BasePath "Artifacts"
 	$LogsPath              = Join-Path $ArtifactsPath "Logs"
 	$ScriptsPath           = Join-Path $ArtifactsPath "Scripts"
 	$PublishedWebsitesPath = Join-Path $ArtifactsPath "_PublishedWebsites"
+	$SolutionFileName      = "$ProductName.sln"
+	$SolutionPath          = Join-Path $SourcePath $SolutionFileName
 }
 
 # Define the Task to call when none was specified by the caller.
 Task Default -depends Build
-
-Task Clean -description "Removes any artifacts that may be present from prior runs of the CI script." {
-	if (Test-Path $ArtifactsPath) {
-		Write-Host "Deleting $ArtifactsPath..." -NoNewline
-		Remove-Item $ArtifactsPath -Recurse -Force
-		Write-Host "done!"
-	}
-}
 
 Task InstallDependencies -description "Installs all dependencies required to execute the tasks in this script." {
 	exec { 
@@ -32,30 +27,55 @@ Task InstallDependencies -description "Installs all dependencies required to exe
 	}
 }
 
+Task Clean -depends InstallDependencies -description "Removes any artifacts that may be present from prior runs of the CI script." {
+	if (Test-Path $ArtifactsPath) {
+		Write-Host "Deleting $ArtifactsPath..." -NoNewline
+		Remove-Item $ArtifactsPath -Recurse -Force
+		Write-Host "done!"
+	}
+
+	Write-Host "Cleaning solution $SolutionPath..." -NoNewline
+
+	Invoke-MsBuild `
+		-Path                  $SolutionPath `
+		-MsBuildParameters "/t:Clean" `
+			| Out-Null
+
+	Write-Host "done!"
+}
+
 Task LoadSettings -description "Loads the environment specific settings." {
 	# Search for a settings file
 	$TemplateParametersFileName = 'environment-settings.json'
 	$TemplateParametersFilePath = Join-Path $BasePath $TemplateParametersFileName
 	
 	$Script:Settings = Get-EnvironmentSettings `
+		-ProductName      $ProductName `
 		-SettingsFilePath $TemplateParametersFilePath
+
+	Write-Host "done!"
 }
 
-Task Build -depends Clean,InstallDependencies,LoadSettings -description "Compiles all source code." {
-	$SolutionFileName = "$($Settings.ProductName).sln"
-	$SolutionPath     = Join-Path $SourcePath $SolutionFileName
-
+Task Build -depends Clean -description "Compiles all source code." {
 	$BuildVersion = Get-BuildVersion
 
 	exec { nuget restore $SolutionPath }
 
-	Write-Host "Building $($Settings.ProductName) $BuildVersion from $SolutionPath"
+	Write-Host "Building $ProductName $BuildVersion from $SolutionPath"
 	
 	# Make sure the path exists, or the logs won't be written.
 	New-Item `
 		-ItemType Directory `
 		-Path $LogsPath |
 			Out-Null
+
+	# Update the AssemblyInfo file with the version #.
+	$AssemblyInfoFilePath = Join-Path $SourcePath 'AssemblyInfo.cs'
+	Update-AssemblyInfoVersion `
+		-Path    $AssemblyInfoFilePath `
+		-Version $BuildVersion
+
+	Write-Host "Compiling solution $SolutionPath..." -NoNewline
 
 	# Compile the whole solution according to how the solution file is configured.
 	$MsBuildSucceeded = Invoke-MsBuild `
@@ -70,7 +90,9 @@ Task Build -depends Clean,InstallDependencies,LoadSettings -description "Compile
 		throw "Build Failed!"
 	}
 
-	Write-Host "Compilation completed, packaging..." -NoNewline
+	Write-Host "done!"
+
+	Write-Host "Packaging..." -NoNewline
 
 	# Package up deployables
 	$WebProjectFileName = "ExampleApp.csproj"
@@ -92,9 +114,7 @@ Task Build -depends Clean,InstallDependencies,LoadSettings -description "Compile
 
 Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed resources are set up in the target runtime environment." {
 	# Ensure the Azure PowerShell cmdlets are available
-	Import-Module Azure
-
-	Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation))..."
+	Import-Module Azure -Force | Out-Null
 
 	# First, make sure some Azure credentials are loaded
 	$AzureAccount = Get-AzureAccount
@@ -124,6 +144,10 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 		}
 	}
 
+	$AzureSubscription = (Get-AzureSubscription -Current).SubscriptionName
+
+	Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $AzureSubscription..."
+
 	# Set up paths to the Resource Manager template
 	$TemplatesPath	  = Join-Path $ArtifactsPath "Templates"
 	$TemplateFilePath = Join-Path $TemplatesPath "ExampleApp.json"
@@ -135,12 +159,6 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 	$templateParameters.environmentLocation = $Settings.EnvironmentLocation
 	$templateParameters.exampleAppSiteName  = $Settings.ExampleAppSiteName
 
-	# WARNING:
-	#	If the following call fails, the error doesn't bubble up and the build script will continue on. :(
-	#	But the impact of this occurring should be minimal.  The script is likely to fail in subsequent 
-	#	tasks if changes have been made to the template files and they fail to be applied.
-
-	# TODO: Find a way to end the script if this call fails
 	New-AzureResourceGroup `
 		-Name			            $Settings.ResourceGroupName `
 		-Location                   $Settings.EnvironmentLocation `
@@ -181,14 +199,25 @@ Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from t
 	Write-Host "Deployment Completed"
 }
 
-Task FunctionalTest -description 'Tests that the required features and use cases are working in the target environment.' {
+Task FunctionalTest -depends LoadSettings -description 'Tests that the required features and use cases are working in the target environment.' {
+	Write-Host 'Getting Base URI...' -NoNewline
+
+	$ExampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
+	$ExampleWebsiteBaseUri = "http://$ExampleWebsiteHostName"
+
+	Write-Host $ExampleWebsiteBaseUri
+
+	${env:ExampleApp.BaseUri} = $ExampleWebsiteBaseUri
+
 	$TestDlls = @(
 		(Join-Path $ArtifactsPath 'ExampleApp.Test.Functional.dll')
 	)
 	
 	Write-Host "Running tests in $TestDlls"
 
-	exec { xunit.console $TestDlls }
+	$XUnitPath = Join-Path $Env:ChocolateyInstall 'bin\xunit.console.exe'
+
+	exec { & $XUnitPath $TestDlls }
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {

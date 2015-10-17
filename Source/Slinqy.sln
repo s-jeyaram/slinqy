@@ -24,6 +24,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleApp", "ExampleApp\ExampleApp.csproj", "{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleApp.Test.Functional", "ExampleApp.Test.Functional\ExampleApp.Test.Functional.csproj", "{5FB77DEA-B800-42CC-9A5F-673608CF9D12}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77} = {CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

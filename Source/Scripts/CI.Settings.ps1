@@ -2,6 +2,9 @@ function Get-EnvironmentSettings {
 	Param(
 		[Parameter(Mandatory=$true)]
 		[String]
+		$ProductName,
+		[Parameter(Mandatory=$true)]
+		[String]
 		$SettingsFilePath
 	)
 	# Create the Hashtable
@@ -19,15 +22,17 @@ function Get-EnvironmentSettings {
 
 		$params = $SettingsFileContent.parameters
 	} else {
+		Write-Host "Loading settings from environment variables..."
 		$params = New-Object PSCustomObject
 	}
 
-	$hash.ProductName         = if ($params.productName)         { $params.productName.value }         else { Get-Setting "ProductName"         "Slinqy"  }
-	$hash.EnvironmentName     = if ($params.environmentName)     { $params.environmentName.value }     else { Get-Setting "EnvironmentName"     "Dev" }
-	$hash.EnvironmentLocation = if ($params.environmentLocation) { $params.environmentLocation.value } else { Get-Setting "EnvironmentLocation" "West US" }
+	# Build the hash values from a combination of sources.
+	$hash.EnvironmentName     = if ($params.environmentName)     { $params.environmentName.value }     else { Get-Setting "EnvironmentName" }
+	$hash.EnvironmentLocation = if ($params.environmentLocation) { $params.environmentLocation.value } else { Get-Setting "EnvironmentLocation" }
 
-	$hash.ResourceGroupName	  = $hash.EnvironmentName + '-' + $hash.ProductName
-	$hash.ExampleAppName	  = $hash.ProductName + '-ExampleApp'
+	# Autogenerate some setting values.
+	$hash.ResourceGroupName	  = $hash.EnvironmentName + '-' + $ProductName
+	$hash.ExampleAppName	  = $ProductName + '-ExampleApp'
 	$hash.ExampleAppSiteName  = $hash.EnvironmentName + '-' + $hash.ExampleAppName
 
 	Write-Output $hash
@@ -41,12 +46,13 @@ function Get-Setting(
 	$SettingValue = [System.Environment]::GetEnvironmentVariable($settingName)
 
 	# Try to use the default value.
-	$SettingValue = if (-not $SettingValue) { $defaultValue }
+	$SettingValue = if (-not $SettingValue) { $defaultValue } else { $SettingValue }
 
 	if (-not $SettingValue) {
-		# Ask console user
-		$SettingValue = Read-Host -Prompt "What should the value be for setting '${settingName}'?"
+		$error = "Could not find a value for '$settingName'.  Add a value for this setting either in your environment variables or your environment settings file then retry your command again."
+
+		throw $error
 	} 
 
-	return $SettingValue
+	return $SettingValue.ToString()
 }
