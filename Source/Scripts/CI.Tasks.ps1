@@ -66,6 +66,12 @@ Task Build -depends Clean,LoadSettings -description "Compiles all source code." 
 		-Path $LogsPath |
 			Out-Null
 
+	# Update the AssemblyInfo file with the version #.
+	$AssemblyInfoFilePath = Join-Path $SourcePath 'AssemblyInfo.cs'
+	Update-AssemblyInfoVersion `
+		-Path    $AssemblyInfoFilePath `
+		-Version $BuildVersion
+
 	# Compile the whole solution according to how the solution file is configured.
 	$MsBuildSucceeded = Invoke-MsBuild `
 		-Path                  $SolutionPath `
