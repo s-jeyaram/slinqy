@@ -46,7 +46,7 @@ function Get-Setting(
 	$SettingValue = [System.Environment]::GetEnvironmentVariable($settingName)
 
 	# Try to use the default value.
-	$SettingValue = if (-not $SettingValue) { $defaultValue }
+	$SettingValue = if (-not $SettingValue) { $defaultValue } else { $SettingValue }
 
 	if (-not $SettingValue) {
 		$error = "Could not find a value for '$settingName'.  Add a value for this setting either in your environment variables or your environment settings file then retry your command again."
