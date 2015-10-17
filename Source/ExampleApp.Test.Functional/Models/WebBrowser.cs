@@ -50,7 +50,11 @@ namespace ExampleApp.Test.Functional.Models
 
                 if (relativePathField == null)
                     throw new InvalidOperationException(
-                        $"You must add a public string constant named {WebPageRelativePathConstantName} to type {type.FullName} before it can be used."
+                        string.Format(
+                            "You must add a public string constant named {0} to type {1} before it can be used.", 
+                            WebPageRelativePathConstantName, 
+                            type.FullName
+                        )
                     );
 
                 wellKnownPages.Add(

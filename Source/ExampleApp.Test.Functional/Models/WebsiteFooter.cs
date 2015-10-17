@@ -7,7 +7,7 @@ namespace ExampleApp.Test.Functional.Models
     {
         [FindsBy] private IWebElement AppVersion = null;
 
-        public string Version => AppVersion.Text;
+        public string Version { get { return AppVersion.Text; } }
 
         public 
         WebsiteFooter(
