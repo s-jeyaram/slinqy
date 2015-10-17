@@ -92,7 +92,7 @@ Task Build -depends Clean,InstallDependencies,LoadSettings -description "Compile
 
 Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed resources are set up in the target runtime environment." {
 	# Ensure the Azure PowerShell cmdlets are available
-	Import-Module Azure
+	Import-Module Azure -Force | Out-Null
 
 	# First, make sure some Azure credentials are loaded
 	$AzureAccount = Get-AzureAccount
@@ -201,7 +201,7 @@ Task FunctionalTest -depends LoadSettings -description 'Tests that the required 
 
 	$XUnitPath = Join-Path $Env:ChocolateyInstall 'bin\xunit.console.exe'
 
-	exec { . $XUnitPath $TestDlls }
+	exec { & $XUnitPath $TestDlls }
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
