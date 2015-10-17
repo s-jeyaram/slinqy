@@ -49,8 +49,12 @@ Task LoadSettings -description "Loads the environment specific settings." {
 	$TemplateParametersFileName = 'environment-settings.json'
 	$TemplateParametersFilePath = Join-Path $BasePath $TemplateParametersFileName
 	
+	Write-Host "Reading settings from $TemplateParametersFilePath..." -NoNewline
+
 	$Script:Settings = Get-EnvironmentSettings `
 		-SettingsFilePath $TemplateParametersFilePath
+
+	Write-Host "done!"
 }
 
 Task Build -depends Clean,LoadSettings -description "Compiles all source code." {
