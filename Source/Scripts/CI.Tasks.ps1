@@ -45,9 +45,6 @@ Task Clean -depends InstallDependencies -description "Removes any artifacts that
 }
 
 Task LoadSettings -description "Loads the environment specific settings." {
-	Write-Host "LoadSettings started..."
-	Write-Host "UserInteractive: $([System.Environment]::UserInteractive)"
-
 	# Search for a settings file
 	$TemplateParametersFileName = 'environment-settings.json'
 	$TemplateParametersFilePath = Join-Path $BasePath $TemplateParametersFileName
