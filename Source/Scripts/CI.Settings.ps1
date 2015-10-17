@@ -49,7 +49,9 @@ function Get-Setting(
 	$SettingValue = if (-not $SettingValue) { $defaultValue }
 
 	if (-not $SettingValue) {
-		throw "Could not find a value for '$settingName'.  Add a value for this setting either in your environment variables or your environment settings file then retry your command again."
+		$error = "Could not find a value for '$settingName'.  Add a value for this setting either in your environment variables or your environment settings file then retry your command again."
+
+		throw $error
 	} 
 
 	return $SettingValue.ToString()
