@@ -18,7 +18,7 @@ function Update-AssemblyInfoVersion {
 
 	Write-Host "Updating $Path with $Version..." -NoNewline
 
-	$AssemblyInfoContent = Get-Content $Path -Raw -Encoding UTF8
+	$AssemblyInfoContent = Get-Content $Path -Encoding UTF8
 
 	$AssemblyInfoContent = $AssemblyInfoContent -replace 'AssemblyVersion\(".*"\)', "AssemblyVersion(""$Version"")"
 
