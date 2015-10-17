@@ -2,6 +2,9 @@ function Get-EnvironmentSettings {
 	Param(
 		[Parameter(Mandatory=$true)]
 		[String]
+		$ProductName,
+		[Parameter(Mandatory=$true)]
+		[String]
 		$SettingsFilePath
 	)
 	# Create the Hashtable
@@ -22,12 +25,11 @@ function Get-EnvironmentSettings {
 		$params = New-Object PSCustomObject
 	}
 
-	$hash.ProductName         = if ($params.productName)         { $params.productName.value }         else { Get-Setting "ProductName"         "Slinqy"  }
-	$hash.EnvironmentName     = if ($params.environmentName)     { $params.environmentName.value }     else { Get-Setting "EnvironmentName"     "Dev" }
-	$hash.EnvironmentLocation = if ($params.environmentLocation) { $params.environmentLocation.value } else { Get-Setting "EnvironmentLocation" "West US" }
+	$hash.EnvironmentName     = if ($params.environmentName)     { $params.environmentName.value }     else { Get-Setting "EnvironmentName" }
+	$hash.EnvironmentLocation = if ($params.environmentLocation) { $params.environmentLocation.value } else { Get-Setting "EnvironmentLocation" }
 
-	$hash.ResourceGroupName	  = $hash.EnvironmentName + '-' + $hash.ProductName
-	$hash.ExampleAppName	  = $hash.ProductName + '-ExampleApp'
+	$hash.ResourceGroupName	  = $hash.EnvironmentName + '-' + $ProductName
+	$hash.ExampleAppName	  = $ProductName + '-ExampleApp'
 	$hash.ExampleAppSiteName  = $hash.EnvironmentName + '-' + $hash.ExampleAppName
 
 	Write-Output $hash
