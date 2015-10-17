@@ -45,6 +45,8 @@ Task Clean -depends InstallDependencies -description "Removes any artifacts that
 }
 
 Task LoadSettings -description "Loads the environment specific settings." {
+	Write-Host "LoadSettings started..."
+
 	# Search for a settings file
 	$TemplateParametersFileName = 'environment-settings.json'
 	$TemplateParametersFilePath = Join-Path $BasePath $TemplateParametersFileName
@@ -76,6 +78,8 @@ Task Build -depends Clean,LoadSettings -description "Compiles all source code." 
 		-Path    $AssemblyInfoFilePath `
 		-Version $BuildVersion
 
+	Write-Host "Compiling solution $SolutionPath..." -NoNewline
+
 	# Compile the whole solution according to how the solution file is configured.
 	$MsBuildSucceeded = Invoke-MsBuild `
 		-Path                  $SolutionPath `
@@ -89,7 +93,9 @@ Task Build -depends Clean,LoadSettings -description "Compiles all source code." 
 		throw "Build Failed!"
 	}
 
-	Write-Host "Compilation completed, packaging..." -NoNewline
+	Write-Host "done!"
+
+	Write-Host "Packaging..." -NoNewline
 
 	# Package up deployables
 	$WebProjectFileName = "ExampleApp.csproj"
