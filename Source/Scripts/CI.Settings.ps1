@@ -50,5 +50,5 @@ function Get-Setting(
 		$SettingValue = Read-Host -Prompt "What should the value be for setting '${settingName}'?"
 	} 
 
-	return $SettingValue
+	return $SettingValue.ToString()
 }
