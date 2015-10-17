@@ -7,11 +7,14 @@ $BasePath = "Uninitialized" # Caller must specify.
 
 # Define the input properties and their default values.
 properties {
+	$ProductName           = "Slinqy"
 	$SourcePath            = Join-Path $BasePath "Source"
 	$ArtifactsPath         = Join-Path $BasePath "Artifacts"
 	$LogsPath              = Join-Path $ArtifactsPath "Logs"
 	$ScriptsPath           = Join-Path $ArtifactsPath "Scripts"
 	$PublishedWebsitesPath = Join-Path $ArtifactsPath "_PublishedWebsites"
+	$SolutionFileName      = "$ProductName.sln"
+	$SolutionPath          = Join-Path $SourcePath $SolutionFileName
 }
 
 # Define the Task to call when none was specified by the caller.
@@ -23,6 +26,15 @@ Task Clean -description "Removes any artifacts that may be present from prior ru
 		Remove-Item $ArtifactsPath -Recurse -Force
 		Write-Host "done!"
 	}
+
+	Write-Host "Cleaning solution $SolutionPath..." -NoNewline
+
+	Invoke-MsBuild `
+		-Path                  $SolutionPath `
+		-MsBuildParameters "/t:Clean" `
+			| Out-Null
+
+	Write-Host "done!"
 }
 
 Task InstallDependencies -description "Installs all dependencies required to execute the tasks in this script." {
@@ -42,14 +54,11 @@ Task LoadSettings -description "Loads the environment specific settings." {
 }
 
 Task Build -depends Clean,InstallDependencies,LoadSettings -description "Compiles all source code." {
-	$SolutionFileName = "$($Settings.ProductName).sln"
-	$SolutionPath     = Join-Path $SourcePath $SolutionFileName
-
 	$BuildVersion = Get-BuildVersion
 
 	exec { nuget restore $SolutionPath }
 
-	Write-Host "Building $($Settings.ProductName) $BuildVersion from $SolutionPath"
+	Write-Host "Building $ProductName $BuildVersion from $SolutionPath"
 	
 	# Make sure the path exists, or the logs won't be written.
 	New-Item `
