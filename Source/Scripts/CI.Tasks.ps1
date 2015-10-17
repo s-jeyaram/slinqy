@@ -56,7 +56,7 @@ Task LoadSettings -description "Loads the environment specific settings." {
 	Write-Host "done!"
 }
 
-Task Build -depends Clean,LoadSettings -description "Compiles all source code." {
+Task Build -depends Clean -description "Compiles all source code." {
 	$BuildVersion = Get-BuildVersion
 
 	exec { nuget restore $SolutionPath }
