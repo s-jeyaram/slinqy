@@ -20,7 +20,14 @@ properties {
 # Define the Task to call when none was specified by the caller.
 Task Default -depends Build
 
-Task Clean -description "Removes any artifacts that may be present from prior runs of the CI script." {
+Task InstallDependencies -description "Installs all dependencies required to execute the tasks in this script." {
+	exec { 
+		cinst invokemsbuild --version 1.5.17 --confirm
+		cinst xunit         --version 2.0.0  --confirm
+	}
+}
+
+Task Clean -depends InstallDependencies -description "Removes any artifacts that may be present from prior runs of the CI script." {
 	if (Test-Path $ArtifactsPath) {
 		Write-Host "Deleting $ArtifactsPath..." -NoNewline
 		Remove-Item $ArtifactsPath -Recurse -Force
@@ -37,13 +44,6 @@ Task Clean -description "Removes any artifacts that may be present from prior ru
 	Write-Host "done!"
 }
 
-Task InstallDependencies -description "Installs all dependencies required to execute the tasks in this script." {
-	exec { 
-		cinst invokemsbuild --version 1.5.17 --confirm
-		cinst xunit         --version 2.0.0  --confirm
-	}
-}
-
 Task LoadSettings -description "Loads the environment specific settings." {
 	# Search for a settings file
 	$TemplateParametersFileName = 'environment-settings.json'
@@ -53,7 +53,7 @@ Task LoadSettings -description "Loads the environment specific settings." {
 		-SettingsFilePath $TemplateParametersFilePath
 }
 
-Task Build -depends Clean,InstallDependencies,LoadSettings -description "Compiles all source code." {
+Task Build -depends Clean,LoadSettings -description "Compiles all source code." {
 	$BuildVersion = Get-BuildVersion
 
 	exec { nuget restore $SolutionPath }
