@@ -46,7 +46,7 @@ Task Clean -depends InstallDependencies -description "Removes any artifacts that
 
 Task LoadSettings -description "Loads the environment specific settings." {
 	Write-Host "LoadSettings started..."
-	Write-Host ([System.Environment]::UserInteractive)
+	Write-Host "UserInteractive: $([System.Environment]::UserInteractive)"
 
 	# Search for a settings file
 	$TemplateParametersFileName = 'environment-settings.json'
@@ -162,12 +162,6 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 	$templateParameters.environmentLocation = $Settings.EnvironmentLocation
 	$templateParameters.exampleAppSiteName  = $Settings.ExampleAppSiteName
 
-	# WARNING:
-	#	If the following call fails, the error doesn't bubble up and the build script will continue on. :(
-	#	But the impact of this occurring should be minimal.  The script is likely to fail in subsequent 
-	#	tasks if changes have been made to the template files and they fail to be applied.
-
-	# TODO: Find a way to end the script if this call fails
 	New-AzureResourceGroup `
 		-Name			            $Settings.ResourceGroupName `
 		-Location                   $Settings.EnvironmentLocation `
