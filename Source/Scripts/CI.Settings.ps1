@@ -22,12 +22,15 @@ function Get-EnvironmentSettings {
 
 		$params = $SettingsFileContent.parameters
 	} else {
+		Write-Host "Loading settings from environment variables..."
 		$params = New-Object PSCustomObject
 	}
 
+	# Build the hash values from a combination of sources.
 	$hash.EnvironmentName     = if ($params.environmentName)     { $params.environmentName.value }     else { Get-Setting "EnvironmentName" }
 	$hash.EnvironmentLocation = if ($params.environmentLocation) { $params.environmentLocation.value } else { Get-Setting "EnvironmentLocation" }
 
+	# Autogenerate some setting values.
 	$hash.ResourceGroupName	  = $hash.EnvironmentName + '-' + $ProductName
 	$hash.ExampleAppName	  = $ProductName + '-ExampleApp'
 	$hash.ExampleAppSiteName  = $hash.EnvironmentName + '-' + $hash.ExampleAppName
@@ -46,8 +49,7 @@ function Get-Setting(
 	$SettingValue = if (-not $SettingValue) { $defaultValue }
 
 	if (-not $SettingValue) {
-		# Ask console user
-		$SettingValue = Read-Host -Prompt "What should the value be for setting '${settingName}'?"
+		throw "Could not find a value for '$settingName'.  Add a value for this setting either in your environment variables or your environment settings file then retry your command again."
 	} 
 
 	return $SettingValue.ToString()
