@@ -8,6 +8,9 @@ namespace ExampleApp.Test.Functional.Models.ExampleAppPages
     /// </summary>
     public class HomePage : SlinqyExampleWebPage
     {
+        /// <summary>
+        /// Defines the relative path for the Homepage.
+        /// </summary>
         public const string RelativePath = "/";
 
         /// <summary>

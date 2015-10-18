@@ -6,16 +6,31 @@ using TechTalk.SpecFlow;
 
 namespace ExampleApp.Test.Functional.Steps
 {
+    /// <summary>
+    /// Defines steps for using the versioning infrastructure.
+    /// </summary>
     [Binding]
     public class VersionSteps
     {
+        /// <summary>
+        /// Reference to the browser controller.
+        /// </summary>
         private WebBrowser _webBrowser;
 
+        /// <summary>
+        /// Initializes a new instance with a web browser.
+        /// </summary>
+        /// <param name="webBrowser"></param>
         public VersionSteps(WebBrowser webBrowser)
         {
             _webBrowser = webBrowser;
         }
 
+        /// <summary>
+        /// Verifies that the version number displayed on the web page 
+        /// footer matches the version number of the local test assembly 
+        /// ensuring they were both built from the same source code.
+        /// </summary>
         [Then]
         public void ThenTheApplicationVersionMatchesTheTestVersion()
         {

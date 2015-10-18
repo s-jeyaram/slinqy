@@ -29,17 +29,7 @@
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
-        <Rule Name="ElementDocumentationMustHaveSummary">
-          <RuleSettings>
-            <BooleanProperty Name="Enabled">False</BooleanProperty>
-          </RuleSettings>
-        </Rule>
         <Rule Name="PartialElementDocumentationMustHaveSummary">
-          <RuleSettings>
-            <BooleanProperty Name="Enabled">False</BooleanProperty>
-          </RuleSettings>
-        </Rule>
-        <Rule Name="ElementDocumentationMustHaveSummaryText">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
@@ -214,14 +204,19 @@
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
-        <Rule Name="ElementsMustBeDocumented">
+        <Rule Name="DocumentationTextMustEndWithAPeriod">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">True</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+        <Rule Name="ElementDocumentationMustHaveSummary">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
-        <Rule Name="DocumentationTextMustEndWithAPeriod">
+        <Rule Name="ElementDocumentationMustHaveSummaryText">
           <RuleSettings>
-            <BooleanProperty Name="Enabled">True</BooleanProperty>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
       </Rules>

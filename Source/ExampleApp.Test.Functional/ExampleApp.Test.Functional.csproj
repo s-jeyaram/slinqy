@@ -90,7 +90,6 @@
     <Compile Include="Models\ExampleAppPages\HomePage.cs" />
     <Compile Include="Models\SeleniumWebBase.cs" />
     <Compile Include="Models\ExampleAppPages\SlinqyExampleWebPage.cs" />
-    <Compile Include="Models\ExampleAppPages\SlinqyExampleWebsite.cs" />
     <Compile Include="Models\WebBrowser.cs" />
     <Compile Include="Models\WebPage.cs" />
     <Compile Include="Models\WebPageWidget.cs" />

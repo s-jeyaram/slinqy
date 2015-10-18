@@ -9,9 +9,16 @@ namespace ExampleApp.Test.Functional.Models
     /// </summary>
     public abstract class SeleniumWebBase
     {
+        /// <summary>
+        /// Reference to the IWebDriver to use for interacting with the web browser.
+        /// </summary>
         private readonly IWebDriver _webBrowserDriver;
 
-        protected 
+        /// <summary>
+        /// Initializes the SeleniumWebBase with the IWebDriver to use.
+        /// </summary>
+        /// <param name="webBrowserDriver">Specifies the IWebDriver to use for interacting with the web browser.</param>
+        protected
         SeleniumWebBase(
             IWebDriver webBrowserDriver)
         {
