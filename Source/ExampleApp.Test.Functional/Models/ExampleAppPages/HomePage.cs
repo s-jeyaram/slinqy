@@ -4,7 +4,7 @@ using OpenQA.Selenium;
 namespace ExampleApp.Test.Functional.Models.ExampleAppPages
 {
     /// <summary>
-    /// Modles the Slinqy Example App Homepage.
+    /// Models the Slinqy Example App Homepage.
     /// </summary>
     public class HomePage : SlinqyExampleWebPage
     {
