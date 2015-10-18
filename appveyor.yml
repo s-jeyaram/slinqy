@@ -15,4 +15,5 @@ deploy_script:
 test: off
 
 cache:
-  - .\Source\packages -> .\Source\ExampleApp\packages.config  # preserve "packages" directory in the root of build folder but will reset it if packages.config is modified
+  - .\Source\packages -> .\Source\ExampleApp\packages.config
+  - .\Source\packages -> .\Source\ExampleApp.Test.Functional\packages.config
