@@ -27,12 +27,12 @@ namespace ExampleApp.Test.Functional.Models
         /// <summary>
         /// Reference to the IWebDriver to use for controlling the browser.
         /// </summary>
-        private readonly IWebDriver _webBrowserDriver;
+        private readonly IWebDriver webBrowserDriver;
 
         /// <summary>
         /// The default base URI of the target website, will be used with relative paths.
         /// </summary>
-        private readonly Uri        _baseUri;
+        private readonly Uri        baseUri;
         
         /// <summary>
         /// Initializes an instance of this type with a default base URI.
@@ -41,8 +41,8 @@ namespace ExampleApp.Test.Functional.Models
         public 
         WebBrowser(Uri baseUri)
         {
-            _baseUri          = baseUri;
-            _webBrowserDriver = new ChromeDriver(); // TODO: Inject
+            this.baseUri          = baseUri;
+            webBrowserDriver = new ChromeDriver(); // TODO: Inject
         }
 
         /// <summary>
@@ -107,11 +107,11 @@ namespace ExampleApp.Test.Functional.Models
             var relativeUri = WellKnownPages.Single(pair => pair.Value == typeof (TPage)).Key;
 
             var fullyQualifiedUri = new Uri(
-                _baseUri,
+                baseUri,
                 relativeUri
             );
 
-            _webBrowserDriver
+            webBrowserDriver
                 .Navigate()
                 .GoToUrl(fullyQualifiedUri);
 
@@ -128,7 +128,7 @@ namespace ExampleApp.Test.Functional.Models
         /// </returns>
         public TPage GetCurrentPageAs<TPage>() where TPage : Webpage
         {
-            var uri = new Uri(_webBrowserDriver.Url);
+            var uri = new Uri(webBrowserDriver.Url);
             var path = uri.AbsolutePath;
 
             var match = WellKnownPages.FirstOrDefault(kvp => kvp.Key.OriginalString == path);
@@ -138,7 +138,7 @@ namespace ExampleApp.Test.Functional.Models
 
             var pageType = match.Value;
 
-            return (TPage)Activator.CreateInstance(pageType, _webBrowserDriver);
+            return (TPage)Activator.CreateInstance(pageType, webBrowserDriver);
         }
         
         /// <summary>
@@ -146,7 +146,7 @@ namespace ExampleApp.Test.Functional.Models
         /// </summary>
         public void Dispose()
         {
-            _webBrowserDriver.Dispose();
+            webBrowserDriver.Dispose();
         }
     }
 }

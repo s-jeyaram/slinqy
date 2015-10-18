@@ -12,12 +12,12 @@ namespace ExampleApp.Test.Functional.Models.ExampleAppPages
         /// Proxy to the web element containing the application version number.
         /// </summary>
         /// <remarks>This field is automatically populated by Selenium.</remarks>
-        [FindsBy] private IWebElement AppVersion = null;
+        [FindsBy] private IWebElement appVersion = null;
 
         /// <summary>
         /// Gets the version number displayed on the web page footer.
         /// </summary>
-        public string Version { get { return AppVersion.Text; } }
+        public string Version { get { return appVersion.Text; } }
 
         /// <summary>
         /// Initializes the class with the IWebDriver to use for controlling the browser.

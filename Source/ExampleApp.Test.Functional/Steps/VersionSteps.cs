@@ -15,7 +15,7 @@ namespace ExampleApp.Test.Functional.Steps
         /// <summary>
         /// Reference to the browser controller.
         /// </summary>
-        private readonly WebBrowser _webBrowser;
+        private readonly WebBrowser webBrowser;
 
         /// <summary>
         /// Initializes a new instance with a web browser.
@@ -23,7 +23,7 @@ namespace ExampleApp.Test.Functional.Steps
         /// <param name="webBrowser">Specifies the browser.</param>
         public VersionSteps(WebBrowser webBrowser)
         {
-            _webBrowser = webBrowser;
+            this.webBrowser = webBrowser;
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace ExampleApp.Test.Functional.Steps
         [Then]
         public void ThenTheApplicationVersionMatchesTheTestVersion()
         {
-            var examplePage = _webBrowser.GetCurrentPageAs<SlinqyExampleWebpage>();
+            var examplePage = webBrowser.GetCurrentPageAs<SlinqyExampleWebpage>();
 
             var websiteVersion = examplePage.Footer.Version;
             var testVersion    = Assembly.GetExecutingAssembly().GetName().Version.ToString();

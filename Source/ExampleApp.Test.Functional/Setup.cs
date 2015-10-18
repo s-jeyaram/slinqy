@@ -15,12 +15,12 @@ namespace ExampleApp.Test.Functional
         /// <summary>
         /// Simple object container for SpecFlows dependency injection of objects in to Step classes.
         /// </summary>
-        private readonly IObjectContainer _objectContainer;
+        private readonly IObjectContainer objectContainer;
 
         /// <summary>
         /// This is a field.
         /// </summary>
-        private WebBrowser _webBrowser;
+        private WebBrowser webBrowser;
 
         /// <summary>
         /// Initializes a new instance.
@@ -30,7 +30,7 @@ namespace ExampleApp.Test.Functional
         Setup(
             IObjectContainer objectContainer)
         {
-            _objectContainer = objectContainer;
+            this.objectContainer = objectContainer;
         }
 
         /// <summary>
@@ -43,9 +43,9 @@ namespace ExampleApp.Test.Functional
         {
             // Get the base URL from configuration
             var exampleAppBaseUri = new Uri(GetSetting("ExampleApp.BaseUri"));
-            _webBrowser        = new WebBrowser(exampleAppBaseUri);
+            webBrowser        = new WebBrowser(exampleAppBaseUri);
 
-            _objectContainer.RegisterInstanceAs(_webBrowser);
+            objectContainer.RegisterInstanceAs(webBrowser);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace ExampleApp.Test.Functional
         /// </summary>
         public void Dispose()
         {
-            _webBrowser.Dispose();
+            webBrowser.Dispose();
         }
     }
 }

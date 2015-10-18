@@ -12,7 +12,7 @@ namespace ExampleApp.Test.Functional.Models
         /// <summary>
         /// Reference to the IWebDriver to use for interacting with the web browser.
         /// </summary>
-        private readonly IWebDriver _webBrowserDriver;
+        private readonly IWebDriver webBrowserDriver;
 
         /// <summary>
         /// Initializes the SeleniumWebBase with the IWebDriver to use.
@@ -22,9 +22,9 @@ namespace ExampleApp.Test.Functional.Models
         SeleniumWebBase(
             IWebDriver webBrowserDriver)
         {
-            _webBrowserDriver = webBrowserDriver;
+            this.webBrowserDriver = webBrowserDriver;
 
-            PageFactory.InitElements(_webBrowserDriver, this);
+            PageFactory.InitElements(this.webBrowserDriver, this);
         }
     }
 }

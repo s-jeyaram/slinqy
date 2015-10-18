@@ -13,7 +13,7 @@ namespace ExampleApp.Test.Functional.Steps
         /// <summary>
         /// Reference to the browser controller.
         /// </summary>
-        private readonly WebBrowser _webBrowser;
+        private readonly WebBrowser webBrowser;
 
         /// <summary>
         /// Initializes a new instance with a web browser.
@@ -23,7 +23,7 @@ namespace ExampleApp.Test.Functional.Steps
         NavigationSteps(
             WebBrowser webBrowser)
         {
-            _webBrowser = webBrowser;
+            this.webBrowser = webBrowser;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace ExampleApp.Test.Functional.Steps
         public void GivenINavigateToTheHomepage()
         {
             // Attempt to navigate to the Home page.
-            _webBrowser.NavigateTo<Homepage>(); 
+            webBrowser.NavigateTo<Homepage>(); 
         }
     }
 }
