@@ -1,7 +1,7 @@
 ﻿using ExampleApp.Test.Functional.Models;
+using ExampleApp.Test.Functional.Models.ExampleAppPages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
-using ExampleApp.Test.Functional.Models.ExampleAppPages;
 using TechTalk.SpecFlow;
 
 namespace ExampleApp.Test.Functional.Steps
@@ -15,12 +15,12 @@ namespace ExampleApp.Test.Functional.Steps
         /// <summary>
         /// Reference to the browser controller.
         /// </summary>
-        private WebBrowser _webBrowser;
+        private readonly WebBrowser _webBrowser;
 
         /// <summary>
         /// Initializes a new instance with a web browser.
         /// </summary>
-        /// <param name="webBrowser"></param>
+        /// <param name="webBrowser">Specifies the browser.</param>
         public VersionSteps(WebBrowser webBrowser)
         {
             _webBrowser = webBrowser;
