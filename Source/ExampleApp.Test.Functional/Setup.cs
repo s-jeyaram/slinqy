@@ -10,12 +10,17 @@ namespace ExampleApp.Test.Functional
     /// Code for setting up the local environment for performing the tests.
     /// </summary>
     [Binding]
-    public class Setup
+    public sealed class Setup : IDisposable
     {
         /// <summary>
         /// Simple object container for SpecFlows dependency injection of objects in to Step classes.
         /// </summary>
         private readonly IObjectContainer _objectContainer;
+
+        /// <summary>
+        /// This is a field.
+        /// </summary>
+        private WebBrowser _webBrowser;
 
         /// <summary>
         /// Initializes a new instance.
@@ -36,11 +41,11 @@ namespace ExampleApp.Test.Functional
         void 
         InitializeWebBrowser()
         {
-            // Get the base url from configuration
+            // Get the base URL from configuration
             var exampleAppBaseUri = new Uri(GetSetting("ExampleApp.BaseUri"));
-            var webBrowser        = new WebBrowser(exampleAppBaseUri);
+            _webBrowser        = new WebBrowser(exampleAppBaseUri);
 
-            _objectContainer.RegisterInstanceAs(webBrowser);
+            _objectContainer.RegisterInstanceAs(_webBrowser);
         }
 
         /// <summary>
@@ -60,6 +65,14 @@ namespace ExampleApp.Test.Functional
                 settingValue = ConfigurationManager.AppSettings[settingName];
 
             return settingValue;
+        }
+
+        /// <summary>
+        /// Disposes resources.
+        /// </summary>
+        public void Dispose()
+        {
+            _webBrowser.Dispose();
         }
     }
 }

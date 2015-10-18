@@ -6,7 +6,7 @@ namespace ExampleApp
     /// <summary>
     /// Defines the HTTP routes for the application.
     /// </summary>
-    public class RouteConfig
+    public static class RouteConfig
     {
         /// <summary>
         /// Applies routes to the specified RouteCollection.

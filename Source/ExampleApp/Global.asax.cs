@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace ExampleApp
@@ -11,6 +12,7 @@ namespace ExampleApp
         /// <summary>
         /// This method is automatically called when the application first starts.
         /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();

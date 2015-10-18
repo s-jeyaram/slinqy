@@ -30,10 +30,10 @@ namespace ExampleApp.Test.Functional.Steps
         /// Navigates to the Example App Homepage.
         /// </summary>
         [Given]
-        public void GivenINavigateToTheHomePage()
+        public void GivenINavigateToTheHomepage()
         {
             // Attempt to navigate to the Home page.
-            _webBrowser.NavigateTo<HomePage>(); 
+            _webBrowser.NavigateTo<Homepage>(); 
         }
     }
 }

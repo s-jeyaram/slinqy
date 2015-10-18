@@ -34,7 +34,7 @@ namespace ExampleApp.Test.Functional.Steps
         [Then]
         public void ThenTheApplicationVersionMatchesTheTestVersion()
         {
-            var examplePage = _webBrowser.GetCurrentPageAs<SlinqyExampleWebPage>();
+            var examplePage = _webBrowser.GetCurrentPageAs<SlinqyExampleWebpage>();
 
             var websiteVersion = examplePage.Footer.Version;
             var testVersion    = Assembly.GetExecutingAssembly().GetName().Version.ToString();

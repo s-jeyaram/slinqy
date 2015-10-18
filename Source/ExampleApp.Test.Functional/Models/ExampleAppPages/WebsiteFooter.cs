@@ -6,7 +6,7 @@ namespace ExampleApp.Test.Functional.Models.ExampleAppPages
     /// <summary>
     /// Models the footer of the Slinqy Example App website.
     /// </summary>
-    public class WebsiteFooter : WebPageWidget
+    public class WebsiteFooter : WebpageWidget
     {
         /// <summary>
         /// Proxy to the web element containing the application version number.

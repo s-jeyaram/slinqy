@@ -6,7 +6,7 @@ namespace ExampleApp.Test.Functional.Models.ExampleAppPages
     /// <summary>
     /// Models the Slinqy Example App Homepage.
     /// </summary>
-    public class HomePage : SlinqyExampleWebPage
+    public class Homepage : SlinqyExampleWebpage
     {
         /// <summary>
         /// Defines the relative path for the Homepage.
@@ -14,13 +14,13 @@ namespace ExampleApp.Test.Functional.Models.ExampleAppPages
         public const string RelativePath = "/";
 
         /// <summary>
-        /// Initializes the HomePage with the IWebDriver to use for controlling the page.
+        /// Initializes the Homepage with the IWebDriver to use for controlling the page.
         /// </summary>
         /// <param name="webBrowserDriver">
         /// Specifies the IWebDriver to use to interact with the Homepage.
         /// </param>
         public 
-        HomePage(
+        Homepage(
             IWebDriver webBrowserDriver) 
                 : base(webBrowserDriver, new Uri(RelativePath, UriKind.Relative))
         {
