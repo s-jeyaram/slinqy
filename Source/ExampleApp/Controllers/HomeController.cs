@@ -13,9 +13,9 @@
         /// <returns>Returns the default Homepage view.</returns>
         public ActionResult Index()
         {
-            ViewBag.Title = "Home Page";
+            this.ViewBag.Title = "Home Page";
 
-            return View();
+            return this.View();
         }
     }
 }

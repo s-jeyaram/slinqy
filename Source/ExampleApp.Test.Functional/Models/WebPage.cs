@@ -22,7 +22,7 @@
             IWebDriver  webBrowserDriver,
             Uri         webpageRelativePath) : base(webBrowserDriver)
         {
-            WebpageRelativeUri = webpageRelativePath;
+            this.WebpageRelativeUri = webpageRelativePath;
         }
     }
 }

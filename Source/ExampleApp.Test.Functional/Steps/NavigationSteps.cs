@@ -33,7 +33,7 @@
         public void GivenINavigateToTheHomepage()
         {
             // Attempt to navigate to the Home page.
-            webBrowser.NavigateTo<Homepage>(); 
+            this.webBrowser.NavigateTo<Homepage>(); 
         }
     }
 }

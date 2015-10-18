@@ -22,7 +22,7 @@
             IWebDriver  webBrowserDriver,
             Uri         webpageRelativePath) : base(webBrowserDriver, webpageRelativePath)
         {
-            Footer = new WebsiteFooter(webBrowserDriver);
+            this.Footer = new WebsiteFooter(webBrowserDriver);
         }
     }
 }

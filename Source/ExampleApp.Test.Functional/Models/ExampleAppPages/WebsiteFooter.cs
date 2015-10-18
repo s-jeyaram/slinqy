@@ -17,7 +17,7 @@
         /// <summary>
         /// Gets the version number displayed on the web page footer.
         /// </summary>
-        public string Version { get { return appVersion.Text; } }
+        public string Version { get { return this.appVersion.Text; } }
 
         /// <summary>
         /// Initializes the class with the IWebDriver to use for controlling the browser.

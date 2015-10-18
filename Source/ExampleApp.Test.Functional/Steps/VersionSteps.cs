@@ -34,7 +34,7 @@
         [Then]
         public void ThenTheApplicationVersionMatchesTheTestVersion()
         {
-            var examplePage = webBrowser.GetCurrentPageAs<SlinqyExampleWebpage>();
+            var examplePage = this.webBrowser.GetCurrentPageAs<SlinqyExampleWebpage>();
 
             var websiteVersion = examplePage.Footer.Version;
             var testVersion    = Assembly.GetExecutingAssembly().GetName().Version.ToString();

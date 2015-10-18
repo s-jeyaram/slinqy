@@ -42,7 +42,7 @@
         WebBrowser(Uri baseUri)
         {
             this.baseUri          = baseUri;
-            webBrowserDriver = new ChromeDriver(); // TODO: Inject
+            this.webBrowserDriver = new ChromeDriver(); // TODO: Inject
         }
 
         /// <summary>
@@ -107,15 +107,15 @@
             var relativeUri = WellKnownPages.Single(pair => pair.Value == typeof (TPage)).Key;
 
             var fullyQualifiedUri = new Uri(
-                baseUri,
+                this.baseUri,
                 relativeUri
             );
 
-            webBrowserDriver
+            this.webBrowserDriver
                 .Navigate()
                 .GoToUrl(fullyQualifiedUri);
 
-            return GetCurrentPageAs<TPage>();
+            return this.GetCurrentPageAs<TPage>();
         }
 
         /// <summary>
@@ -128,7 +128,7 @@
         /// </returns>
         public TPage GetCurrentPageAs<TPage>() where TPage : Webpage
         {
-            var uri = new Uri(webBrowserDriver.Url);
+            var uri = new Uri(this.webBrowserDriver.Url);
             var path = uri.AbsolutePath;
 
             var match = WellKnownPages.FirstOrDefault(kvp => kvp.Key.OriginalString == path);
@@ -138,7 +138,7 @@
 
             var pageType = match.Value;
 
-            return (TPage)Activator.CreateInstance(pageType, webBrowserDriver);
+            return (TPage)Activator.CreateInstance(pageType, this.webBrowserDriver);
         }
         
         /// <summary>
@@ -146,7 +146,7 @@
         /// </summary>
         public void Dispose()
         {
-            webBrowserDriver.Dispose();
+            this.webBrowserDriver.Dispose();
         }
     }
 }

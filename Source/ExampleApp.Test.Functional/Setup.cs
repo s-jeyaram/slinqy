@@ -42,10 +42,10 @@
         InitializeWebBrowser()
         {
             // Get the base URL from configuration
-            var exampleAppBaseUri = new Uri(GetSetting("ExampleApp.BaseUri"));
-            webBrowser        = new WebBrowser(exampleAppBaseUri);
+            var exampleAppBaseUri   = new Uri(GetSetting("ExampleApp.BaseUri"));
+            this.webBrowser         = new WebBrowser(exampleAppBaseUri);
 
-            objectContainer.RegisterInstanceAs(webBrowser);
+            this.objectContainer.RegisterInstanceAs(this.webBrowser);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@
         /// </summary>
         public void Dispose()
         {
-            webBrowser.Dispose();
+            this.webBrowser.Dispose();
         }
     }
 }
