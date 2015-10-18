@@ -10,11 +10,6 @@
     public abstract class SeleniumWebBase
     {
         /// <summary>
-        /// Reference to the IWebDriver to use for interacting with the web browser.
-        /// </summary>
-        private readonly IWebDriver webBrowserDriver;
-
-        /// <summary>
         /// Initializes the SeleniumWebBase with the IWebDriver to use.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the IWebDriver to use for interacting with the web browser.</param>
@@ -22,9 +17,7 @@
         SeleniumWebBase(
             IWebDriver webBrowserDriver)
         {
-            this.webBrowserDriver = webBrowserDriver;
-
-            PageFactory.InitElements(this.webBrowserDriver, this);
+            PageFactory.InitElements(webBrowserDriver, this);
         }
     }
 }

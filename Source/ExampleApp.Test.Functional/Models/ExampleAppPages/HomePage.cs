@@ -1,7 +1,7 @@
 ﻿namespace ExampleApp.Test.Functional.Models.ExampleAppPages
 {
-    using System;
     using OpenQA.Selenium;
+    using System;
 
     /// <summary>
     /// Models the Slinqy Example App Homepage.
