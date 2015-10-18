@@ -13,3 +13,6 @@ deploy_script:
   - ps: .\CI "Deploy,FunctionalTest"
 
 test: off
+
+cache:
+  - .\Source\packages -> .\Source\ExampleApp\packages.config  # preserve "packages" directory in the root of build folder but will reset it if packages.config is modified
