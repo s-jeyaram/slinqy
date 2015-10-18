@@ -7,6 +7,9 @@ using System.Reflection;
 
 namespace ExampleApp.Test.Functional.Models
 {
+    /// <summary>
+    /// Models a web browser.
+    /// </summary>
     public class WebBrowser : IDisposable
     {
         private const string WebPageRelativePathConstantName = "RelativePath";
