@@ -22,7 +22,7 @@ namespace ExampleApp.Test.Functional.Models
         /// Maintains the collection of classes inheriting the Webpage class, keyed on their RelativePaths.
         /// This is done so that instances of these types can be instantiated from a given relative path.
         /// </summary>
-        private static readonly Dictionary<string, Type> WellKnownPages = GetWellKnownPages(); // TODO: Swap Uri for string type.
+        private static readonly Dictionary<Uri, Type> WellKnownPages = GetWellKnownPages(); // TODO: Swap Uri for string type.
 
         /// <summary>
         /// Reference to the IWebDriver to use for controlling the browser.
@@ -50,14 +50,14 @@ namespace ExampleApp.Test.Functional.Models
         /// </summary>
         /// <returns>Returns a collection of Types, keyed on the relative path of the Webpage.</returns>
         static 
-        Dictionary<string, Type> 
+        Dictionary<Uri, Type> 
         GetWellKnownPages()
         {
             var types = Assembly
                 .GetExecutingAssembly()
                 .GetTypes();
 
-            var wellKnownPages = new Dictionary<string, Type>();
+            var wellKnownPages = new Dictionary<Uri, Type>();
 
             foreach (var type in types.Where(t => typeof(Webpage).IsAssignableFrom(t) && !t.IsAbstract))
             {
@@ -80,7 +80,7 @@ namespace ExampleApp.Test.Functional.Models
                     );
 
                 wellKnownPages.Add(
-                    relativePathField.GetRawConstantValue().ToString(), 
+                    new Uri(relativePathField.GetRawConstantValue().ToString(), UriKind.Relative), 
                     type
                 );
             }
@@ -130,7 +130,7 @@ namespace ExampleApp.Test.Functional.Models
             var uri = new Uri(_webBrowserDriver.Url);
             var path = uri.AbsolutePath;
 
-            var match = WellKnownPages.FirstOrDefault(kvp => kvp.Key == path);
+            var match = WellKnownPages.FirstOrDefault(kvp => kvp.Key.OriginalString == path);
 
             if (match.Key == null)
                 throw new NotFoundException("Could not find a matching page for path " + path);
