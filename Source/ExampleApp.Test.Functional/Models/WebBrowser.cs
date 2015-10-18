@@ -10,7 +10,7 @@ namespace ExampleApp.Test.Functional.Models
     /// <summary>
     /// Models a web browser.
     /// </summary>
-    public class WebBrowser : IDisposable
+    public sealed class WebBrowser : IDisposable
     {
         /// <summary>
         /// Defines the name of constant field that each class inheriting WebPage must implement.
