@@ -18,6 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\CI.ps1 = ..\CI.ps1
 		..\LICENSE = ..\LICENSE
 		..\README.md = ..\README.md
+		Settings.StyleCop = Settings.StyleCop
 	EndProjectSection
 EndProject
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "ExampleApp.ResourceGroup", "ExampleApp.ResourceGroup\ExampleApp.ResourceGroup.deployproj", "{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}"
