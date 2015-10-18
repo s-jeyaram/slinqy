@@ -1,8 +1,8 @@
-﻿using System.Web.Mvc;
-using System.Web.Routing;
-
-namespace ExampleApp
+﻿namespace ExampleApp
 {
+    using System.Web.Mvc;
+    using System.Web.Routing;
+
     /// <summary>
     /// Defines the HTTP routes for the application.
     /// </summary>

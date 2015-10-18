@@ -1,8 +1,8 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.PageObjects;
-
-namespace ExampleApp.Test.Functional.Models
+﻿namespace ExampleApp.Test.Functional.Models
 {
+    using OpenQA.Selenium;
+    using OpenQA.Selenium.Support.PageObjects;
+
     /// <summary>
     /// Models a web component that can be initialized by Selenium.
     /// A web component can either be an entire web page, or part of a web page.

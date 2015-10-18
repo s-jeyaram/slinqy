@@ -1,9 +1,9 @@
-﻿using ExampleApp.Test.Functional.Models;
-using ExampleApp.Test.Functional.Models.ExampleAppPages;
-using TechTalk.SpecFlow;
-
-namespace ExampleApp.Test.Functional.Steps
+﻿namespace ExampleApp.Test.Functional.Steps
 {
+    using ExampleApp.Test.Functional.Models;
+    using ExampleApp.Test.Functional.Models.ExampleAppPages;
+    using TechTalk.SpecFlow;
+
     /// <summary>
     /// Defines steps for navigating the Example App website.
     /// </summary>

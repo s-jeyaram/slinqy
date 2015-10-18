@@ -1,7 +1,7 @@
-﻿using System.Web.Mvc;
-
-namespace ExampleApp.Controllers
+﻿namespace ExampleApp.Controllers
 {
+    using System.Web.Mvc;
+
     /// <summary>
     /// Defines supported actions for the Homepage.
     /// </summary>

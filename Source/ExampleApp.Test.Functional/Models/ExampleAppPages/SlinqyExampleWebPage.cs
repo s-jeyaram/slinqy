@@ -1,8 +1,8 @@
-﻿using System;
-using OpenQA.Selenium;
-
-namespace ExampleApp.Test.Functional.Models.ExampleAppPages
+﻿namespace ExampleApp.Test.Functional.Models.ExampleAppPages
 {
+    using System;
+    using OpenQA.Selenium;
+
     /// <summary>
     /// The base class for all Slinqy Example App web pages.
     /// </summary>

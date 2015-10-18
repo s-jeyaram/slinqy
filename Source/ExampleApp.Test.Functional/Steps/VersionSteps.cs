@@ -1,11 +1,11 @@
-﻿using ExampleApp.Test.Functional.Models;
-using ExampleApp.Test.Functional.Models.ExampleAppPages;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Reflection;
-using TechTalk.SpecFlow;
-
-namespace ExampleApp.Test.Functional.Steps
+﻿namespace ExampleApp.Test.Functional.Steps
 {
+    using ExampleApp.Test.Functional.Models;
+    using ExampleApp.Test.Functional.Models.ExampleAppPages;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System.Reflection;
+    using TechTalk.SpecFlow;
+
     /// <summary>
     /// Defines steps for using the versioning infrastructure.
     /// </summary>

@@ -1,9 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Web.Mvc;
-using System.Web.Routing;
-
-namespace ExampleApp
+﻿namespace ExampleApp
 {
+    using System.Diagnostics.CodeAnalysis;
+    using System.Web.Mvc;
+    using System.Web.Routing;
+
     /// <summary>
     /// Handles application life cycle events.
     /// </summary>

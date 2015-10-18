@@ -1,7 +1,7 @@
-﻿using OpenQA.Selenium;
-
-namespace ExampleApp.Test.Functional.Models
+﻿namespace ExampleApp.Test.Functional.Models
 {
+    using OpenQA.Selenium;
+
     /// <summary>
     /// Models a sub-component of a web page.
     /// </summary>

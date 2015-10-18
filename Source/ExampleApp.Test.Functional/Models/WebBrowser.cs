@@ -1,13 +1,13 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-
-namespace ExampleApp.Test.Functional.Models
+﻿namespace ExampleApp.Test.Functional.Models
 {
+    using OpenQA.Selenium;
+    using OpenQA.Selenium.Chrome;
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Reflection;
+
     /// <summary>
     /// Models a web browser.
     /// </summary>

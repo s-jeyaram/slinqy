@@ -1,8 +1,8 @@
-﻿using System;
-using OpenQA.Selenium;
-
-namespace ExampleApp.Test.Functional.Models
+﻿namespace ExampleApp.Test.Functional.Models
 {
+    using System;
+    using OpenQA.Selenium;
+
     /// <summary>
     /// Models a whole web page.
     /// </summary>

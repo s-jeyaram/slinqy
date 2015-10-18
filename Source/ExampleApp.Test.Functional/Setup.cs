@@ -1,11 +1,11 @@
-﻿using System;
-using System.Configuration;
-using BoDi;
-using ExampleApp.Test.Functional.Models;
-using TechTalk.SpecFlow;
-
-namespace ExampleApp.Test.Functional
+﻿namespace ExampleApp.Test.Functional
 {
+    using System;
+    using System.Configuration;
+    using BoDi;
+    using ExampleApp.Test.Functional.Models;
+    using TechTalk.SpecFlow;
+
     /// <summary>
     /// Code for setting up the local environment for performing the tests.
     /// </summary>

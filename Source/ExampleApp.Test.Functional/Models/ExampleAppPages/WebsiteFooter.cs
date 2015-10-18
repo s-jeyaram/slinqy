@@ -1,8 +1,8 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.PageObjects;
-
-namespace ExampleApp.Test.Functional.Models.ExampleAppPages
+﻿namespace ExampleApp.Test.Functional.Models.ExampleAppPages
 {
+    using OpenQA.Selenium;
+    using OpenQA.Selenium.Support.PageObjects;
+
     /// <summary>
     /// Models the footer of the Slinqy Example App website.
     /// </summary>
