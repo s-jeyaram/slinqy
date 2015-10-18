@@ -1,7 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
 
-namespace ExampleApp.Test.Functional.Models
+namespace ExampleApp.Test.Functional.Models.ExampleAppPages
 {
     public class WebsiteFooter : WebPageWidget
     {

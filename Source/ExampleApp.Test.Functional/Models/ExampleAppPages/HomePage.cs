@@ -1,7 +1,7 @@
 ﻿using System;
 using OpenQA.Selenium;
 
-namespace ExampleApp.Test.Functional.Models
+namespace ExampleApp.Test.Functional.Models.ExampleAppPages
 {
     public class HomePage : SlinqyExampleWebPage
     {

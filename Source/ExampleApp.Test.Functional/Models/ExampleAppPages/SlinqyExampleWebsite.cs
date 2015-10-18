@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ExampleApp.Test.Functional.Models
+namespace ExampleApp.Test.Functional.Models.ExampleAppPages
 {
     public class SlinqyExampleWebsite
     {
