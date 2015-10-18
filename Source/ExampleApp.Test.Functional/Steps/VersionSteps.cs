@@ -46,8 +46,7 @@
 The version of test code does not match the version of the deployed code, which could be because:
 A) The latest code has not been deployed,
 B) The previous deployment of the latest code failed, or
-C) There is a bug related to versioning."
-            );
+C) There is a bug related to versioning.");
         }
     }
 }

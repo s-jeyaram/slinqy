@@ -67,8 +67,7 @@
                     .SingleOrDefault(fi => 
                         fi.IsLiteral && 
                         !fi.IsInitOnly && 
-                        fi.Name == WebPageRelativePathConstantName
-                    );
+                        fi.Name == WebPageRelativePathConstantName);
 
                 if (relativePathField == null)
                     throw new InvalidOperationException(
@@ -76,14 +75,11 @@
                             CultureInfo.InvariantCulture,
                             "You must add a public string constant named {0} to type {1} before it can be used.", 
                             WebPageRelativePathConstantName, 
-                            type.FullName
-                        )
-                    );
+                            type.FullName));
 
                 wellKnownPages.Add(
                     new Uri(relativePathField.GetRawConstantValue().ToString(), UriKind.Relative), 
-                    type
-                );
+                    type);
             }
 
             return wellKnownPages;
@@ -102,14 +98,13 @@
         /// Remember that it is possible to end up on a web page that is different than what was requested by TPage.
         /// </returns>
         public
-        TPage NavigateTo<TPage>() where TPage: Webpage
+        TPage NavigateTo<TPage>() where TPage : Webpage
         {
-            var relativeUri = WellKnownPages.Single(pair => pair.Value == typeof (TPage)).Key;
+            var relativeUri = WellKnownPages.Single(pair => pair.Value == typeof(TPage)).Key;
 
             var fullyQualifiedUri = new Uri(
                 this.baseUri,
-                relativeUri
-            );
+                relativeUri);
 
             this.webBrowserDriver
                 .Navigate()

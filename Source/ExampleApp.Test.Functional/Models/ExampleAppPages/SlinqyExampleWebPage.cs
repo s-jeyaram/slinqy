@@ -19,8 +19,8 @@
         /// <param name="webBrowserDriver">Specifies the IWebDriver to use for controlling the browser.</param>
         /// <param name="webpageRelativePath">Specifies the relative path of the web page.</param>
         protected SlinqyExampleWebpage(
-            IWebDriver  webBrowserDriver,
-            Uri         webpageRelativePath) : base(webBrowserDriver, webpageRelativePath)
+            IWebDriver webBrowserDriver,
+            Uri        webpageRelativePath) : base(webBrowserDriver, webpageRelativePath)
         {
             this.Footer = new WebsiteFooter(webBrowserDriver);
         }
