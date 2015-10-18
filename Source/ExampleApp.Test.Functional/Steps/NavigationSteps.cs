@@ -30,7 +30,9 @@
         /// Navigates to the Example App Homepage.
         /// </summary>
         [Given]
-        public void GivenINavigateToTheHomepage()
+        public 
+        void 
+        GivenINavigateToTheHomepage()
         {
             // Attempt to navigate to the Home page.
             this.webBrowser.NavigateTo<Homepage>(); 

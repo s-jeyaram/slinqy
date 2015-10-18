@@ -98,7 +98,8 @@
         /// Remember that it is possible to end up on a web page that is different than what was requested by TPage.
         /// </returns>
         public
-        TPage NavigateTo<TPage>() where TPage : Webpage
+        TPage 
+        NavigateTo<TPage>() where TPage : Webpage
         {
             var relativeUri = WellKnownPages.Single(pair => pair.Value == typeof(TPage)).Key;
 
@@ -121,7 +122,9 @@
         /// If the current Webpage is of type TPage, then an instance of Webpage modeling TPage will be returned.
         /// Otherwise, null will be returned.
         /// </returns>
-        public TPage GetCurrentPageAs<TPage>() where TPage : Webpage
+        public 
+        TPage 
+        GetCurrentPageAs<TPage>() where TPage : Webpage
         {
             var uri = new Uri(this.webBrowserDriver.Url);
             var path = uri.AbsolutePath;
@@ -139,7 +142,9 @@
         /// <summary>
         /// Frees any resources allocated by this instance.
         /// </summary>
-        public void Dispose()
+        public 
+        void 
+        Dispose()
         {
             this.webBrowserDriver.Dispose();
         }

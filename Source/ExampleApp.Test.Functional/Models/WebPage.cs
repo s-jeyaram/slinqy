@@ -18,7 +18,8 @@
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the driver to use for controlling the browser.</param>
         /// <param name="webpageRelativePath">Specifies the relative path of this web page.</param>
-        protected Webpage(
+        protected 
+        Webpage(
             IWebDriver  webBrowserDriver,
             Uri         webpageRelativePath) : base(webBrowserDriver)
         {

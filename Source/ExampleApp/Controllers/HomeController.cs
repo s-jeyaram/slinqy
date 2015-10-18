@@ -11,7 +11,9 @@
         /// Handles the default HTTP GET /.
         /// </summary>
         /// <returns>Returns the default Homepage view.</returns>
-        public ActionResult Index()
+        public 
+        ActionResult 
+        Index()
         {
             this.ViewBag.Title = "Home Page";
 

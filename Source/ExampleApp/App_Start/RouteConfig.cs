@@ -12,7 +12,11 @@
         /// Applies routes to the specified RouteCollection.
         /// </summary>
         /// <param name="routes">Specifies the RouteCollection to configure.</param>
-        public static void RegisterRoutes(RouteCollection routes)
+        public 
+        static 
+        void 
+        RegisterRoutes(
+            RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 

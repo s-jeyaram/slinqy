@@ -70,7 +70,9 @@
         /// <summary>
         /// Disposes resources.
         /// </summary>
-        public void Dispose()
+        public 
+        void 
+        Dispose()
         {
             this.webBrowser.Dispose();
         }
