@@ -49,6 +49,7 @@ namespace ExampleApp.Test.Functional.Models
         /// Returns a collection of all the classes in all the loaded assemblies that inherit from the Webpage class.
         /// </summary>
         /// <returns>Returns a collection of Types, keyed on the relative path of the Webpage.</returns>
+        private
         static 
         Dictionary<Uri, Type> 
         GetWellKnownPages()
