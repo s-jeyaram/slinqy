@@ -4,5 +4,5 @@
 	So that I can understand how the system should act
 
 Scenario: Deployed Version Matches Test Version
-	Given I navigate to the Home page
+	Given I navigate to the Homepage
 	Then the Application Version matches the Test Version

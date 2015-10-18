@@ -34,8 +34,8 @@ namespace ExampleApp.Test.Functional.Features.Infrastructure
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Version", "As a User\nI want to know what version I\'m using\nSo that I can understand how the " +
-                    "system should act", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Version", "As a User\r\nI want to know what version I\'m using\r\nSo that I can understand how th" +
+                    "e system should act", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -82,7 +82,7 @@ namespace ExampleApp.Test.Functional.Features.Infrastructure
 #line 6
 this.ScenarioSetup(scenarioInfo);
 #line 7
- testRunner.Given("I navigate to the Home page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I navigate to the Homepage", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 8
  testRunner.Then("the Application Version matches the Test Version", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

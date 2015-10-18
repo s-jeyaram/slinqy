@@ -6,3 +6,4 @@ packages
 *.user
 environment-settings.json
 *.suo
+StyleCop.Cache
