@@ -1,9 +1,9 @@
 ﻿namespace ExampleApp.Test.Functional
 {
+    using BoDi;
+    using Models;
     using System;
     using System.Configuration;
-    using BoDi;
-    using ExampleApp.Test.Functional.Models;
     using TechTalk.SpecFlow;
 
     /// <summary>

@@ -1,7 +1,7 @@
 ﻿namespace ExampleApp.Test.Functional.Steps
 {
-    using ExampleApp.Test.Functional.Models;
-    using ExampleApp.Test.Functional.Models.ExampleAppPages;
+    using Models;
+    using Models.ExampleAppPages;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Reflection;
     using TechTalk.SpecFlow;
