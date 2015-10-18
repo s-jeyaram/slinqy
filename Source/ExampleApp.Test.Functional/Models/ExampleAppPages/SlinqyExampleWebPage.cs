@@ -18,7 +18,8 @@
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the IWebDriver to use for controlling the browser.</param>
         /// <param name="webpageRelativePath">Specifies the relative path of the web page.</param>
-        protected SlinqyExampleWebpage(
+        protected 
+        SlinqyExampleWebpage(
             IWebDriver webBrowserDriver,
             Uri        webpageRelativePath) : base(webBrowserDriver, webpageRelativePath)
         {

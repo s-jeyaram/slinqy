@@ -21,7 +21,9 @@
         /// Initializes a new instance with a web browser.
         /// </summary>
         /// <param name="webBrowser">Specifies the browser.</param>
-        public VersionSteps(WebBrowser webBrowser)
+        public 
+        VersionSteps(
+            WebBrowser webBrowser)
         {
             this.webBrowser = webBrowser;
         }
@@ -32,7 +34,9 @@
         /// ensuring they were both built from the same source code.
         /// </summary>
         [Then]
-        public void ThenTheApplicationVersionMatchesTheTestVersion()
+        public 
+        void 
+        ThenTheApplicationVersionMatchesTheTestVersion()
         {
             var examplePage = this.webBrowser.GetCurrentPageAs<SlinqyExampleWebpage>();
 
