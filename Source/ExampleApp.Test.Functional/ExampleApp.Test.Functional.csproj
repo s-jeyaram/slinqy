@@ -87,25 +87,37 @@
     <Compile Include="..\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
     </Compile>
+    <Compile Include="Features\AutoExpandQueueStorage.feature.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoExpandQueueStorage.feature</DependentUpon>
+    </Compile>
     <Compile Include="Features\Infrastructure\Versioning.feature.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Versioning.feature</DependentUpon>
     </Compile>
     <Compile Include="Models\ExampleAppPages\HomePage.cs" />
+    <Compile Include="Models\ExampleAppPages\QueueHistory.cs" />
     <Compile Include="Models\SeleniumWebBase.cs" />
     <Compile Include="Models\ExampleAppPages\SlinqyExampleWebPage.cs" />
     <Compile Include="Models\WebBrowser.cs" />
     <Compile Include="Models\WebPage.cs" />
     <Compile Include="Models\WebPageWidget.cs" />
     <Compile Include="Models\ExampleAppPages\WebsiteFooter.cs" />
+    <Compile Include="SpecFlowContextualInfo.cs" />
     <Compile Include="Steps\NavigationSteps.cs" />
+    <Compile Include="Steps\QueueSteps.cs" />
     <Compile Include="Steps\VersionSteps.cs" />
     <Compile Include="Setup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="Features\AutoExpandQueueStorage.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>AutoExpandQueueStorage.feature.cs</LastGenOutput>
     </None>
     <None Include="Features\Infrastructure\Versioning.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>

@@ -57,6 +57,19 @@
         }
 
         /// <summary>
+        /// Initializes contextual information about the SpecFlow scenario.
+        /// </summary>
+        [BeforeScenario]
+        public
+        void 
+        InitializeScenarioStartTimestamp()
+        {
+            var context = new SpecFlowContextualInfo(scenarioStartTimestamp: DateTimeOffset.UtcNow);
+
+            this.objectContainer.RegisterInstanceAs(context);
+        }
+
+        /// <summary>
         /// Gets the specified configuration setting.
         /// </summary>
         /// <param name="settingName">Specifies the name of the configuration setting to get.</param>
