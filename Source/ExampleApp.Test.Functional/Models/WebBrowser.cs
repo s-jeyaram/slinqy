@@ -22,7 +22,7 @@
         /// Maintains the collection of classes inheriting the Webpage class, keyed on their RelativePaths.
         /// This is done so that instances of these types can be instantiated from a given relative path.
         /// </summary>
-        private static readonly Dictionary<Uri, Type> WellKnownPages = GetWellKnownPages(); // TODO: Swap Uri for string type.
+        private static readonly Dictionary<Uri, Type> WellKnownPages = GetWellKnownPages();
 
         /// <summary>
         /// Reference to the IWebDriver to use for controlling the browser.
@@ -33,16 +33,19 @@
         /// The default base URI of the target website, will be used with relative paths.
         /// </summary>
         private readonly Uri        baseUri;
-        
+
         /// <summary>
         /// Initializes an instance of this type with a default base URI.
         /// </summary>
+        /// <param name="webBrowserDriver">Specifies the IWebDriver instance to use for interacting with the browser.</param>
         /// <param name="baseUri">Specifies the base URI that will be used with all relative paths.</param>
         public 
-        WebBrowser(Uri baseUri)
+        WebBrowser(
+            IWebDriver  webBrowserDriver,
+            Uri         baseUri)
         {
             this.baseUri          = baseUri;
-            this.webBrowserDriver = new ChromeDriver(); // TODO: Inject
+            this.webBrowserDriver = webBrowserDriver;
         }
 
         /// <summary>

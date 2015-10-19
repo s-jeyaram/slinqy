@@ -2,6 +2,8 @@
 {
     using BoDi;
     using Models;
+    using OpenQA.Selenium;
+    using OpenQA.Selenium.Chrome;
     using System;
     using System.Configuration;
     using TechTalk.SpecFlow;
@@ -18,9 +20,14 @@
         private readonly IObjectContainer objectContainer;
 
         /// <summary>
-        /// This is a field.
+        /// Maintains a reference to the current web browser.
         /// </summary>
         private WebBrowser webBrowser;
+        
+        /// <summary>
+        /// Maintains a reference to the current web driver.
+        /// </summary>
+        private IWebDriver webDriver;
 
         /// <summary>
         /// Initializes a new instance.
@@ -41,9 +48,10 @@
         void 
         InitializeWebBrowser()
         {
-            // Get the base URL from configuration
-            var exampleAppBaseUri   = new Uri(GetSetting("ExampleApp.BaseUri"));
-            this.webBrowser         = new WebBrowser(exampleAppBaseUri);
+            this.webDriver        = new ChromeDriver();
+            var exampleAppBaseUri = new Uri(GetSetting("ExampleApp.BaseUri"));
+                                  
+            this.webBrowser       = new WebBrowser(this.webDriver, exampleAppBaseUri);
 
             this.objectContainer.RegisterInstanceAs(this.webBrowser);
         }
@@ -75,6 +83,7 @@
         Dispose()
         {
             this.webBrowser.Dispose();
+            this.webDriver.Dispose();
         }
     }
 }
