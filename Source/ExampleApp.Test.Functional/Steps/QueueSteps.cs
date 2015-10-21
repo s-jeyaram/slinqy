@@ -121,7 +121,7 @@
                     return;
             }
 
-            Assert.Fail("The Queue Storage Capacity was not increased as expected.");
+            Assert.Fail("The Queue Storage Capacity was not increased.");
         }
     }
 }
