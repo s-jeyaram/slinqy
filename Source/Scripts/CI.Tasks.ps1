@@ -270,3 +270,6 @@ Task Pull -description "Pulls the latest source from master to the local repo." 
 Task Push -depends Pull,Build,Deploy,FunctionalTest -description "Performs pre-push actions before actually pushing to the remote repo." {
     exec { git push }
 }
+
+Task Full -depends DestroyEnvironment,Build,Deploy,FunctionalTest,DestroyEnvironment -description "Runs all pertinent CI tasks and cleans up afterward (destroys the environment)." {
+}
