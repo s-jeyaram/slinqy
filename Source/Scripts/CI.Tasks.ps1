@@ -1,6 +1,7 @@
 # Include additional scripts
 Include "CI.Settings.ps1"
 Include "CI.Functions.ps1"
+Include "CI.Azure.Functions.ps1"
 
 # Define path parameters
 $BasePath = "Uninitialized" # Caller must specify.
@@ -111,9 +112,6 @@ Task Build -depends Clean -description "Compiles all source code." {
 }
 
 Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed resources are set up in the target runtime environment." {
-    # Ensure the Azure PowerShell cmdlets are available
-    Import-Module Azure -Force | Out-Null
-
     # First, make sure some Azure credentials are loaded
     $AzureAccount = Get-AzureAccount
 
@@ -157,11 +155,7 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
     $templateParameters.environmentLocation = $Settings.EnvironmentLocation
     $templateParameters.exampleAppSiteName  = $Settings.ExampleAppSiteName
 
-    # See if the resource group already exists
-    $resourceGroups = Get-AzureResourceGroup
-    $appGroup = $resourceGroups | where {$_.ResourceGroupName -eq $Settings.ResourceGroupName}
-
-    if (-not $appGroup) {
+    if (-not (Check-AzureResourceGroupExists $Settings.ResourceGroupName)) {
         Write-Host "Creating resource group $($Settings.ResourceGroupName)..." -NoNewline
 
         New-AzureResourceGroup `
@@ -253,6 +247,11 @@ Task FunctionalTest -depends LoadSettings -description 'Tests that the required 
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
+    if (-not (Check-AzureResourceGroupExists $Settings.ResourceGroupName)) {
+        Write-Host "The resource group $($Settings.ResourceGroupName) doesn't exist, nothing to delete..."
+        return
+    }
+
     $answer = Read-Host `
         -Prompt "Are you use you want to permanently delete all services and data from the target environment $($Settings.EnvironmentName)? (y/n)"
 
