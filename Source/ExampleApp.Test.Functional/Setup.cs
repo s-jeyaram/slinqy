@@ -53,22 +53,16 @@
                                   
             this.webBrowser       = new WebBrowser(this.webDriver, exampleAppBaseUri);
 
+            this.webDriver
+                .Manage()
+                .Timeouts()
+                .ImplicitlyWait(
+                    TimeSpan.FromSeconds(10)
+                );
+
             this.objectContainer.RegisterInstanceAs(this.webBrowser);
         }
-
-        /// <summary>
-        /// Initializes contextual information about the SpecFlow scenario.
-        /// </summary>
-        [BeforeScenario]
-        public
-        void 
-        InitializeScenarioStartTimestamp()
-        {
-            var context = new SpecFlowContextualInfo(scenarioStartTimestamp: DateTimeOffset.UtcNow);
-
-            this.objectContainer.RegisterInstanceAs(context);
-        }
-
+        
         /// <summary>
         /// Gets the specified configuration setting.
         /// </summary>

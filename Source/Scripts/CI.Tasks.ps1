@@ -7,235 +7,267 @@ $BasePath = "Uninitialized" # Caller must specify.
 
 # Define the input properties and their default values.
 properties {
-	$ProductName           = "Slinqy"
-	$SourcePath            = Join-Path $BasePath "Source"
-	$ArtifactsPath         = Join-Path $BasePath "Artifacts"
-	$LogsPath              = Join-Path $ArtifactsPath "Logs"
-	$ScriptsPath           = Join-Path $ArtifactsPath "Scripts"
-	$PublishedWebsitesPath = Join-Path $ArtifactsPath "_PublishedWebsites"
-	$SolutionFileName      = "$ProductName.sln"
-	$SolutionPath          = Join-Path $SourcePath $SolutionFileName
+    $ProductName           = "Slinqy"
+    $SourcePath            = Join-Path $BasePath "Source"
+    $ArtifactsPath         = Join-Path $BasePath "Artifacts"
+    $LogsPath              = Join-Path $ArtifactsPath "Logs"
+    $ScriptsPath           = Join-Path $ArtifactsPath "Scripts"
+    $PublishedWebsitesPath = Join-Path $ArtifactsPath "_PublishedWebsites"
+    $SolutionFileName      = "$ProductName.sln"
+    $SolutionPath          = Join-Path $SourcePath $SolutionFileName
 }
 
 # Define the Task to call when none was specified by the caller.
 Task Default -depends Build
 
 Task InstallDependencies -description "Installs all dependencies required to execute the tasks in this script." {
-	exec { 
-		cinst invokemsbuild --version 1.5.17 --confirm
-		cinst xunit         --version 2.0.0  --confirm
-	}
+    exec { 
+        cinst invokemsbuild --version 1.5.17 --confirm
+        cinst xunit         --version 2.0.0  --confirm
+    }
 }
 
 Task Clean -depends InstallDependencies -description "Removes any artifacts that may be present from prior runs of the CI script." {
-	if (Test-Path $ArtifactsPath) {
-		Write-Host "Deleting $ArtifactsPath..." -NoNewline
-		Remove-Item $ArtifactsPath -Recurse -Force
-		Write-Host "done!"
-	}
+    if (Test-Path $ArtifactsPath) {
+        Write-Host "Deleting $ArtifactsPath..." -NoNewline
+        Remove-Item $ArtifactsPath -Recurse -Force
+        Write-Host "done!"
+    }
 
-	Write-Host "Cleaning solution $SolutionPath..." -NoNewline
+    Write-Host "Cleaning solution $SolutionPath..." -NoNewline
 
-	Invoke-MsBuild `
-		-Path                  $SolutionPath `
-		-MsBuildParameters "/t:Clean" `
-			| Out-Null
+    Invoke-MsBuild `
+        -Path                  $SolutionPath `
+        -MsBuildParameters "/t:Clean" `
+            | Out-Null
 
-	Write-Host "done!"
+    Write-Host "done!"
 }
 
 Task LoadSettings -description "Loads the environment specific settings." {
-	# Search for a settings file
-	$TemplateParametersFileName = 'environment-settings.json'
-	$TemplateParametersFilePath = Join-Path $BasePath $TemplateParametersFileName
-	
-	$Script:Settings = Get-EnvironmentSettings `
-		-ProductName      $ProductName `
-		-SettingsFilePath $TemplateParametersFilePath
-
-	Write-Host "done!"
+    # Search for a settings file
+    $TemplateParametersFileName = 'environment-settings.json'
+    $TemplateParametersFilePath = Join-Path $BasePath $TemplateParametersFileName
+    
+    $Script:Settings = Get-EnvironmentSettings `
+        -ProductName      $ProductName `
+        -SettingsFilePath $TemplateParametersFilePath
 }
 
 Task Build -depends Clean -description "Compiles all source code." {
-	$BuildVersion = Get-BuildVersion
+    $BuildVersion = Get-BuildVersion
 
-	exec { nuget restore $SolutionPath }
+    exec { nuget restore $SolutionPath }
 
-	Write-Host "Building $ProductName $BuildVersion from $SolutionPath"
-	
-	# Make sure the path exists, or the logs won't be written.
-	New-Item `
-		-ItemType Directory `
-		-Path $LogsPath |
-			Out-Null
+    Write-Host "Building $ProductName $BuildVersion from $SolutionPath"
+    
+    # Make sure the path exists, or the logs won't be written.
+    New-Item `
+        -ItemType Directory `
+        -Path $LogsPath |
+            Out-Null
 
-	# Update the AssemblyInfo file with the version #.
-	$AssemblyInfoFilePath = Join-Path $SourcePath 'AssemblyInfo.cs'
-	Update-AssemblyInfoVersion `
-		-Path    $AssemblyInfoFilePath `
-		-Version $BuildVersion
+    # Update the AssemblyInfo file with the version #.
+    $AssemblyInfoFilePath = Join-Path $SourcePath 'AssemblyInfo.cs'
+    Update-AssemblyInfoVersion `
+        -Path    $AssemblyInfoFilePath `
+        -Version $BuildVersion
 
-	Write-Host "Compiling solution $SolutionPath..." -NoNewline
+    Write-Host "Compiling solution $SolutionPath..." -NoNewline
 
-	# Compile the whole solution according to how the solution file is configured.
-	$MsBuildSucceeded = Invoke-MsBuild `
-		-Path                  $SolutionPath `
-		-BuildLogDirectoryPath $LogsPath `
-		-MsBuildParameters     "/p:OutDir=$ArtifactsPath\" `
-		-KeepBuildLogOnSuccessfulBuilds
+    # Compile the whole solution according to how the solution file is configured.
+    $MsBuildSucceeded = Invoke-MsBuild `
+        -Path                  $SolutionPath `
+        -BuildLogDirectoryPath $LogsPath `
+        -MsBuildParameters     "/p:OutDir=$ArtifactsPath\" `
+        -KeepBuildLogOnSuccessfulBuilds
 
-	if (-not $MsBuildSucceeded) {
-		$BuildFilePath = Join-Path $LogsPath "$SolutionFileName.msbuild.log"
-		Get-Content $BuildFilePath
-		throw "Build Failed!"
-	}
+    if (-not $MsBuildSucceeded) {
+        $BuildFilePath = Join-Path $LogsPath "$SolutionFileName.msbuild.log"
+        Get-Content $BuildFilePath
+        throw "Build Failed!"
+    }
 
-	Write-Host "done!"
+    Write-Host "done!"
 
-	Write-Host "Packaging..." -NoNewline
+    Write-Host "Packaging..." -NoNewline
 
-	# Package up deployables
-	$WebProjectFileName = "ExampleApp.csproj"
-	$WebProjectPath     = Join-Path $SourcePath "ExampleApp\$WebProjectFileName"
-	$MsBuildSucceeded   = Invoke-MsBuild `
-		-Path                  $WebProjectPath `
-		-BuildLogDirectoryPath $LogsPath `
-		-MsBuildParameters     "/p:OutDir=$ArtifactsPath\ /t:Package" `
-		-KeepBuildLogOnSuccessfulBuilds
+    # Package up deployables
+    $WebProjectFileName = "ExampleApp.csproj"
+    $WebProjectPath     = Join-Path $SourcePath "ExampleApp\$WebProjectFileName"
+    $MsBuildSucceeded   = Invoke-MsBuild `
+        -Path                  $WebProjectPath `
+        -BuildLogDirectoryPath $LogsPath `
+        -MsBuildParameters     "/p:OutDir=$ArtifactsPath\ /t:Package" `
+        -KeepBuildLogOnSuccessfulBuilds
 
-	if (-not $MsBuildSucceeded) {
-		$BuildFilePath = Join-Path $LogsPath "$WebProjectFileName.msbuild.log"
-		Get-Content $BuildFilePath
-		throw "Build Failed!"
-	}
+    if (-not $MsBuildSucceeded) {
+        $BuildFilePath = Join-Path $LogsPath "$WebProjectFileName.msbuild.log"
+        Get-Content $BuildFilePath
+        throw "Build Failed!"
+    }
 
-	Write-Host "done!"
+    Write-Host "done!"
 }
 
 Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed resources are set up in the target runtime environment." {
-	# Ensure the Azure PowerShell cmdlets are available
-	Import-Module Azure -Force | Out-Null
+    # Ensure the Azure PowerShell cmdlets are available
+    Import-Module Azure -Force | Out-Null
 
-	# First, make sure some Azure credentials are loaded
-	$AzureAccount = Get-AzureAccount
+    # First, make sure some Azure credentials are loaded
+    $AzureAccount = Get-AzureAccount
 
-	if (-not $AzureAccount) {
-		$AzureSubscription = Get-AzureSubscription -Current -ErrorAction SilentlyContinue
+    if (-not $AzureAccount) {
+        $AzureSubscription = Get-AzureSubscription -Current -ErrorAction SilentlyContinue
 
-		if (-not $AzureSubscription) {
-			# Check environment variables for credentials
-			$AzureDeployUser = $env:AzureDeployUser
-			$AzureDeployPass = $env:AzureDeployPass
+        if (-not $AzureSubscription) {
+            # Check environment variables for credentials
+            $AzureDeployUser = $env:AzureDeployUser
+            $AzureDeployPass = $env:AzureDeployPass
 
-			if ($AzureDeployUser -and $AzureDeployPass) {
-				$AzureDeployPassSecure = $AzureDeployPass | ConvertTo-SecureString -AsPlainText -Force
-				$AzureCredential       = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AzureDeployUser,$AzureDeployPassSecure
+            if ($AzureDeployUser -and $AzureDeployPass) {
+                $AzureDeployPassSecure = $AzureDeployPass | ConvertTo-SecureString -AsPlainText -Force
+                $AzureCredential       = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AzureDeployUser,$AzureDeployPassSecure
 
-				$Account = Add-AzureAccount -Credential $AzureCredential
-			} else {
-				Write-Host "Could not find any Azure credentials on the local machine, prompting console user..."
-				# Prompt the console user for credentials
-				$Account = Add-AzureAccount
-			}
+                $Account = Add-AzureAccount -Credential $AzureCredential
+            } else {
+                Write-Host "Could not find any Azure credentials on the local machine, prompting console user..."
+                # Prompt the console user for credentials
+                $Account = Add-AzureAccount
+            }
 
-			if (-not $Account){
-				throw 'No Azure account found or specified!'
-			}
-		}
-	}
+            if (-not $Account){
+                throw 'No Azure account found or specified!'
+            }
+        }
+    }
 
-	$AzureSubscription = (Get-AzureSubscription -Current).SubscriptionName
+    $AzureSubscription = (Get-AzureSubscription -Current).SubscriptionName
 
-	Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $AzureSubscription..."
+    Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $AzureSubscription..."
 
-	# Set up paths to the Resource Manager template
-	$TemplatesPath	  = Join-Path $ArtifactsPath "Templates"
-	$TemplateFilePath = Join-Path $TemplatesPath "ExampleApp.json"
+    # Set up paths to the Resource Manager template
+    $TemplatesPath	  = Join-Path $ArtifactsPath "Templates"
+    $TemplateFilePath = Join-Path $TemplatesPath "ExampleApp.json"
 
-	Switch-AzureMode AzureResourceManager
+    Switch-AzureMode AzureResourceManager
 
-	$templateParameters                     = @{}
-	$templateParameters.environmentName     = $Settings.EnvironmentName
-	$templateParameters.environmentLocation = $Settings.EnvironmentLocation
-	$templateParameters.exampleAppSiteName  = $Settings.ExampleAppSiteName
+    $templateParameters                     = @{}
+    $templateParameters.environmentName     = $Settings.EnvironmentName
+    $templateParameters.environmentLocation = $Settings.EnvironmentLocation
+    $templateParameters.exampleAppSiteName  = $Settings.ExampleAppSiteName
 
-	New-AzureResourceGroup `
-		-Name			            $Settings.ResourceGroupName `
-		-Location                   $Settings.EnvironmentLocation `
-		-TemplateParameterObject    $templateParameters `
-		-TemplateFile               $TemplateFilePath `
-		-Force |
-			Out-Null
+    # See if the resource group already exists
+    $resourceGroups = Get-AzureResourceGroup
+    $appGroup = $resourceGroups | where {$_.ResourceGroupName -eq $Settings.ResourceGroupName}
 
-	Write-Host "Provisioning completed!"
+    if (-not $appGroup) {
+        Write-Host "Creating resource group $($Settings.ResourceGroupName)..." -NoNewline
+
+        New-AzureResourceGroup `
+            -Name			            $Settings.ResourceGroupName `
+            -Location                   $Settings.EnvironmentLocation
+
+        Write-Host "done!"
+    }
+
+    Write-Host "Updating resource group $($Settings.ResourceGroupName)..." -NoNewline
+
+    $result = New-AzureResourceGroupDeployment `
+        -ResourceGroupName			$Settings.ResourceGroupName `
+        -TemplateParameterObject    $templateParameters `
+        -TemplateFile               $TemplateFilePath `
+        -Force
+
+    Write-Host "done!"
+
+    # Save connection strings locally.
+    $environmentSecretsPath     = Join-Path $BasePath "environment-secrets.config"
+    $serviceBusConnectionString = $result.Outputs["serviceBusConnectionString"].Value    
+    
+    Write-Host "Saving connection strings to $environmentSecretsPath..." -NoNewline
+
+    Set-Content $environmentSecretsPath `
+        -Value "<?xml version='1.0' encoding='utf-8'?>
+<appSettings>
+  <add 
+    key=""Microsoft.ServiceBus.ConnectionString""
+    value=""$serviceBusConnectionString""
+  />
+</appSettings>" `
+        -Force
+
+    Write-Host "done!"
+    Write-Host
+    Write-Host "Provisioning completed!"
 }
 
 Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from the last build that occurred to the target environment." {
-	$ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "ExampleApp_Package\ExampleApp.zip"
+    $ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "ExampleApp_Package\ExampleApp.zip"
 
-	Write-Host "Deploying $ExampleAppPackagePath to $($Settings.ExampleAppSiteName)..."
+    Write-Host "Deploying $ExampleAppPackagePath to $($Settings.ExampleAppSiteName)..."
 
-	Switch-AzureMode AzureServiceManagement
-	Publish-AzureWebsiteProject `
-		-Package $ExampleAppPackagePath `
-		-Name    $Settings.ExampleAppSiteName
+    Switch-AzureMode AzureServiceManagement
+    Publish-AzureWebsiteProject `
+        -Package $ExampleAppPackagePath `
+        -Name    $Settings.ExampleAppSiteName
 
-	Write-Host "done!"
+    Write-Host "done!"
 
-	# Hit the Example App website to make sure it's alive
-	$ExampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
+    # Hit the Example App website to make sure it's alive
+    $ExampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
 
-	Write-Host "Checking $ExampleWebsiteHostName..." -NoNewline
+    Write-Host "Checking $ExampleWebsiteHostName..." -NoNewline
 
-	$Response = Invoke-WebRequest $ExampleWebsiteHostName -UseBasicParsing
-	$StatusCode = $Response.StatusCode
+    $Response = Invoke-WebRequest $ExampleWebsiteHostName -UseBasicParsing
+    $StatusCode = $Response.StatusCode
 
-	Write-Host "Response Code: $StatusCode"
+    Write-Host "Response Code: $StatusCode"
 
-	if (-not ($StatusCode -eq 200)) {
-		throw "Unexpected response: $Response"
-	}
+    if (-not ($StatusCode -eq 200)) {
+        throw "Unexpected response: $Response"
+    }
 
-	Write-Host "Deployment Completed"
+    Write-Host "Deployment Completed"
 }
 
 Task FunctionalTest -depends LoadSettings -description 'Tests that the required features and use cases are working in the target environment.' {
-	Write-Host 'Getting Base URI...' -NoNewline
+    Write-Host 'Getting Base URI...' -NoNewline
 
-	$ExampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
-	$ExampleWebsiteBaseUri = "http://$ExampleWebsiteHostName"
+    $ExampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
+    $ExampleWebsiteBaseUri = "http://$ExampleWebsiteHostName"
 
-	Write-Host $ExampleWebsiteBaseUri
+    Write-Host $ExampleWebsiteBaseUri
 
-	${env:ExampleApp.BaseUri} = $ExampleWebsiteBaseUri
+    ${env:ExampleApp.BaseUri} = $ExampleWebsiteBaseUri
 
-	$TestDlls = @(
-		(Join-Path $ArtifactsPath 'ExampleApp.Test.Functional.dll')
-	)
-	
-	Write-Host "Running tests in $TestDlls"
+    $TestDlls = @(
+        (Join-Path $ArtifactsPath 'ExampleApp.Test.Functional.dll')
+    )
+    
+    Write-Host "Running tests in $TestDlls"
 
-	$XUnitPath = Join-Path $Env:ChocolateyInstall 'bin\xunit.console.exe'
+    $XUnitPath = Join-Path $Env:ChocolateyInstall 'bin\xunit.console.exe'
 
-	exec { & $XUnitPath $TestDlls }
+    exec { & $XUnitPath $TestDlls }
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
-	$answer = Read-Host `
-		-Prompt "Are you use you want to permanently delete all services and data from the target environment $($Settings.EnvironmentName)? (y/n)"
+    $answer = Read-Host `
+        -Prompt "Are you use you want to permanently delete all services and data from the target environment $($Settings.EnvironmentName)? (y/n)"
 
-	if ($answer -eq 'y'){
-		Switch-AzureMode AzureResourceManager
-		Remove-AzureResourceGroup `
-			-Name $Settings.ResourceGroupName `
-			-Force
-	}
+    if ($answer -eq 'y'){
+        Switch-AzureMode AzureResourceManager
+        Remove-AzureResourceGroup `
+            -Name $Settings.ResourceGroupName `
+            -Force
+    }
 }
 
 Task Pull -description "Pulls the latest source from master to the local repo." {
-	exec { git pull origin master }
+    exec { git pull origin master }
 }
 
 Task Push -depends Pull,Build,Deploy,FunctionalTest -description "Performs pre-push actions before actually pushing to the remote repo." {
-	exec { git push }
+    exec { git push }
 }

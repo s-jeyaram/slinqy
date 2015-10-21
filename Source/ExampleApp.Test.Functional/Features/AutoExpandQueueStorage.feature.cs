@@ -82,7 +82,7 @@ namespace ExampleApp.Test.Functional.Features
 #line 6
 this.ScenarioSetup(scenarioInfo);
 #line 7
- testRunner.Given("the Queue Storage Utilization Scale Up Threshold is set", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("a Queue with Storage Utilization Scale Up Threshold set", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 8
  testRunner.When("the Queue Storage Utilization reaches the Scale Up Threshold", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 9

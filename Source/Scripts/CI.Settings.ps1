@@ -12,7 +12,7 @@ function Get-EnvironmentSettings {
 
 	# Populate it
 	if (Test-Path $settingsFilePath) {
-		Write-Host "Loading settings from $settingsFilePath..."
+		Write-Host "Loading settings from $settingsFilePath..." -NoNewline
 
 		# Load the specified settings
 		$SettingsFileContent = Get-Content `
@@ -22,7 +22,7 @@ function Get-EnvironmentSettings {
 
 		$params = $SettingsFileContent.parameters
 	} else {
-		Write-Host "Loading settings from environment variables..."
+		Write-Host "Loading settings from environment variables..." -NoNewline
 		$params = New-Object PSCustomObject
 	}
 
@@ -34,6 +34,8 @@ function Get-EnvironmentSettings {
 	$hash.ResourceGroupName	  = $hash.EnvironmentName + '-' + $ProductName
 	$hash.ExampleAppName	  = $ProductName + '-ExampleApp'
 	$hash.ExampleAppSiteName  = $hash.EnvironmentName + '-' + $hash.ExampleAppName
+
+	Write-Host "done!"
 
 	Write-Output $hash
 }

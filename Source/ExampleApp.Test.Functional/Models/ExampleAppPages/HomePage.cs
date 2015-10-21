@@ -2,9 +2,6 @@
 {
     using OpenQA.Selenium;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
 
     /// <summary>
     /// Models the Slinqy Example App Homepage.
@@ -19,20 +16,13 @@
         /// <summary>
         /// Gets or sets the threshold for when the queue agent should scale the queue storage capacity.
         /// </summary>
-        public double                       ScaleUpThresholdPercentage  { get; set; }
+        public double ScaleUpThresholdPercentage  { get; set; }
 
         /// <summary>
-        /// Gets the history of the queue.
+        /// Gets the form for creating a new queue.
         /// </summary>
-        public IEnumerable<QueueHistory>    QueueHistory
-        {
-            get
-            {
-                this.ToString();
-                return Enumerable.Empty<QueueHistory>();
-            }
-        }
-
+        public CreateQueueForm CreateQueueForm { get; private set; }
+        
         /// <summary>
         /// Initializes the Homepage with the IWebDriver to use for controlling the page.
         /// </summary>
@@ -44,24 +34,7 @@
             IWebDriver webBrowserDriver) 
                 : base(webBrowserDriver, new Uri(RelativePath, UriKind.Relative))
         {
-        }
-
-        /// <summary>
-        /// Applies the settings to the agent.
-        /// </summary>
-        public 
-        void 
-        UpdateAgent()
-        {
-            this.ToString();
-        }
-
-        /// <summary>
-        /// Generates queue messages and submits them to the queue.
-        /// </summary>
-        public void GenerateQueueMessages()
-        {
-            this.ToString();
+            this.CreateQueueForm = new CreateQueueForm(webBrowserDriver);
         }
     }
 }

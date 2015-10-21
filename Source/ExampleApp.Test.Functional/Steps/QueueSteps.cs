@@ -4,7 +4,6 @@
     using Models;
     using Models.ExampleAppPages;
     using System;
-    using System.Linq;
     using TechTalk.SpecFlow;
 
     /// <summary>
@@ -16,46 +15,44 @@
         /// <summary>
         /// Maintains a reference to the WebBrowser driver to use for interacting with the web browser.
         /// </summary>
-        private readonly WebBrowser             webBrowser;
-
-        /// <summary>
-        /// Maintains a reference to the scenarios contextual information.
-        /// </summary>
-        private readonly SpecFlowContextualInfo context;
-
+        private readonly WebBrowser webBrowser;
+        
         /// <summary>
         /// Initializes a new instance with a WebBrowser.
         /// </summary>
-        /// <param name="context">
-        /// Specifies the contextual information about the current scenario.
-        /// </param>
         /// <param name="browser">
         /// Specifies the WebBrowser instance to use for interacting with the browser.
         /// </param>
         public 
         QueueSteps(
-            SpecFlowContextualInfo  context,
-            WebBrowser              browser)
+            WebBrowser browser)
         {
-            this.context    = context;
             this.webBrowser = browser;
         }
 
         /// <summary>
-        /// Configures the Queue Storage Utilization Scale Up Threshold setting on the queue agent.
+        /// Creates a Queue with the Queue Storage Utilization Scale Up Threshold setting.
         /// </summary>
         [Given]
         public 
         void 
-        GivenTheQueueStorageUtilizationScaleUpThresholdIsSet()
+        GivenAQueueWithStorageUtilizationScaleUpThresholdSet()
         {
             var homepage = this.webBrowser.NavigateTo<Homepage>();
 
-            // Set the threshold low so it doesn't take much to hit it.
-            homepage.ScaleUpThresholdPercentage = 0.05;
-            homepage.UpdateAgent();
+            // Configure so it doesn't take much to hit the threshold.
+            var createQueueParams = new CreateQueueParameters(
+                "test-queue",
+                storageCapacityMegabytes:   1024,
+                scaleUpThresholdPercentage: 0.05
+            );
 
-            ContextSet(homepage);
+            var manageQueueSection = homepage
+                .CreateQueueForm
+                .CreateQueue(createQueueParams);
+            
+            ContextSet(createQueueParams);
+            ContextSet(manageQueueSection);
         }
 
         /// <summary>
@@ -67,9 +64,12 @@
         void 
         WhenTheQueueStorageUtilizationReachesTheScaleUpThreshold()
         {
-            ContextGet<Homepage>()
+            ContextGet<ManageQueueSection>()
+                .QueueClient
                 .GenerateQueueMessages();
         }
+
+        // TODO: Move these Context methods to a base class.
 
         /// <summary>
         /// Saves the specified value in the scenario context for subsequent steps to use.
@@ -103,10 +103,12 @@
         /// </summary>
         [Then]
         public 
+        static
         void 
         ThenTheQueueStorageCapacityExpands()
         {
-            var homepage = ContextGet<Homepage>();
+            var manageQueueSection = ContextGet<ManageQueueSection>();
+            var createQueueParams = ContextGet<CreateQueueParameters>();
 
             // TODO: Make poll logic a generic function
 
@@ -115,19 +117,8 @@
 
             while (DateTimeOffset.UtcNow.Subtract(pollStartTimestamp).TotalSeconds <= pollMaxSeconds)
             {
-                // Evaluate queue capacity over time, should see it expand since the start of the test.
-                var capacityHistory = homepage.QueueHistory.Where(history => history.Timestamp > this.context.ScenarioStartTimestamp);
-
-                var lastCapacityValue = 0;
-
-                // Check if the capacity has increased
-                foreach (var historyRecord in capacityHistory)
-                {
-                    if (lastCapacityValue > 0 && historyRecord.StorageCapacityGigabytes > lastCapacityValue)
-                        return;
-                    
-                    lastCapacityValue = historyRecord.StorageCapacityGigabytes;
-                }
+                if (manageQueueSection.QueueInformation.StorageCapacityMegabytes > createQueueParams.StorageCapacityMegabytes)
+                    return;
             }
 
             Assert.Fail("The Queue Storage Capacity was not increased as expected.");

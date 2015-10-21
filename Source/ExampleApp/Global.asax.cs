@@ -1,13 +1,15 @@
 ﻿namespace ExampleApp
 {
     using System.Diagnostics.CodeAnalysis;
+    using System.Web;
     using System.Web.Mvc;
+    using System.Web.Optimization;
     using System.Web.Routing;
 
     /// <summary>
     /// Handles application life cycle events.
     /// </summary>
-    public class WebApiApplication : System.Web.HttpApplication
+    public class WebApiApplication : HttpApplication
     {
         /// <summary>
         /// This method is automatically called when the application first starts.
@@ -19,6 +21,7 @@
         {
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
     }
 }

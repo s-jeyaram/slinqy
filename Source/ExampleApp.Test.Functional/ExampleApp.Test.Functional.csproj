@@ -97,8 +97,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Versioning.feature</DependentUpon>
     </Compile>
+    <Compile Include="Models\ExampleAppPages\CreateQueueForm.cs">
+      <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
+    </Compile>
+    <Compile Include="Models\ExampleAppPages\CreateQueueParameters.cs" />
     <Compile Include="Models\ExampleAppPages\HomePage.cs" />
-    <Compile Include="Models\ExampleAppPages\QueueHistory.cs" />
+    <Compile Include="Models\ExampleAppPages\ManageQueueSection.cs" />
+    <Compile Include="Models\ExampleAppPages\QueueClientSection.cs" />
+    <Compile Include="Models\ExampleAppPages\QueueInformation.cs" />
     <Compile Include="Models\SeleniumWebBase.cs" />
     <Compile Include="Models\ExampleAppPages\SlinqyExampleWebPage.cs" />
     <Compile Include="Models\WebBrowser.cs" />
@@ -124,6 +130,7 @@
       <LastGenOutput>Versioning.feature.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
+    <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
