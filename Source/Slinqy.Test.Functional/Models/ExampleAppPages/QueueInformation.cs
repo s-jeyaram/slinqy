@@ -1,4 +1,4 @@
-﻿namespace ExampleApp.Test.Functional.Models.ExampleAppPages
+﻿namespace Slinqy.Test.Functional.Models.ExampleAppPages
 {
     using System.Globalization;
     using OpenQA.Selenium;

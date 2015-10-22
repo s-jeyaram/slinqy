@@ -1,4 +1,4 @@
-﻿namespace ExampleApp.Test.Functional.Models.ExampleAppPages
+﻿namespace Slinqy.Test.Functional.Models.ExampleAppPages
 {
     /// <summary>
     /// Models the parameters for creating a new Slinqy queue on the Example App Homepage.

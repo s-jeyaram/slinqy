@@ -11,22 +11,22 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace ExampleApp.Test.Functional.Features.Infrastructure
+namespace Slinqy.Test.Functional.Features
 {
     using TechTalk.SpecFlow;
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "1.9.0.77")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class VersionFeature : Xunit.IClassFixture<VersionFeature.FixtureData>, System.IDisposable
+    public partial class AutoExpandQueueStorageFeature : Xunit.IClassFixture<AutoExpandQueueStorageFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
         
-#line 1 "Versioning.feature"
+#line 1 "AutoExpandQueueStorage.feature"
 #line hidden
         
-        public VersionFeature()
+        public AutoExpandQueueStorageFeature()
         {
             this.TestInitialize();
         }
@@ -34,8 +34,8 @@ namespace ExampleApp.Test.Functional.Features.Infrastructure
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Version", "As a User\r\nI want to know what version I\'m using\r\nSo that I can understand how th" +
-                    "e system should act", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "AutoExpandQueueStorage", "As a Queue Writer\nI want my queue storage capacity to expand when it nears capaci" +
+                    "ty\nSo that I can always store my messages", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -64,7 +64,7 @@ namespace ExampleApp.Test.Functional.Features.Infrastructure
             testRunner.CollectScenarioErrors();
         }
         
-        public virtual void SetFixture(VersionFeature.FixtureData fixtureData)
+        public virtual void SetFixture(AutoExpandQueueStorageFeature.FixtureData fixtureData)
         {
         }
         
@@ -74,17 +74,19 @@ namespace ExampleApp.Test.Functional.Features.Infrastructure
         }
         
         [Xunit.FactAttribute()]
-        [Xunit.TraitAttribute("FeatureTitle", "Version")]
-        [Xunit.TraitAttribute("Description", "Deployed Version Matches Test Version")]
-        public virtual void DeployedVersionMatchesTestVersion()
+        [Xunit.TraitAttribute("FeatureTitle", "AutoExpandQueueStorage")]
+        [Xunit.TraitAttribute("Description", "Queue Storage Expands When Utilization Reaches Threshold")]
+        public virtual void QueueStorageExpandsWhenUtilizationReachesThreshold()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Deployed Version Matches Test Version", ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Queue Storage Expands When Utilization Reaches Threshold", ((string[])(null)));
 #line 6
 this.ScenarioSetup(scenarioInfo);
 #line 7
- testRunner.Given("I navigate to the Homepage", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("a Queue with Storage Utilization Scale Up Threshold set", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 8
- testRunner.Then("the Application Version matches the Test Version", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("the Queue Storage Utilization reaches the Scale Up Threshold", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 9
+ testRunner.Then("the Queue Storage Capacity expands", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -96,12 +98,12 @@ this.ScenarioSetup(scenarioInfo);
             
             public FixtureData()
             {
-                VersionFeature.FeatureSetup();
+                AutoExpandQueueStorageFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                VersionFeature.FeatureTearDown();
+                AutoExpandQueueStorageFeature.FeatureTearDown();
             }
         }
     }

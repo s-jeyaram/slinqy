@@ -1,4 +1,4 @@
-﻿namespace ExampleApp.Test.Functional
+﻿namespace Slinqy.Test.Functional
 {
     using BoDi;
     using Models;

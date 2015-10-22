@@ -197,7 +197,7 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 }
 
 Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from the last build that occurred to the target environment." {
-    $ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "ExampleApp_Package\ExampleApp.zip"
+    $ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "ExampleApp.Web_Package\ExampleApp.Web.zip"
 
     Write-Host "Deploying $ExampleAppPackagePath to $($Settings.ExampleAppSiteName)..."
 
@@ -236,7 +236,7 @@ Task FunctionalTest -depends LoadSettings -description 'Tests that the required 
     ${env:ExampleApp.BaseUri} = $ExampleWebsiteBaseUri
 
     $TestDlls = @(
-        (Join-Path $ArtifactsPath 'ExampleApp.Test.Functional.dll')
+        (Join-Path $ArtifactsPath 'Slinqy.Test.Functional.dll')
     )
     
     Write-Host "Running tests in $TestDlls"

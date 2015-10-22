@@ -1,4 +1,4 @@
-﻿namespace ExampleApp.Test.Functional.Steps
+﻿namespace Slinqy.Test.Functional.Steps
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Models;
