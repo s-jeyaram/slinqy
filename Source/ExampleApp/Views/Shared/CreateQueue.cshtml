@@ -1,6 +1,6 @@
 ﻿@model ExampleApp.Models.CreateQueueModel
 
-@using (Ajax.BeginForm("CreateQueue", "Home", new AjaxOptions{ HttpMethod = "POST", UpdateTargetId = "MainBody" }, new { Id = "CreateQueueForm"}))
+@using (Ajax.BeginForm("CreateQueue", "Home", new AjaxOptions{ HttpMethod = "POST", UpdateTargetId = "MainBody", OnBegin = "CreateQueueStarted", OnComplete = "CreateQueueCompleted", OnSuccess = "CreateQueueSucceeded", OnFailure = "CreateQueueFailed" }, new { Id = "CreateQueueForm"}))
 {
     @Html.AntiForgeryToken()
 
@@ -11,3 +11,25 @@
         <input id="CreateQueueButton" type="submit" value="Create"/>
     </div>
 }
+
+<script type="text/javascript">
+    // Called when the user initiates a create queue AJAX request.
+    function CreateQueueStarted() {
+        $('#AjaxStatus').text('STARTED');
+        $('#AjaxStatusMessage').text('Request submitting, awaiting a response from the server.');
+    }
+
+    function CreateQueueSucceeded() {
+        $('#AjaxResult').text('SUCCEEDED');
+        $('#AjaxStatusMessage').text('The last request was successful.');
+    }
+
+    function CreateQueueFailed(response) {
+        $('#AjaxResult').text('FAILED');
+        $('#AjaxStatusMessage').text(response.responseText);
+    }
+
+    function CreateQueueCompleted(xhr) {
+        $('#AjaxStatus').text('COMPLETED');
+    }
+</script>

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Globalization;
+    using System.Threading;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
 
@@ -24,6 +25,21 @@
         /// The proxy reference to the submit button on the create queue form.
         /// </summary>
         [FindsBy] private IWebElement CreateQueueButton = null;
+
+        /// <summary>
+        /// The proxy reference to the AJAX request status element on the web page.
+        /// </summary>
+        [FindsBy] private IWebElement AjaxStatus = null;
+
+        /// <summary>
+        /// The proxy reference to the AJAX request result element on the web page.
+        /// </summary>
+        [FindsBy] private IWebElement AjaxResult = null;
+
+        /// <summary>
+        /// The proxy reference to the AJAX request result message element on the web page.
+        /// </summary>
+        [FindsBy] private IWebElement AjaxStatusMessage = null;
 
         /// <summary>
         /// Initializes a new instance with the web browser driver.
@@ -54,7 +70,15 @@
 
             // Submit
             this.CreateQueueButton.Click();
-            
+
+            // Wait for it to finish
+            while (this.AjaxStatus.Text != "COMPLETED")
+                Thread.Sleep(1000);
+
+            // Check the result
+            if (this.AjaxResult.Text == "FAILED")
+                throw new InvalidOperationException(this.AjaxStatusMessage.Text);
+        
             // Return queue info
             return new ManageQueueSection(this.WebBrowserDriver);
         }
