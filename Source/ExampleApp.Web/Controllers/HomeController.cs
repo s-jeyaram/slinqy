@@ -1,4 +1,4 @@
-﻿namespace ExampleApp.Controllers
+﻿namespace ExampleApp.Web.Controllers
 {
     using System;
     using Microsoft.ServiceBus;

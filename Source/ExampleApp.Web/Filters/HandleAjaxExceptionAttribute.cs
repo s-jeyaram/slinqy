@@ -1,4 +1,4 @@
-﻿namespace ExampleApp.Filters
+﻿namespace ExampleApp.Web.Filters
 {
     using System.Net;
     using System.Web.Mvc;

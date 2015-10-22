@@ -1,4 +1,4 @@
-﻿@model ExampleApp.Models.CreateQueueModel
+﻿@model ExampleApp.Web.Models.CreateQueueModel
 
 @using (Ajax.BeginForm("CreateQueue", "Home", new AjaxOptions{ HttpMethod = "POST", UpdateTargetId = "MainBody", OnBegin = "CreateQueueStarted", OnComplete = "CreateQueueCompleted", OnSuccess = "CreateQueueSucceeded", OnFailure = "CreateQueueFailed" }, new { Id = "CreateQueueForm"}))
 {

@@ -1,4 +1,4 @@
-﻿namespace ExampleApp
+﻿namespace ExampleApp.Web
 {
     using System;
     using System.Web.Optimization;

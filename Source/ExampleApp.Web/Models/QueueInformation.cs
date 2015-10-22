@@ -1,4 +1,4 @@
-﻿namespace ExampleApp.Models
+﻿namespace ExampleApp.Web.Models
 {
     /// <summary>
     /// Models standard queue information.

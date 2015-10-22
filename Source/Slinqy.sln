@@ -25,12 +25,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "ExampleApp.ResourceGroup", "ExampleApp.ResourceGroup\ExampleApp.ResourceGroup.deployproj", "{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleApp", "ExampleApp\ExampleApp.csproj", "{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleApp.Test.Functional", "ExampleApp.Test.Functional\ExampleApp.Test.Functional.csproj", "{5FB77DEA-B800-42CC-9A5F-673608CF9D12}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77} = {CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleApp.Web", "ExampleApp.Web\ExampleApp.Web.csproj", "{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,10 +39,10 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5FB77DEA-B800-42CC-9A5F-673608CF9D12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FB77DEA-B800-42CC-9A5F-673608CF9D12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

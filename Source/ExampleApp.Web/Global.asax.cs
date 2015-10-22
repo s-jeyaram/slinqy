@@ -1,4 +1,4 @@
-﻿namespace ExampleApp
+﻿namespace ExampleApp.Web
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Web;
