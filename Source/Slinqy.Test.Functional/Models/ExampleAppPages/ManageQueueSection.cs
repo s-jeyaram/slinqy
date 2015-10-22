@@ -17,14 +17,14 @@
         ManageQueueSection(
             IWebDriver          webBrowserDriver) : base(webBrowserDriver)
         {
-            this.QueueInformation = new QueueInformation(webBrowserDriver);
+            this.QueueInformation = new QueueInformationSection(webBrowserDriver);
             this.QueueClient      = new QueueClientSection(webBrowserDriver);
         }
 
         /// <summary>
         /// Gets the static queue information.
         /// </summary>
-        public QueueInformation     QueueInformation    { get; private set; }
+        public QueueInformationSection     QueueInformation    { get; private set; }
 
         /// <summary>
         /// Gets the queue client section for interacting with the queue.

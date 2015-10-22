@@ -6,7 +6,7 @@
     /// <summary>
     /// Models the footer of the Slinqy Example App website.
     /// </summary>
-    public class WebsiteFooter : WebpageWidget
+    public class WebsiteFooterSection : WebpageWidget
     {
         /// <summary>
         /// Proxy to the web element containing the application version number.
@@ -19,7 +19,7 @@
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the IWebDriver to use for controlling the browser.</param>
         public 
-        WebsiteFooter(
+        WebsiteFooterSection(
             IWebDriver webBrowserDriver) : base(webBrowserDriver)
         {
         }

@@ -7,7 +7,7 @@
     /// <summary>
     /// Models the queue information that displays on the Homepage.
     /// </summary>
-    public class QueueInformation : SeleniumWebBase
+    public class QueueInformationSection : SeleniumWebBase
     {
         /// <summary>
         /// A proxy reference to the element in the web browser.
@@ -27,7 +27,7 @@
         /// Specifies the driver to use for interacting with the web browser.
         /// </param>
         public 
-        QueueInformation(
+        QueueInformationSection(
             IWebDriver webBrowserDriver) : base(webBrowserDriver)
         {
         }

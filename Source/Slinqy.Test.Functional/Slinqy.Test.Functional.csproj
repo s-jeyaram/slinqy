@@ -104,13 +104,13 @@
     <Compile Include="Models\ExampleAppPages\HomePage.cs" />
     <Compile Include="Models\ExampleAppPages\ManageQueueSection.cs" />
     <Compile Include="Models\ExampleAppPages\QueueClientSection.cs" />
-    <Compile Include="Models\ExampleAppPages\QueueInformation.cs" />
+    <Compile Include="Models\ExampleAppPages\QueueInformationSection.cs" />
     <Compile Include="Models\SeleniumWebBase.cs" />
     <Compile Include="Models\ExampleAppPages\SlinqyExampleWebPage.cs" />
     <Compile Include="Models\WebBrowser.cs" />
     <Compile Include="Models\WebPage.cs" />
     <Compile Include="Models\WebPageWidget.cs" />
-    <Compile Include="Models\ExampleAppPages\WebsiteFooter.cs" />
+    <Compile Include="Models\ExampleAppPages\WebsiteFooterSection.cs" />
     <Compile Include="SpecFlowContextualInfo.cs" />
     <Compile Include="Steps\NavigationSteps.cs" />
     <Compile Include="Steps\QueueSteps.cs" />

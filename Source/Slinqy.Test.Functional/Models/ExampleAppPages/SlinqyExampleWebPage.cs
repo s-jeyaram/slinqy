@@ -18,12 +18,12 @@
             IWebDriver webBrowserDriver,
             Uri        webpageRelativePath) : base(webBrowserDriver, webpageRelativePath)
         {
-            this.Footer = new WebsiteFooter(webBrowserDriver);
+            this.Footer = new WebsiteFooterSection(webBrowserDriver);
         }
 
         /// <summary>
         /// Gets the Footer portion of the web page.
         /// </summary>
-        public WebsiteFooter    Footer  { get; private set; }
+        public WebsiteFooterSection    Footer  { get; private set; }
     }
 }
