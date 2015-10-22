@@ -9,7 +9,7 @@
     internal sealed class HandleAjaxExceptionAttribute : HandleErrorAttribute
     {
         /// <summary>
-        /// Handles exceptions.
+        /// This method will be called for all exceptions and will only react to those that are AJAX requests.
         /// </summary>
         /// <param name="filterContext">Specifies the exception context to handle.</param>
         public 
@@ -22,8 +22,7 @@
             {
                 filterContext.HttpContext.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
 
-                filterContext.Result = new ContentResult
-                {
+                filterContext.Result = new ContentResult {
                     Content = filterContext.Exception.Message
                 };
                 
