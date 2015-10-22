@@ -1,6 +1,7 @@
 ﻿namespace ExampleApp
 {
     using System.Web.Mvc;
+    using Filters;
 
     /// <summary>
     /// Configures the GlobalFilterCollection.

@@ -153,10 +153,10 @@
     <Compile Include="App_Start\GlobalFilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Filters\HandleAjaxExceptionAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="HandleAjaxExceptionAttribute.cs" />
     <Compile Include="Models\CreateQueueModel.cs" />
     <Compile Include="Models\ManageQueueModel.cs" />
     <Compile Include="Models\QueueInformation.cs" />
