@@ -10,22 +10,16 @@
     /// Defines steps for using the versioning infrastructure.
     /// </summary>
     [Binding]
-    public class VersionSteps
+    public class VersionSteps : BaseSteps
     {
-        /// <summary>
-        /// Reference to the browser controller.
-        /// </summary>
-        private readonly WebBrowser webBrowser;
-
         /// <summary>
         /// Initializes a new instance with a web browser.
         /// </summary>
         /// <param name="webBrowser">Specifies the browser.</param>
         public 
         VersionSteps(
-            WebBrowser webBrowser)
+            WebBrowser webBrowser) : base(webBrowser)
         {
-            this.webBrowser = webBrowser;
         }
 
         /// <summary>
@@ -38,7 +32,7 @@
         void 
         ThenTheApplicationVersionMatchesTheTestVersion()
         {
-            var examplePage = this.webBrowser.GetCurrentPageAs<SlinqyExampleWebpage>();
+            var examplePage = this.WebBrowser.GetCurrentPageAs<SlinqyExampleWebpage>();
 
             var websiteVersion = examplePage.Footer.Version;
             var testVersion    = Assembly.GetExecutingAssembly().GetName().Version.ToString();

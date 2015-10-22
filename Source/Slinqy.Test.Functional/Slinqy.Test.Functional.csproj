@@ -112,6 +112,7 @@
     <Compile Include="Models\WebPageWidget.cs" />
     <Compile Include="Models\ExampleAppPages\WebsiteFooterSection.cs" />
     <Compile Include="SpecFlowContextualInfo.cs" />
+    <Compile Include="Steps\BaseSteps.cs" />
     <Compile Include="Steps\NavigationSteps.cs" />
     <Compile Include="Steps\QueueSteps.cs" />
     <Compile Include="Steps\VersionSteps.cs" />

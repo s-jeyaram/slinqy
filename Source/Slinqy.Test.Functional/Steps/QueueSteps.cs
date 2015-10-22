@@ -10,31 +10,25 @@
     /// Defines steps for working with the queues of the Example App.
     /// </summary>
     [Binding]
-    public class QueueSteps
+    public class QueueSteps : BaseSteps
     {
-        /// <summary>
-        /// Maintains a reference to the WebBrowser driver to use for interacting with the web browser.
-        /// </summary>
-        private readonly WebBrowser webBrowser;
-        
         /// <summary>
         /// Initializes a new instance with a WebBrowser.
         /// </summary>
         /// <param name="browser">
         /// Specifies the WebBrowser instance to use for interacting with the browser.
         /// </param>
-        public 
+        public
         QueueSteps(
-            WebBrowser browser)
+            WebBrowser browser) : base(browser)
         {
-            this.webBrowser = browser;
         }
 
         /// <summary>
         /// Generates and submits queue messages to the queue until storage utilization reaches the configured scale up threshold.
         /// </summary>
         [When]
-        public 
+        public
         static
         void 
         WhenTheQueueStorageUtilizationReachesTheScaleUpThreshold()
@@ -48,15 +42,15 @@
         /// Verifies that the queue storage capacity has expanded since the scenario started.
         /// </summary>
         [Then]
-        public 
+        public
         static
         void 
         ThenTheQueueStorageCapacityExpands()
         {
             var manageQueueSection = ContextGet<ManageQueueSection>();
-            var createQueueParams = ContextGet<CreateQueueParameters>();
+            var createQueueParams  = ContextGet<CreateQueueParameters>();
 
-            var pollMaxSeconds     = 60;
+            var pollMaxSeconds     = 30;
             var pollStartTimestamp = DateTimeOffset.UtcNow;
 
             // TODO: Make poll logic a generic function
@@ -77,7 +71,7 @@
         void 
         GivenAQueueWithStorageUtilizationScaleUpThresholdSet()
         {
-            var homepage = this.webBrowser.NavigateTo<Homepage>();
+            var homepage = this.WebBrowser.NavigateTo<Homepage>();
 
             // Configure so it doesn't take much to hit the threshold.
             var createQueueParams = new CreateQueueParameters(
@@ -90,37 +84,8 @@
                 .CreateQueueForm
                 .CreateQueue(createQueueParams);
             
-            ContextSet(createQueueParams);
-            ContextSet(manageQueueSection);
-        }
-
-        // TODO: Move these Context methods to a base class.
-
-        /// <summary>
-        /// Saves the specified value in the scenario context for subsequent steps to use.
-        /// </summary>
-        /// <param name="value">Specifies the value to save.</param>
-        /// <typeparam name="T">Specifies the type of the value.</typeparam>
-        private
-        static
-        void
-        ContextSet<T>(
-            T value)
-        {
-            ScenarioContext.Current.Set(value);
-        }
-
-        /// <summary>
-        /// Retrieves a value that was saved by a previous step.
-        /// </summary>
-        /// <typeparam name="T">Specifies the type of the value.</typeparam>
-        /// <returns>Returns the requested value.</returns>
-        private
-        static
-        T
-        ContextGet<T>()
-        {
-            return ScenarioContext.Current.Get<T>();
+            QueueSteps.ContextSet(createQueueParams);
+            QueueSteps.ContextSet(manageQueueSection);
         }
     }
 }
