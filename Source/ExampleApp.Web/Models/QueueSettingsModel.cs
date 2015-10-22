@@ -3,7 +3,7 @@
     /// <summary>
     /// Models changeable settings for a queue.
     /// </summary>
-    public class QueueSettings
+    public class QueueSettingsModel
     {
         /// <summary>
         /// Initializes a new instance.
@@ -12,7 +12,7 @@
         /// Specifies at what point the queues storage capacity should be expanded.
         /// </param>
         public 
-        QueueSettings(
+        QueueSettingsModel(
             double storageUtilizationScaleUpThreshold)
         {
             this.StorageUtilizationScaleUpThreshold = storageUtilizationScaleUpThreshold;

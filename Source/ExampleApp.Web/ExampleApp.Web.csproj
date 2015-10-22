@@ -159,8 +159,8 @@
     </Compile>
     <Compile Include="Models\CreateQueueModel.cs" />
     <Compile Include="Models\ManageQueueModel.cs" />
-    <Compile Include="Models\QueueInformation.cs" />
-    <Compile Include="Models\QueueSettings.cs" />
+    <Compile Include="Models\QueueInformationModel.cs" />
+    <Compile Include="Models\QueueSettingsModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

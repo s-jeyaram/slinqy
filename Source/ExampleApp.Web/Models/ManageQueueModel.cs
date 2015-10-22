@@ -15,18 +15,18 @@
             string  queueName,
             long     storageCapacityMegabytes)
         {
-            this.QueueSettings    = new QueueSettings(0.5);
-            this.QueueInformation = new QueueInformation(queueName, storageCapacityMegabytes);
+            this.QueueSettings    = new QueueSettingsModel(0.5);
+            this.QueueInformation = new QueueInformationModel(queueName, storageCapacityMegabytes);
         }
 
         /// <summary>
         /// Gets information about the queue.
         /// </summary>
-        public QueueInformation QueueInformation { get; private set; }
+        public QueueInformationModel QueueInformation { get; private set; }
 
         /// <summary>
         /// Gets the current settings for the queue.
         /// </summary>
-        public QueueSettings    QueueSettings    { get; private set; }
+        public QueueSettingsModel    QueueSettings    { get; private set; }
     }
 }
