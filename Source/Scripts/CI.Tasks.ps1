@@ -94,8 +94,8 @@ Task Build -depends Clean -description "Compiles all source code." {
     Write-Host "Packaging..." -NoNewline
 
     # Package up deployables
-    $WebProjectFileName = "ExampleApp.csproj"
-    $WebProjectPath     = Join-Path $SourcePath "ExampleApp\$WebProjectFileName"
+    $WebProjectFileName = "ExampleApp.Web.csproj"
+    $WebProjectPath     = Join-Path $SourcePath "ExampleApp.Web\$WebProjectFileName"
     $MsBuildSucceeded   = Invoke-MsBuild `
         -Path                  $WebProjectPath `
         -BuildLogDirectoryPath $LogsPath `
