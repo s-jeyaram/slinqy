@@ -1,11 +1,11 @@
 ﻿namespace ExampleApp.Web.Controllers
 {
-    using System;
     using Microsoft.ServiceBus;
+    using Microsoft.ServiceBus.Messaging;
     using Models;
+    using System;
     using System.Configuration;
     using System.Web.Mvc;
-    using Microsoft.ServiceBus.Messaging;
 
     /// <summary>
     /// Defines supported actions for the Homepage.

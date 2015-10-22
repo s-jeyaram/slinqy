@@ -9,11 +9,6 @@
     public abstract class Webpage : SeleniumWebBase
     {
         /// <summary>
-        /// Gets the relative path of the web page.
-        /// </summary>
-        public Uri WebpageRelativeUri { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance with the web driver and relative path of the web page.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the driver to use for controlling the browser.</param>
@@ -25,5 +20,10 @@
         {
             this.WebpageRelativeUri = webpageRelativePath;
         }
+
+        /// <summary>
+        /// Gets the relative path of the web page.
+        /// </summary>
+        public Uri  WebpageRelativeUri  { get; private set; }
     }
 }

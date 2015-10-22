@@ -8,11 +8,6 @@
     public class SpecFlowContextualInfo
     {
         /// <summary>
-        /// Gets the time stamp when the scenario started.
-        /// </summary>
-        public DateTimeOffset ScenarioStartTimestamp { get; private set; }
-
-        /// <summary>
         /// Instantiates a new instance with time stamp of when the scenario started.
         /// </summary>
         /// <param name="scenarioStartTimestamp">
@@ -24,5 +19,10 @@
         {
             this.ScenarioStartTimestamp = scenarioStartTimestamp;
         }
+
+        /// <summary>
+        /// Gets the time stamp when the scenario started.
+        /// </summary>
+        public DateTimeOffset   ScenarioStartTimestamp  { get; private set; }
     }
 }

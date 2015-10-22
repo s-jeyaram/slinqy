@@ -8,17 +8,6 @@
     public class ManageQueueSection : SeleniumWebBase
     {
         /// <summary>
-        /// Gets the static queue information.
-        /// </summary>
-        public QueueInformation QueueInformation { get; private set; }
-
-        /// <summary>
-        /// Gets the queue client section for interacting with the queue.
-        /// </summary>
-
-        public QueueClientSection QueueClient { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance.
         /// </summary>
         /// <param name="webBrowserDriver">
@@ -31,5 +20,15 @@
             this.QueueInformation = new QueueInformation(webBrowserDriver);
             this.QueueClient      = new QueueClientSection(webBrowserDriver);
         }
+
+        /// <summary>
+        /// Gets the static queue information.
+        /// </summary>
+        public QueueInformation     QueueInformation    { get; private set; }
+
+        /// <summary>
+        /// Gets the queue client section for interacting with the queue.
+        /// </summary>
+        public QueueClientSection   QueueClient         { get; private set; }
     }
 }

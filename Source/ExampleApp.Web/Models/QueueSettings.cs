@@ -6,11 +6,6 @@
     public class QueueSettings
     {
         /// <summary>
-        /// Gets the threshold at which point the queues storage capacity should be expanded.
-        /// </summary>
-        public double StorageUtilizationScaleUpThreshold { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance.
         /// </summary>
         /// <param name="storageUtilizationScaleUpThreshold">
@@ -22,5 +17,10 @@
         {
             this.StorageUtilizationScaleUpThreshold = storageUtilizationScaleUpThreshold;
         }
+
+        /// <summary>
+        /// Gets the threshold at which point the queues storage capacity should be expanded.
+        /// </summary>
+        public double   StorageUtilizationScaleUpThreshold  { get; private set; }
     }
 }

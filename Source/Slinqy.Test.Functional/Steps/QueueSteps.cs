@@ -31,6 +31,45 @@
         }
 
         /// <summary>
+        /// Generates and submits queue messages to the queue until storage utilization reaches the configured scale up threshold.
+        /// </summary>
+        [When]
+        public 
+        static
+        void 
+        WhenTheQueueStorageUtilizationReachesTheScaleUpThreshold()
+        {
+            ContextGet<ManageQueueSection>()
+                .QueueClient
+                .GenerateQueueMessages();
+        }
+
+        /// <summary>
+        /// Verifies that the queue storage capacity has expanded since the scenario started.
+        /// </summary>
+        [Then]
+        public 
+        static
+        void 
+        ThenTheQueueStorageCapacityExpands()
+        {
+            var manageQueueSection = ContextGet<ManageQueueSection>();
+            var createQueueParams = ContextGet<CreateQueueParameters>();
+
+            var pollMaxSeconds     = 60;
+            var pollStartTimestamp = DateTimeOffset.UtcNow;
+
+            // TODO: Make poll logic a generic function
+            while (DateTimeOffset.UtcNow.Subtract(pollStartTimestamp).TotalSeconds <= pollMaxSeconds)
+            {
+                if (manageQueueSection.QueueInformation.StorageCapacityMegabytes > createQueueParams.StorageCapacityMegabytes)
+                    return;
+            }
+
+            Assert.Fail("The Queue Storage Capacity was not increased.");
+        }
+
+        /// <summary>
         /// Creates a Queue with the Queue Storage Utilization Scale Up Threshold setting.
         /// </summary>
         [Given]
@@ -55,20 +94,6 @@
             ContextSet(manageQueueSection);
         }
 
-        /// <summary>
-        /// Generates and submits queue messages to the queue until storage utilization reaches the configured scale up threshold.
-        /// </summary>
-        [When]
-        public 
-        static
-        void 
-        WhenTheQueueStorageUtilizationReachesTheScaleUpThreshold()
-        {
-            ContextGet<ManageQueueSection>()
-                .QueueClient
-                .GenerateQueueMessages();
-        }
-
         // TODO: Move these Context methods to a base class.
 
         /// <summary>
@@ -90,38 +115,12 @@
         /// </summary>
         /// <typeparam name="T">Specifies the type of the value.</typeparam>
         /// <returns>Returns the requested value.</returns>
-        private 
-        static 
-        T 
+        private
+        static
+        T
         ContextGet<T>()
         {
             return ScenarioContext.Current.Get<T>();
-        }
-
-        /// <summary>
-        /// Verifies that the queue storage capacity has expanded since the scenario started.
-        /// </summary>
-        [Then]
-        public 
-        static
-        void 
-        ThenTheQueueStorageCapacityExpands()
-        {
-            var manageQueueSection = ContextGet<ManageQueueSection>();
-            var createQueueParams = ContextGet<CreateQueueParameters>();
-
-            // TODO: Make poll logic a generic function
-
-            var pollMaxSeconds     = 60;
-            var pollStartTimestamp = DateTimeOffset.UtcNow;
-
-            while (DateTimeOffset.UtcNow.Subtract(pollStartTimestamp).TotalSeconds <= pollMaxSeconds)
-            {
-                if (manageQueueSection.QueueInformation.StorageCapacityMegabytes > createQueueParams.StorageCapacityMegabytes)
-                    return;
-            }
-
-            Assert.Fail("The Queue Storage Capacity was not increased.");
         }
     }
 }

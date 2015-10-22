@@ -6,21 +6,6 @@
     public class CreateQueueParameters
     {
         /// <summary>
-        /// Gets the name of the new queue.
-        /// </summary>
-        public string   QueueName                   { get; private set; }
-
-        /// <summary>
-        /// Gets the desired storage capacity for the new queue.
-        /// </summary>
-        public long      StorageCapacityMegabytes    { get; private set; }
-
-        /// <summary>
-        /// Gets the scale up threshold setting.
-        /// </summary>
-        public double   ScaleUpThresholdPercentage  { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance with the desired settings for the new queue.
         /// </summary>
         /// <param name="queueName">Specifies the name of the new queue.</param>
@@ -35,5 +20,20 @@
             this.StorageCapacityMegabytes   = storageCapacityMegabytes;
             this.ScaleUpThresholdPercentage = scaleUpThresholdPercentage;
         }
+
+        /// <summary>
+        /// Gets the name of the new queue.
+        /// </summary>
+        public string   QueueName                   { get; private set; }
+
+        /// <summary>
+        /// Gets the desired storage capacity for the new queue.
+        /// </summary>
+        public long     StorageCapacityMegabytes    { get; private set; }
+
+        /// <summary>
+        /// Gets the scale up threshold setting.
+        /// </summary>
+        public double   ScaleUpThresholdPercentage  { get; private set; }
     }
 }

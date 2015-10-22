@@ -14,16 +14,6 @@
         public const string RelativePath = "/";
 
         /// <summary>
-        /// Gets or sets the threshold for when the queue agent should scale the queue storage capacity.
-        /// </summary>
-        public double ScaleUpThresholdPercentage  { get; set; }
-
-        /// <summary>
-        /// Gets the form for creating a new queue.
-        /// </summary>
-        public CreateQueueForm CreateQueueForm { get; private set; }
-        
-        /// <summary>
         /// Initializes the Homepage with the IWebDriver to use for controlling the page.
         /// </summary>
         /// <param name="webBrowserDriver">
@@ -36,5 +26,10 @@
         {
             this.CreateQueueForm = new CreateQueueForm(webBrowserDriver);
         }
+        
+        /// <summary>
+        /// Gets the form for creating a new queue.
+        /// </summary>
+        public CreateQueueForm  CreateQueueForm             { get; private set; }
     }
 }

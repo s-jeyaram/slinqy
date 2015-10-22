@@ -19,16 +19,6 @@
         /// A proxy reference to the element in the web browser.
         /// </summary>
         [FindsBy] private IWebElement QueueInformation_StorageCapacityMegabytes = null;
-
-        /// <summary>
-        /// Gets the name of the queue.
-        /// </summary>
-        public string QueueName { get { return this.QueueInformation_QueueName.Text; } }
-
-        /// <summary>
-        /// Gets the storage capacity of the queue.
-        /// </summary>
-        public int StorageCapacityMegabytes { get { return int.Parse(this.QueueInformation_StorageCapacityMegabytes.Text, CultureInfo.InvariantCulture); } }
         
         /// <summary>
         /// Initializes a new instance.
@@ -41,5 +31,15 @@
             IWebDriver webBrowserDriver) : base(webBrowserDriver)
         {
         }
+
+        /// <summary>
+        /// Gets the name of the queue.
+        /// </summary>
+        public string   QueueName                   { get { return this.QueueInformation_QueueName.Text; } }
+
+        /// <summary>
+        /// Gets the storage capacity of the queue.
+        /// </summary>
+        public int      StorageCapacityMegabytes    { get { return int.Parse(this.QueueInformation_StorageCapacityMegabytes.Text, CultureInfo.InvariantCulture); } }
     }
 }

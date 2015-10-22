@@ -15,11 +15,6 @@
         [FindsBy] private IWebElement appVersion = null;
 
         /// <summary>
-        /// Gets the version number displayed on the web page footer.
-        /// </summary>
-        public string Version { get { return this.appVersion.Text; } }
-
-        /// <summary>
         /// Initializes the class with the IWebDriver to use for controlling the browser.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the IWebDriver to use for controlling the browser.</param>
@@ -28,5 +23,10 @@
             IWebDriver webBrowserDriver) : base(webBrowserDriver)
         {
         }
+
+        /// <summary>
+        /// Gets the version number displayed on the web page footer.
+        /// </summary>
+        public string   Version { get { return this.appVersion.Text; } }
     }
 }

@@ -64,6 +64,17 @@
         }
         
         /// <summary>
+        /// Disposes resources.
+        /// </summary>
+        public 
+        void 
+        Dispose()
+        {
+            this.webBrowser.Dispose();
+            this.webDriver.Dispose();
+        }
+
+        /// <summary>
         /// Gets the specified configuration setting.
         /// </summary>
         /// <param name="settingName">Specifies the name of the configuration setting to get.</param>
@@ -80,17 +91,6 @@
                 settingValue = ConfigurationManager.AppSettings[settingName];
 
             return settingValue;
-        }
-
-        /// <summary>
-        /// Disposes resources.
-        /// </summary>
-        public 
-        void 
-        Dispose()
-        {
-            this.webBrowser.Dispose();
-            this.webDriver.Dispose();
         }
     }
 }

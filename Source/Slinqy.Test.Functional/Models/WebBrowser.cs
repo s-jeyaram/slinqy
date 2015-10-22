@@ -48,46 +48,6 @@
         }
 
         /// <summary>
-        /// Returns a collection of all the classes in all the loaded assemblies that inherit from the Webpage class.
-        /// </summary>
-        /// <returns>Returns a collection of Types, keyed on the relative path of the Webpage.</returns>
-        private
-        static 
-        Dictionary<Uri, Type> 
-        GetWellKnownPages()
-        {
-            var types = Assembly
-                .GetExecutingAssembly()
-                .GetTypes();
-
-            var wellKnownPages = new Dictionary<Uri, Type>();
-
-            foreach (var type in types.Where(t => typeof(Webpage).IsAssignableFrom(t) && !t.IsAbstract))
-            {
-                var relativePathField = type
-                    .GetFields(BindingFlags.Public | BindingFlags.Static)
-                    .SingleOrDefault(fi => 
-                        fi.IsLiteral && 
-                        !fi.IsInitOnly && 
-                        fi.Name == WebPageRelativePathConstantName);
-
-                if (relativePathField == null)
-                    throw new InvalidOperationException(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "You must add a public string constant named {0} to type {1} before it can be used.", 
-                            WebPageRelativePathConstantName, 
-                            type.FullName));
-
-                wellKnownPages.Add(
-                    new Uri(relativePathField.GetRawConstantValue().ToString(), UriKind.Relative), 
-                    type);
-            }
-
-            return wellKnownPages;
-        }
-
-        /// <summary>
         /// Directs the browser to navigate directly to the specified TPage, 
         /// as if the user typed the URL directly in the browsers address bar.
         /// </summary>
@@ -149,6 +109,46 @@
         Dispose()
         {
             this.webBrowserDriver.Dispose();
+        }
+
+        /// <summary>
+        /// Returns a collection of all the classes in all the loaded assemblies that inherit from the Webpage class.
+        /// </summary>
+        /// <returns>Returns a collection of Types, keyed on the relative path of the Webpage.</returns>
+        private
+        static 
+        Dictionary<Uri, Type> 
+        GetWellKnownPages()
+        {
+            var types = Assembly
+                .GetExecutingAssembly()
+                .GetTypes();
+
+            var wellKnownPages = new Dictionary<Uri, Type>();
+
+            foreach (var type in types.Where(t => typeof(Webpage).IsAssignableFrom(t) && !t.IsAbstract))
+            {
+                var relativePathField = type
+                    .GetFields(BindingFlags.Public | BindingFlags.Static)
+                    .SingleOrDefault(fi => 
+                        fi.IsLiteral && 
+                        !fi.IsInitOnly && 
+                        fi.Name == WebPageRelativePathConstantName);
+
+                if (relativePathField == null)
+                    throw new InvalidOperationException(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "You must add a public string constant named {0} to type {1} before it can be used.", 
+                            WebPageRelativePathConstantName, 
+                            type.FullName));
+
+                wellKnownPages.Add(
+                    new Uri(relativePathField.GetRawConstantValue().ToString(), UriKind.Relative), 
+                    type);
+            }
+
+            return wellKnownPages;
         }
     }
 }
