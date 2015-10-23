@@ -16,6 +16,7 @@ properties {
     $PublishedWebsitesPath = Join-Path $ArtifactsPath "_PublishedWebsites"
     $SolutionFileName      = "$ProductName.sln"
     $SolutionPath          = Join-Path $SourcePath $SolutionFileName
+    $XUnitPath             = Join-Path $Env:ChocolateyInstall 'bin\xunit.console.exe'
 }
 
 # Define the Task to call when none was specified by the caller.
@@ -41,7 +42,7 @@ Task Clean -depends InstallDependencies -description "Removes any artifacts that
         -Path                  $SolutionPath `
         -MsBuildParameters "/t:Clean" `
             | Out-Null
-
+    
     Write-Host "done!"
 }
 
@@ -88,6 +89,24 @@ Task Build -depends Clean -description "Compiles all source code." {
         Get-Content $BuildFilePath
         throw "Build Failed!"
     }
+
+    Write-Host "done!"
+
+    # Unit test the built code
+    $TestDlls = @(
+        (Join-Path $ArtifactsPath 'Slinqy.Core.Test.Unit.dll')
+    )
+
+    Write-Host "Unit testing $TestDlls..."
+
+    $OpenCoverPath       = Join-Path $SourcePath 'packages\OpenCover.4.6.166\tools\OpenCover.Console.exe'
+    $OpenCoverOutputPath = Join-Path $ArtifactsPath "coverage.xml"
+
+
+    $currentDir = Get-Location
+    Set-Location $ArtifactsPath
+    exec { . $OpenCoverPath -target:$XUnitPath -targetargs:$TestDlls -register:user -output:$OpenCoverOutputPath -filter:"+[*]Slinqy.* -[*.Test.*]*" }
+    Set-Location $currentDir
 
     Write-Host "done!"
 
@@ -240,8 +259,6 @@ Task FunctionalTest -depends LoadSettings -description 'Tests that the required 
     )
     
     Write-Host "Running tests in $TestDlls"
-
-    $XUnitPath = Join-Path $Env:ChocolateyInstall 'bin\xunit.console.exe'
 
     exec { & $XUnitPath $TestDlls }
 }
