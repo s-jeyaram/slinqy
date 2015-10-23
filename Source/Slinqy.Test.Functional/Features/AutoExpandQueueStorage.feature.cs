@@ -73,19 +73,20 @@ namespace Slinqy.Test.Functional.Features
             this.ScenarioTearDown();
         }
         
-        [Xunit.FactAttribute()]
+        [Xunit.FactAttribute(Skip="Ignored")]
         [Xunit.TraitAttribute("FeatureTitle", "AutoExpandQueueStorage")]
         [Xunit.TraitAttribute("Description", "Queue Storage Expands When Utilization Reaches Threshold")]
         public virtual void QueueStorageExpandsWhenUtilizationReachesThreshold()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Queue Storage Expands When Utilization Reaches Threshold", ((string[])(null)));
-#line 6
-this.ScenarioSetup(scenarioInfo);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Queue Storage Expands When Utilization Reaches Threshold", new string[] {
+                        "Ignore"});
 #line 7
- testRunner.Given("a Queue with Storage Utilization Scale Up Threshold set", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+this.ScenarioSetup(scenarioInfo);
 #line 8
- testRunner.When("the Queue Storage Utilization reaches the Scale Up Threshold", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.Given("a Queue with Storage Utilization Scale Up Threshold set", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 9
+ testRunner.When("the Queue Storage Utilization reaches the Scale Up Threshold", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 10
  testRunner.Then("the Queue Storage Capacity expands", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
