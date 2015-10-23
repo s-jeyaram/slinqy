@@ -168,6 +168,12 @@
   <ItemGroup>
     <Content Include="Scripts\jquery-2.1.4.min.map" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Slinqy.Core\Slinqy.Core.csproj">
+      <Project>{FAB647C5-0C68-49B4-BB25-EAE93B93FA44}</Project>
+      <Name>Slinqy.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

@@ -37,28 +37,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slinqy.Core", "Slinqy.Core\
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80EC2E4E-7ACC-4219-BB95-AD80DB7DD318}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF7FAD0F-EFD5-4FCE-8141-78A5CCD8FC77}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5FB77DEA-B800-42CC-9A5F-673608CF9D12}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{5FB77DEA-B800-42CC-9A5F-673608CF9D12}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{5FB77DEA-B800-42CC-9A5F-673608CF9D12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FB77DEA-B800-42CC-9A5F-673608CF9D12}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6D311BA9-A06F-4C77-8CDA-E398C73C9433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6D311BA9-A06F-4C77-8CDA-E398C73C9433}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D311BA9-A06F-4C77-8CDA-E398C73C9433}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D311BA9-A06F-4C77-8CDA-E398C73C9433}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FAB647C5-0C68-49B4-BB25-EAE93B93FA44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FAB647C5-0C68-49B4-BB25-EAE93B93FA44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAB647C5-0C68-49B4-BB25-EAE93B93FA44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAB647C5-0C68-49B4-BB25-EAE93B93FA44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

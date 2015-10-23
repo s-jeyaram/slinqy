@@ -3,6 +3,7 @@
     <CollectionProperty Name="RecognizedWords">
       <Value>Slinqy</Value>
     </CollectionProperty>
+    <BooleanProperty Name="ViolationsAsErrors">True</BooleanProperty>
   </GlobalSettings>
   <Parsers>
     <Parser ParserId="StyleCop.CSharp.CsParser">
