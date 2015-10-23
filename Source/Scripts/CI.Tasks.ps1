@@ -112,6 +112,10 @@ Task Build -depends Clean -description "Compiles all source code." {
 
     exec { . $ReportGeneratorPath $OpenCoverOutputPath $ReportGeneratorOutputPath }
 
+    $CoverallsPath = Join-Path $SourcePath 'packages\coveralls.io.1.3.4\tools\coveralls.net.exe'
+
+    exec { . $CoverallsPath --opencover $OpenCoverOutputPath }
+
     Write-Host "done!"
 
     Write-Host "Packaging..." -NoNewline
