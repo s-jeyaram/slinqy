@@ -1,0 +1,29 @@
+﻿namespace Slinqy.Test.Functional.Models
+{
+    using OpenQA.Selenium;
+    using System;
+
+    /// <summary>
+    /// Models a whole web page.
+    /// </summary>
+    public abstract class Webpage : SeleniumWebBase
+    {
+        /// <summary>
+        /// Initializes a new instance with the web driver and relative path of the web page.
+        /// </summary>
+        /// <param name="webBrowserDriver">Specifies the driver to use for controlling the browser.</param>
+        /// <param name="webpageRelativePath">Specifies the relative path of this web page.</param>
+        protected 
+        Webpage(
+            IWebDriver  webBrowserDriver,
+            Uri         webpageRelativePath) : base(webBrowserDriver)
+        {
+            this.WebpageRelativeUri = webpageRelativePath;
+        }
+
+        /// <summary>
+        /// Gets the relative path of the web page.
+        /// </summary>
+        public Uri  WebpageRelativeUri  { get; private set; }
+    }
+}

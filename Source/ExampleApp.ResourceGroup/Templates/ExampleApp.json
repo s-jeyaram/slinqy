@@ -30,13 +30,25 @@
     },
     "exampleAppSiteName": {
       "type": "string",
-      "defaultValue": "ExampleApp"      
+      "defaultValue": "ExampleApp"
     }
   },
   "variables": {
-    "hostingPlanName": "[concat(parameters('exampleAppSiteName'), 'HostingPlan')]"
+    "hostingPlanName": "[concat(parameters('exampleAppSiteName'), 'HostingPlan')]",
+    "sbVersion": "[providers('Microsoft.ServiceBus', 'namespaces').apiVersions[0]]",
+    "defaultSASKeyName": "RootManageSharedAccessKey",
+    "authRuleResourceId": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('exampleAppSiteName'), variables('defaultSASKeyName'))]"
   },
   "resources": [
+    {
+      "apiVersion": "[variables('sbVersion')]",
+      "name": "[parameters('exampleAppSiteName')]",
+      "type": "Microsoft.ServiceBus/namespaces",
+      "location": "[parameters('environmentLocation')]",
+      "tags": {
+        "displayName": "ServiceBus"
+      }
+    },
     {
       "apiVersion": "2014-06-01",
       "name": "[variables('hostingPlanName')]",
@@ -60,14 +72,23 @@
       "tags": {
         "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]": "Resource",
         "displayName": "Website"
-
       },
       "dependsOn": [
+        "[concat('Microsoft.ServiceBus/namespaces/', parameters('exampleAppSiteName'))]",
         "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
       ],
       "properties": {
         "name": "[parameters('exampleAppSiteName')]",
-        "serverFarm": "[variables('hostingPlanName')]"
+        "serverFarm": "[variables('hostingPlanName')]",
+        "phpVersion": "Off",
+        "siteConfig": {
+          "appsettings": [
+            {
+              "name": "Microsoft.ServiceBus.ConnectionString",
+              "value": "[listkeys(variables('authRuleResourceId'), variables('sbVersion')).primaryConnectionString]"
+            }
+          ]
+        }
       }
     },
     {
@@ -86,5 +107,11 @@
         "applicationId": "[parameters('exampleAppSiteName')]"
       }
     }
-  ]
+  ],
+  "outputs": {
+    "ServiceBusConnectionString": {
+      "type": "string",
+      "value": "[listkeys(variables('authRuleResourceId'), variables('sbVersion')).primaryConnectionString]"
+    }
+  }
 }

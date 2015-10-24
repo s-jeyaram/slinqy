@@ -15,5 +15,5 @@ deploy_script:
 test: off
 
 cache:
-  - .\Source\packages -> .\Source\ExampleApp\packages.config
+  - .\Source\packages -> .\Source\ExampleApp.Web\packages.config
   - C:\Users\appveyor\AppData\Roaming\Windows Azure Powershell\AzureDataCollectionProfile.json

@@ -1,0 +1,16 @@
+﻿@model ExampleApp.Web.Models.ManageQueueModel
+
+@using (Ajax.BeginForm("ManageQueue", "Home", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "ManageQueueForm" }, new { Id = "ManageQueueForm" }))
+{
+    <div>
+        @Html.LabelFor(m => m.QueueInformation)
+        @Html.LabelFor(m => m.QueueInformation.QueueName)
+        <span id="QueueInformation_QueueName">@Model.QueueInformation.QueueName</span>
+        @Html.LabelFor(m => m.QueueInformation.StorageCapacityMegabytes)
+        <span id="QueueInformation_StorageCapacityMegabytes">@Model.QueueInformation.StorageCapacityMegabytes</span> MB
+        <hr/>
+        @Html.LabelFor(m => m.QueueSettings)
+        @Html.EditorFor(m => m.QueueSettings)
+        <input id="UpdateQueueButton" type="submit" value="Update"/>
+    </div>
+}
