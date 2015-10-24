@@ -62,7 +62,7 @@
             CreateQueueParameters createQueueParameters)
         {
             if (createQueueParameters == null)
-                throw new ArgumentNullException("createQueueParameters");
+                throw new ArgumentNullException(nameof(createQueueParameters));
 
             // Enter parameters in to form.
             this.QueueName.SendKeys(createQueueParameters.QueueName);
