@@ -77,20 +77,8 @@ Task Build -depends Clean -description "Compiles all source code." {
 
     Write-Host "Compiling solution $SolutionPath..." -NoNewline
 
-    msbuild
-
     # Compile the whole solution according to how the solution file is configured.
-    $MsBuildSucceeded = Invoke-MsBuild `
-        -Path                  $SolutionPath `
-        -BuildLogDirectoryPath $LogsPath `
-        -MsBuildParameters     "/p:OutDir=$ArtifactsPath\" `
-        -KeepBuildLogOnSuccessfulBuilds
-
-    if (-not $MsBuildSucceeded) {
-        $BuildFilePath = Join-Path $LogsPath "$SolutionFileName.msbuild.log"
-        Get-Content $BuildFilePath
-        throw "Build Failed!"
-    }
+    exec { msbuild $SolutionPath /p:OutDir=$ArtifactsPath\ }
 
     Write-Host "done!"
 
