@@ -27,7 +27,7 @@
             Func<string, Task<SlinqyQueue>> createPhysicalQueueDelegate)
         {
             if (createPhysicalQueueDelegate == null)
-                throw new ArgumentNullException("createPhysicalQueueDelegate");
+                throw new ArgumentNullException(nameof(createPhysicalQueueDelegate));
 
             this.createPhysicalQueueDelegate = createPhysicalQueueDelegate;
         }
