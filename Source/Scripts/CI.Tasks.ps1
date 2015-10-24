@@ -104,7 +104,7 @@ Task Build -depends Clean -description "Compiles all source code." {
 
     $currentDir = Get-Location
     Set-Location $ArtifactsPath
-    exec { . $OpenCoverPath -target:$XUnitPath -targetargs:$TestDlls -register:user -output:$OpenCoverOutputPath -filter:"+[*]Slinqy.* -[*.Test.*]*" }
+    exec { . $OpenCoverPath -target:$XUnitPath -targetargs:$TestDlls -register:user -output:$OpenCoverOutputPath -filter:'+[*]Slinqy.* -[*.Test.*]*' }
     Set-Location $currentDir
 
     $ReportGeneratorPath       = Join-Path $SourcePath 'packages\ReportGenerator.2.3.2.0\tools\ReportGenerator.exe'
