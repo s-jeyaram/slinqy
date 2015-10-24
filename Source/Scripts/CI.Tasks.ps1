@@ -37,7 +37,7 @@ Task Clean -depends InstallDependencies -description "Removes any artifacts that
 
     Write-Host "Cleaning solution $SolutionPath..." -NoNewline
 
-    exec { msbuild $SolutionPath /t:Clean }
+    exec { msbuild $SolutionPath /t:Clean /verbosity:minimal /m /nologo }
     
     Write-Host "done!"
 }
@@ -71,10 +71,10 @@ Task Build -depends Clean -description "Compiles all source code." {
         -Path    $AssemblyInfoFilePath `
         -Version $BuildVersion
 
-    Write-Host "Compiling solution $SolutionPath..." -NoNewline
+    Write-Host "Compiling solution $SolutionPath..."
 
     # Compile the whole solution according to how the solution file is configured.
-    exec { msbuild $SolutionPath /p:OutDir=$ArtifactsPath\ }
+    exec { msbuild $SolutionPath /p:OutDir=$ArtifactsPath\ /verbosity:minimal /m /nologo }
 
     Write-Host "done!"
 
@@ -104,13 +104,13 @@ Task Build -depends Clean -description "Compiles all source code." {
 
     Write-Host "done!"
 
-    Write-Host "Packaging..." -NoNewline
+    Write-Host "Packaging..."
 
     # Package up deployables
     $WebProjectFileName = "ExampleApp.Web.csproj"
     $WebProjectPath     = Join-Path $SourcePath "ExampleApp.Web\$WebProjectFileName"
 
-    exec { msbuild $WebProjectPath /p:OutDir=$ArtifactsPath\ /t:Package }
+    exec { msbuild $WebProjectPath /p:OutDir=$ArtifactsPath\ /t:Package /verbosity:minimal /m /nologo }
 
     Write-Host "done!"
 }
