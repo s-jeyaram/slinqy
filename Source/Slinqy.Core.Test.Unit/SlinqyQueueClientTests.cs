@@ -16,7 +16,7 @@
         public 
         static 
         void 
-        Constructor_CreatePhysicalQueueDelegateIsNull_ThrowArgumentNullException()
+        Constructor_CreatePhysicalQueueDelegateIsNull_ThrowsArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => new SlinqyQueueClient(null));
         }
@@ -48,6 +48,28 @@
 
             // Assert
             Assert.True(delegateCalled);
+        }
+
+        /// <summary>
+        /// Verifies that the queue name is valid.
+        /// </summary>
+        /// <returns>Returns the async Task.</returns>
+        [Fact]
+        public 
+        static 
+        async Task
+        CreateAsync_QueueNameIsEmpty_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var queueName = string.Empty;
+
+            var client = new SlinqyQueueClient(
+                createPhysicalQueueDelegate: name => null
+            );
+
+            // Act
+            // Assert
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await client.CreateAsync(queueName));
         }
     }
 }

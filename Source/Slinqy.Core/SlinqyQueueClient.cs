@@ -44,6 +44,9 @@
         CreateAsync(
             string queueName)
         {
+            if (string.IsNullOrWhiteSpace(queueName))
+                throw new ArgumentNullException(nameof(queueName));
+
             var queueShardName = string.Format(
                 CultureInfo.InvariantCulture,
                 "{0}-{1}",
