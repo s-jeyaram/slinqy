@@ -9,13 +9,13 @@
     public class SlinqyQueue
     {
         /// <summary>
-        /// Initializes a new instance.
+        /// Initializes a new instance of the <see cref="SlinqyQueue"/> class.
         /// </summary>
         /// <param name="queueName">The name of the queue.</param>
         /// <param name="maxSizeInMegabytes">Specifies the storage capacity of the queue.</param>
-        public 
+        public
         SlinqyQueue(
-            string  queueName, 
+            string  queueName,
             long    maxSizeInMegabytes)
         {
             this.Name                   = queueName;

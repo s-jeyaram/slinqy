@@ -8,12 +8,12 @@
     public class SpecFlowContextualInfo
     {
         /// <summary>
-        /// Instantiates a new instance with time stamp of when the scenario started.
+        /// Initializes a new instance of the <see cref="SpecFlowContextualInfo"/> class.
         /// </summary>
         /// <param name="scenarioStartTimestamp">
         /// Specifies the full date and time when the scenario first started executing.
         /// </param>
-        public 
+        public
         SpecFlowContextualInfo(
             DateTimeOffset scenarioStartTimestamp)
         {

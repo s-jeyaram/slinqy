@@ -16,7 +16,7 @@
         private readonly Func<string, Task<SlinqyQueue>> createPhysicalQueueDelegate;
 
         /// <summary>
-        /// Initializes a new queue client instance.
+        /// Initializes a new instance of the <see cref="SlinqyQueueClient"/> class.
         /// </summary>
         /// <param name="createPhysicalQueueDelegate">
         /// Specifies the function to use for creating new physical queue shards.
@@ -39,7 +39,7 @@
         /// Specifies the name of the queue.
         /// </param>
         /// <returns>Returns the resulting SlinqyQueue that was created.</returns>
-        public 
+        public
         Task<SlinqyQueue>
         CreateAsync(
             string queueName)
@@ -53,7 +53,7 @@
                 queueName,
                 0
             );
-            
+
             // Call the function to create the physical queue shard.
             return this.createPhysicalQueueDelegate(queueShardName);
         }

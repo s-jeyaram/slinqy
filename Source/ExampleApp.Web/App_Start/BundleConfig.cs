@@ -12,9 +12,10 @@
         /// Applies the website's bundles to the specified collection.
         /// </summary>
         /// <param name="bundles">Specifies the instance to configure.</param>
-        public 
-        static 
-        void 
+        /// <exception cref="ArgumentNullException">Thrown if the bundles parameter value is null.</exception>
+        public
+        static
+        void
         RegisterBundles(
             BundleCollection bundles)
         {

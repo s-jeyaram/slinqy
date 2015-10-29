@@ -6,11 +6,11 @@
     public class QueueInformationModel
     {
         /// <summary>
-        /// Initializes the instance with information about the queue.
+        /// Initializes a new instance of the <see cref="QueueInformationModel"/> class.
         /// </summary>
         /// <param name="queueName">Specifies the name of the queue.</param>
         /// <param name="storageCapacityMegabytesMegabytes">Specifies the storage capacity of the queue.</param>
-        public 
+        public
         QueueInformationModel(
             string queueName,
             long storageCapacityMegabytesMegabytes)

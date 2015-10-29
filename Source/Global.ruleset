@@ -757,4 +757,13 @@
     <Rule Id="IDE0003" Action="None" />
     <Rule Id="IDE0004" Action="Error" />
   </Rules>
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <Rule Id="SA1633" Action="None" />
+    <Rule Id="SA1009" Action="None" />
+    <Rule Id="SA1025" Action="None" />
+    <Rule Id="SA1111" Action="None" />
+    <Rule Id="SA1118" Action="None" />
+    <Rule Id="SA1503" Action="None" />
+    <Rule Id="SA1500" Action="None" />
+  </Rules>
 </RuleSet>

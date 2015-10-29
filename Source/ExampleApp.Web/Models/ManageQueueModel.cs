@@ -6,11 +6,11 @@
     public class ManageQueueModel
     {
         /// <summary>
-        /// Initializes a new instance.
+        /// Initializes a new instance of the <see cref="ManageQueueModel"/> class.
         /// </summary>
         /// <param name="queueName">Specifies the name of the queue this instance represents.</param>
         /// <param name="storageCapacityMegabytes">Specifies the storage capacity of the queue.</param>
-        public 
+        public
         ManageQueueModel(
             string  queueName,
             long     storageCapacityMegabytes)

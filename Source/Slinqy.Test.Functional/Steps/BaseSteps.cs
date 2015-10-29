@@ -14,12 +14,12 @@
         private readonly WebBrowser webBrowser;
 
         /// <summary>
-        /// Initializes a new instance with a WebBrowser.
+        /// Initializes a new instance of the <see cref="BaseSteps"/> class.
         /// </summary>
         /// <param name="browser">
         /// Specifies the WebBrowser instance to use for interacting with the browser.
         /// </param>
-        protected 
+        protected
         BaseSteps(
             WebBrowser browser)
         {
@@ -29,8 +29,8 @@
         /// <summary>
         /// Gets the WebBrowser instance for interacting with the web browser.
         /// </summary>
-        protected WebBrowser    WebBrowser  { get { return this.webBrowser; } }
-        
+        protected WebBrowser    WebBrowser => this.webBrowser;
+
         /// <summary>
         /// Saves the specified value in the scenario context for subsequent steps to use.
         /// </summary>

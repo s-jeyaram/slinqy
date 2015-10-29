@@ -13,9 +13,9 @@
         /// Verifies the constructor checks for null values.
         /// </summary>
         [Fact]
-        public 
-        static 
-        void 
+        public
+        static
+        void
         Constructor_CreatePhysicalQueueDelegateIsNull_ThrowsArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => new SlinqyQueueClient(null));
@@ -27,8 +27,8 @@
         /// <returns>Returns the async Task.</returns>
         [Fact]
         public
-        static 
-        async Task 
+        static
+        async Task
         CreateAsync_QueueNameValid_CreateDelegateInvoked()
         {
             // Arrange
@@ -55,8 +55,8 @@
         /// </summary>
         /// <returns>Returns the async Task.</returns>
         [Fact]
-        public 
-        static 
+        public
+        static
         async Task
         CreateAsync_QueueNameIsEmpty_ThrowsArgumentNullException()
         {

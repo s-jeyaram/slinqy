@@ -8,20 +8,21 @@
     public class QueueClientSection : SeleniumWebBase
     {
         /// <summary>
-        /// Initializes a new instance.
+        /// Initializes a new instance of the <see cref="QueueClientSection"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the driver to use for interacting with the web browser.</param>
-        public 
+        public
         QueueClientSection(
-            IWebDriver webBrowserDriver) : base(webBrowserDriver)
+            IWebDriver webBrowserDriver)
+                : base(webBrowserDriver)
         {
         }
 
         /// <summary>
         /// Generates messages and puts them in the queue.
         /// </summary>
-        public 
-        void 
+        public
+        void
         GenerateQueueMessages()
         {
             this.ToString();
