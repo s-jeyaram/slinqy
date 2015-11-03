@@ -46,7 +46,8 @@
         ActionResult
         Index()
         {
-            this.ViewBag.Title = "Home Page";
+            this.ViewBag.Title                  = "Home Page";
+            this.ViewBag.ServiceBusNamespace    = this.serviceBusNamespaceManager.Address.ToString();
 
             return this.View();
         }
