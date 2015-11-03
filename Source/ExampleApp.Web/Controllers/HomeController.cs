@@ -62,7 +62,7 @@
             CreateQueueModel createQueueModel)
         {
             if (createQueueModel == null)
-                throw new ArgumentNullException("createQueueModel");
+                throw new ArgumentNullException(nameof(createQueueModel));
 
             var queue = await this.slinqyQueueClient.CreateAsync(createQueueModel.QueueName);
 
@@ -86,8 +86,7 @@
         {
             this.ToString();
 
-            if (manageQueueModel != null)
-                manageQueueModel.ToString();
+            manageQueueModel?.ToString();
         }
 
         /// <summary>
