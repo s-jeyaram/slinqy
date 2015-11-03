@@ -1,12 +1,12 @@
 ﻿namespace ExampleApp.Web.Controllers
 {
-    using Microsoft.ServiceBus;
-    using Models;
-    using Slinqy.Core;
     using System;
     using System.Configuration;
     using System.Threading.Tasks;
     using System.Web.Mvc;
+    using Microsoft.ServiceBus;
+    using Models;
+    using Slinqy.Core;
 
     /// <summary>
     /// Defines supported actions for the Homepage.
@@ -24,9 +24,9 @@
         private readonly SlinqyQueueClient  slinqyQueueClient;
 
         /// <summary>
-        /// Initializes a new instance.
+        /// Initializes a new instance of the <see cref="HomeController"/> class.
         /// </summary>
-        public 
+        public
         HomeController()
         {
             this.slinqyQueueClient = new SlinqyQueueClient(
@@ -42,8 +42,8 @@
         /// Handles the default HTTP GET /.
         /// </summary>
         /// <returns>Returns the default Homepage view.</returns>
-        public 
-        ActionResult 
+        public
+        ActionResult
         Index()
         {
             this.ViewBag.Title = "Home Page";
@@ -56,7 +56,7 @@
         /// </summary>
         /// <param name="createQueueModel">Specifies the parameters of the queue to create.</param>
         /// <returns>Returns the result of the action.</returns>
-        public 
+        public
         async Task<ActionResult>
         CreateQueue(
             CreateQueueModel createQueueModel)
@@ -67,9 +67,9 @@
             var queue = await this.slinqyQueueClient.CreateAsync(createQueueModel.QueueName);
 
             return this.PartialView(
-                "ManageQueue", 
+                "ManageQueue",
                 new ManageQueueModel(
-                    queue.Name, 
+                    queue.Name,
                     queue.MaximumSizeInMegabytes
                 )
             );
@@ -79,8 +79,8 @@
         /// Applies the specified settings to the queue.
         /// </summary>
         /// <param name="manageQueueModel">Specifies new settings for the queue.</param>
-        public 
-        void 
+        public
+        void
         ManageQueue(
             ManageQueueModel manageQueueModel)
         {

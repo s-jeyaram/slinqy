@@ -1,7 +1,7 @@
 ﻿namespace Slinqy.Test.Functional.Models.ExampleAppPages
 {
-    using OpenQA.Selenium;
     using System;
+    using OpenQA.Selenium;
 
     /// <summary>
     /// Models the Slinqy Example App Homepage.
@@ -14,19 +14,19 @@
         public const string RelativePath = "/";
 
         /// <summary>
-        /// Initializes the Homepage with the IWebDriver to use for controlling the page.
+        /// Initializes a new instance of the <see cref="Homepage"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">
         /// Specifies the IWebDriver to use to interact with the Homepage.
         /// </param>
-        public 
+        public
         Homepage(
-            IWebDriver webBrowserDriver) 
+            IWebDriver webBrowserDriver)
                 : base(webBrowserDriver, new Uri(RelativePath, UriKind.Relative))
         {
             this.CreateQueueForm = new CreateQueueForm(webBrowserDriver);
         }
-        
+
         /// <summary>
         /// Gets the form for creating a new queue.
         /// </summary>

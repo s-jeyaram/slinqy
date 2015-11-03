@@ -1,4 +1,9 @@
-﻿namespace ExampleApp.Web
+﻿[module: System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "StyleCop.CSharp.DocumentationRules",
+    "SA1649:FileHeaderFileNameDocumentationMustMatchTypeName",
+    Justification = "Can't get Global.asax to match the class name."
+)]
+namespace ExampleApp.Web
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Web;
@@ -9,14 +14,14 @@
     /// <summary>
     /// Handles application life cycle events.
     /// </summary>
-    public class WebApiApplication : HttpApplication
+    public class Global : HttpApplication
     {
         /// <summary>
         /// This method is automatically called when the application first starts.
         /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "ASP.NET will not call this method if it is static.")]
-        protected 
-        void 
+        protected
+        void
         Application_Start()
         {
             AreaRegistration.RegisterAllAreas();

@@ -8,14 +8,15 @@
     public class ManageQueueSection : SeleniumWebBase
     {
         /// <summary>
-        /// Initializes a new instance.
+        /// Initializes a new instance of the <see cref="ManageQueueSection"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">
         /// Specifies the driver to use for interacting with the web browser.
         /// </param>
-        public 
+        public
         ManageQueueSection(
-            IWebDriver          webBrowserDriver) : base(webBrowserDriver)
+            IWebDriver          webBrowserDriver)
+                : base(webBrowserDriver)
         {
             this.QueueInformation = new QueueInformationSection(webBrowserDriver);
             this.QueueClient      = new QueueClientSection(webBrowserDriver);

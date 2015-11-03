@@ -1,9 +1,9 @@
 ﻿namespace Slinqy.Test.Functional.Steps
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Models;
     using Models.ExampleAppPages;
-    using System;
     using TechTalk.SpecFlow;
 
     /// <summary>
@@ -13,14 +13,15 @@
     public class QueueSteps : BaseSteps
     {
         /// <summary>
-        /// Initializes a new instance with a WebBrowser.
+        /// Initializes a new instance of the <see cref="QueueSteps"/> class.
         /// </summary>
         /// <param name="browser">
         /// Specifies the WebBrowser instance to use for interacting with the browser.
         /// </param>
         public
         QueueSteps(
-            WebBrowser browser) : base(browser)
+            WebBrowser browser)
+                : base(browser)
         {
         }
 
@@ -30,7 +31,7 @@
         [When]
         public
         static
-        void 
+        void
         WhenTheQueueStorageUtilizationReachesTheScaleUpThreshold()
         {
             ContextGet<ManageQueueSection>()
@@ -44,7 +45,7 @@
         [Then]
         public
         static
-        void 
+        void
         ThenTheQueueStorageCapacityExpands()
         {
             var manageQueueSection = ContextGet<ManageQueueSection>();
@@ -67,8 +68,8 @@
         /// Creates a Queue with the Queue Storage Utilization Scale Up Threshold setting.
         /// </summary>
         [Given]
-        public 
-        void 
+        public
+        void
         GivenAQueueWithStorageUtilizationScaleUpThresholdSet()
         {
             var homepage = this.WebBrowser.NavigateTo<Homepage>();
@@ -83,7 +84,7 @@
             var manageQueueSection = homepage
                 .CreateQueueForm
                 .CreateQueue(createQueueParams);
-            
+
             QueueSteps.ContextSet(createQueueParams);
             QueueSteps.ContextSet(manageQueueSection);
         }

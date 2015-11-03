@@ -1,11 +1,11 @@
 ﻿namespace Slinqy.Test.Functional
 {
+    using System;
+    using System.Configuration;
     using BoDi;
     using Models;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Chrome;
-    using System;
-    using System.Configuration;
     using TechTalk.SpecFlow;
 
     /// <summary>
@@ -23,14 +23,14 @@
         /// Maintains a reference to the current web browser.
         /// </summary>
         private WebBrowser webBrowser;
-        
+
         /// <summary>
         /// Maintains a reference to the current web driver.
         /// </summary>
         private IWebDriver webDriver;
 
         /// <summary>
-        /// Initializes a new instance.
+        /// Initializes a new instance of the <see cref="Setup"/> class.
         /// </summary>
         /// <param name="objectContainer">Specifies the object container instance to use for DI.</param>
         public
@@ -45,12 +45,12 @@
         /// </summary>
         [BeforeScenario]
         public
-        void 
+        void
         InitializeWebBrowser()
         {
             this.webDriver        = new ChromeDriver();
             var exampleAppBaseUri = new Uri(GetSetting("ExampleApp.BaseUri"));
-                                  
+
             this.webBrowser       = new WebBrowser(this.webDriver, exampleAppBaseUri);
 
             this.webDriver
@@ -62,12 +62,12 @@
 
             this.objectContainer.RegisterInstanceAs(this.webBrowser);
         }
-        
+
         /// <summary>
         /// Disposes resources.
         /// </summary>
-        public 
-        void 
+        public
+        void
         Dispose()
         {
             this.webBrowser.Dispose();
@@ -79,9 +79,9 @@
         /// </summary>
         /// <param name="settingName">Specifies the name of the configuration setting to get.</param>
         /// <returns>Returns the value of the configuration setting if found.  Otherwise null is returned.</returns>
-        private 
-        static 
-        string 
+        private
+        static
+        string
         GetSetting(
             string settingName)
         {

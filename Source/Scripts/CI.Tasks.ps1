@@ -24,7 +24,6 @@ Task Default -depends Build
 
 Task InstallDependencies -description "Installs all dependencies required to execute the tasks in this script." {
     exec { 
-        cinst invokemsbuild --version 1.5.17 --confirm
         cinst xunit         --version 2.0.0  --confirm
     }
 }
@@ -38,10 +37,7 @@ Task Clean -depends InstallDependencies -description "Removes any artifacts that
 
     Write-Host "Cleaning solution $SolutionPath..." -NoNewline
 
-    Invoke-MsBuild `
-        -Path                  $SolutionPath `
-        -MsBuildParameters "/t:Clean" `
-            | Out-Null
+    exec { msbuild $SolutionPath /t:Clean /verbosity:minimal /m /nologo }
     
     Write-Host "done!"
 }
@@ -75,20 +71,10 @@ Task Build -depends Clean -description "Compiles all source code." {
         -Path    $AssemblyInfoFilePath `
         -Version $BuildVersion
 
-    Write-Host "Compiling solution $SolutionPath..." -NoNewline
+    Write-Host "Compiling solution $SolutionPath..."
 
     # Compile the whole solution according to how the solution file is configured.
-    $MsBuildSucceeded = Invoke-MsBuild `
-        -Path                  $SolutionPath `
-        -BuildLogDirectoryPath $LogsPath `
-        -MsBuildParameters     "/p:OutDir=$ArtifactsPath\" `
-        -KeepBuildLogOnSuccessfulBuilds
-
-    if (-not $MsBuildSucceeded) {
-        $BuildFilePath = Join-Path $LogsPath "$SolutionFileName.msbuild.log"
-        Get-Content $BuildFilePath
-        throw "Build Failed!"
-    }
+    exec { msbuild $SolutionPath /p:OutDir=$ArtifactsPath\ /verbosity:minimal /m /nologo }
 
     Write-Host "done!"
 
@@ -118,22 +104,13 @@ Task Build -depends Clean -description "Compiles all source code." {
 
     Write-Host "done!"
 
-    Write-Host "Packaging..." -NoNewline
+    Write-Host "Packaging..."
 
     # Package up deployables
     $WebProjectFileName = "ExampleApp.Web.csproj"
     $WebProjectPath     = Join-Path $SourcePath "ExampleApp.Web\$WebProjectFileName"
-    $MsBuildSucceeded   = Invoke-MsBuild `
-        -Path                  $WebProjectPath `
-        -BuildLogDirectoryPath $LogsPath `
-        -MsBuildParameters     "/p:OutDir=$ArtifactsPath\ /t:Package" `
-        -KeepBuildLogOnSuccessfulBuilds
 
-    if (-not $MsBuildSucceeded) {
-        $BuildFilePath = Join-Path $LogsPath "$WebProjectFileName.msbuild.log"
-        Get-Content $BuildFilePath
-        throw "Build Failed!"
-    }
+    exec { msbuild $WebProjectPath /p:OutDir=$ArtifactsPath\ /t:Package /verbosity:minimal /m /nologo }
 
     Write-Host "done!"
 }

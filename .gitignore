@@ -8,3 +8,5 @@ environment-settings.json
 *.suo
 StyleCop.Cache
 environment-secrets.config
+
+psake.4.4.2*/

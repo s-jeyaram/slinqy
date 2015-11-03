@@ -10,7 +10,7 @@
     public abstract class SeleniumWebBase
     {
         /// <summary>
-        /// Initializes the SeleniumWebBase with the IWebDriver to use.
+        /// Initializes a new instance of the <see cref="SeleniumWebBase"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the IWebDriver to use for interacting with the web browser.</param>
         protected

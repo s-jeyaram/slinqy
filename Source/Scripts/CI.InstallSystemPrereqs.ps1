@@ -15,4 +15,4 @@ cinst dotnet4.6         --version 4.6.00081.20150925          --confirm
 cinst nuget.commandline --version 2.8.6                       --confirm
 
 # PSake is a tool that coordinates CI tasks.
-cinst psake             --version 4.4.1                       --confirm
+nuget install psake -version 4.4.2

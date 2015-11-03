@@ -5,12 +5,8 @@ version: 0.1.{build}
 build_script:
   - ps: .\Source\Scripts\CI.InstallSystemPrereqs.ps1;.\CI Build
 
-artifacts:
-  - name: Logs
-    path: Artifacts\Logs
-
 deploy_script:
-  - ps: .\CI "Deploy,FunctionalTest"
+  - ps: .\CI Deploy FunctionalTest
 
 test: off
 

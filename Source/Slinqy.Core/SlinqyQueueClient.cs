@@ -16,7 +16,7 @@
         private readonly Func<string, Task<SlinqyQueue>> createPhysicalQueueDelegate;
 
         /// <summary>
-        /// Initializes a new queue client instance.
+        /// Initializes a new instance of the <see cref="SlinqyQueueClient"/> class.
         /// </summary>
         /// <param name="createPhysicalQueueDelegate">
         /// Specifies the function to use for creating new physical queue shards.
@@ -27,7 +27,7 @@
             Func<string, Task<SlinqyQueue>> createPhysicalQueueDelegate)
         {
             if (createPhysicalQueueDelegate == null)
-                throw new ArgumentNullException("createPhysicalQueueDelegate");
+                throw new ArgumentNullException(nameof(createPhysicalQueueDelegate));
 
             this.createPhysicalQueueDelegate = createPhysicalQueueDelegate;
         }
@@ -39,18 +39,21 @@
         /// Specifies the name of the queue.
         /// </param>
         /// <returns>Returns the resulting SlinqyQueue that was created.</returns>
-        public 
+        public
         Task<SlinqyQueue>
         CreateAsync(
             string queueName)
         {
+            if (string.IsNullOrWhiteSpace(queueName))
+                throw new ArgumentNullException(nameof(queueName));
+
             var queueShardName = string.Format(
                 CultureInfo.InvariantCulture,
                 "{0}-{1}",
                 queueName,
                 0
             );
-            
+
             // Call the function to create the physical queue shard.
             return this.createPhysicalQueueDelegate(queueShardName);
         }

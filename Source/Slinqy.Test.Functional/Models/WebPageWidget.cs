@@ -8,12 +8,13 @@
     public class WebpageWidget : SeleniumWebBase
     {
         /// <summary>
-        /// Initializes a new instance.
+        /// Initializes a new instance of the <see cref="WebpageWidget"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the driver used for controlling the browser.</param>
-        public 
+        public
         WebpageWidget(
-            IWebDriver webBrowserDriver) : base(webBrowserDriver)
+            IWebDriver webBrowserDriver)
+                : base(webBrowserDriver)
         {
         }
     }

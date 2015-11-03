@@ -11,12 +11,13 @@
     public class NavigationSteps : BaseSteps
     {
         /// <summary>
-        /// Initializes a new instance with a web browser.
+        /// Initializes a new instance of the <see cref="NavigationSteps"/> class.
         /// </summary>
         /// <param name="webBrowser">Specifies the web browser to use.</param>
-        public 
+        public
         NavigationSteps(
-            WebBrowser webBrowser) : base(webBrowser)
+            WebBrowser webBrowser)
+                : base(webBrowser)
         {
         }
 
@@ -24,12 +25,12 @@
         /// Navigates to the Example App Homepage.
         /// </summary>
         [Given]
-        public 
-        void 
+        public
+        void
         GivenINavigateToTheHomepage()
         {
             // Attempt to navigate to the Home page.
-            this.WebBrowser.NavigateTo<Homepage>(); 
+            this.WebBrowser.NavigateTo<Homepage>();
         }
     }
 }

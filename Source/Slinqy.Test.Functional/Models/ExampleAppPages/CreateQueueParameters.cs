@@ -6,7 +6,7 @@
     public class CreateQueueParameters
     {
         /// <summary>
-        /// Initializes a new instance with the desired settings for the new queue.
+        /// Initializes a new instance of the <see cref="CreateQueueParameters"/> class.
         /// </summary>
         /// <param name="queueName">Specifies the name of the new queue.</param>
         /// <param name="storageCapacityMegabytes">Specifies the desired storage capacity for the new queue.</param>

@@ -1,9 +1,9 @@
 ﻿namespace Slinqy.Test.Functional.Steps
 {
+    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Models;
     using Models.ExampleAppPages;
-    using System.Reflection;
     using TechTalk.SpecFlow;
 
     /// <summary>
@@ -13,23 +13,24 @@
     public class VersionSteps : BaseSteps
     {
         /// <summary>
-        /// Initializes a new instance with a web browser.
+        /// Initializes a new instance of the <see cref="VersionSteps"/> class.
         /// </summary>
         /// <param name="webBrowser">Specifies the browser.</param>
-        public 
+        public
         VersionSteps(
-            WebBrowser webBrowser) : base(webBrowser)
+            WebBrowser webBrowser)
+                : base(webBrowser)
         {
         }
 
         /// <summary>
-        /// Verifies that the version number displayed on the web page 
-        /// footer matches the version number of the local test assembly 
+        /// Verifies that the version number displayed on the web page
+        /// footer matches the version number of the local test assembly
         /// ensuring they were both built from the same source code.
         /// </summary>
         [Then]
-        public 
-        void 
+        public
+        void
         ThenTheApplicationVersionMatchesTheTestVersion()
         {
             var examplePage = this.WebBrowser.GetCurrentPageAs<SlinqyExampleWebpage>();
@@ -44,8 +45,8 @@ B) The previous deployment of the latest code failed, or
 C) There is a bug related to versioning.";
 
             Assert.AreEqual(
-                testVersion, 
-                websiteVersion, 
+                testVersion,
+                websiteVersion,
                 errorMessage
             );
         }

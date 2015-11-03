@@ -12,9 +12,9 @@
         /// Applies routes to the specified RouteCollection.
         /// </summary>
         /// <param name="routes">Specifies the RouteCollection to configure.</param>
-        public 
-        static 
-        void 
+        public
+        static
+        void
         RegisterRoutes(
             RouteCollection routes)
         {
