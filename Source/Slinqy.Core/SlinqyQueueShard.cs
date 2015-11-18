@@ -5,9 +5,6 @@
     /// </summary>
     public class SlinqyQueueShard
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "temp")]
-        private string  shardName;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueShard"/> class.
         /// </summary>
@@ -18,9 +15,14 @@
         string  shardName,
         long    maxSizeInMegabytes)
         {
-            this.shardName          = shardName;
+            this.ShardName          = shardName;
             this.MaxSizeInMegabytes = maxSizeInMegabytes;
         }
+
+        /// <summary>
+        /// Gets the name for this physical queue shard.
+        /// </summary>
+        public string ShardName { get; private set; }
 
         /// <summary>
         /// Gets the maximum capacity for this physical queue shard.
