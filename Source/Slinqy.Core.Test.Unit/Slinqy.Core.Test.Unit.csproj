@@ -54,6 +54,7 @@
       <Link>GlobalSuppressions.cs</Link>
     </Compile>
     <Compile Include="SlinqyQueueClientTests.cs" />
+    <Compile Include="SlinqyQueueTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

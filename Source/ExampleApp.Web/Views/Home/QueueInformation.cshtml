@@ -1,0 +1,39 @@
+﻿@model ExampleApp.Web.Models.QueueInformationModel
+
+<div id="QueueInformation">
+
+    @Html.LabelFor(m => m.QueueName)                <span id="QueueInformation_QueueName">@Model.QueueName</span>
+    @Html.LabelFor(m => m.StorageCapacityMegabytes) <span id="QueueInformation_StorageCapacityMegabytes">@Model.StorageCapacityMegabytes</span> MB
+
+    <script type="text/javascript">
+        // TODO: Refactor in to a reusable AJAX UI status widget.
+
+        function updateQueueInformation() {
+            $('#AjaxResult').text('');
+            $('#AjaxStatusMessage').text('');
+            $('#AjaxStatus').text('STARTING');
+
+            $.get('@Url.HttpRouteUrl("GetQueue", new {queueName = Model.QueueName})')
+                .done(function (data) {
+                    $('#QueueInformation_QueueName').text(data.QueueName);
+                    $('#QueueInformation_StorageCapacityMegabytes').text(data.StorageCapacityMegabytes);
+
+                    $('#AjaxResult').text('SUCCEEDED');
+                })
+                .fail(function (jqxhr, textStatus, error) {
+                    $('#AjaxResult').text('FAILED!');
+                    $('#AjaxStatusMessage').text('textStatus: ' + textStatus + 'error: ' + error + ', response: ' + JSON.stringify(jqxhr));
+                })
+                .always(function (jqxhr) {
+                    $('#AjaxStatus').text('COMPLETED');
+                    $('#AjaxStatusMessage').text(JSON.stringify(jqxhr));
+
+                    setTimeout(updateQueueInformation, 2000);
+                });
+
+            $('#AjaxStatus').text('STARTED');
+        }
+
+        updateQueueInformation();
+    </script>
+</div>

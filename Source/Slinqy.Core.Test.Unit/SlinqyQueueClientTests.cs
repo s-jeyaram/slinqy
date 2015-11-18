@@ -1,6 +1,7 @@
 ﻿namespace Slinqy.Core.Test.Unit
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using Xunit;
 
@@ -18,7 +19,19 @@
         void
         Constructor_CreatePhysicalQueueDelegateIsNull_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new SlinqyQueueClient(null));
+            Assert.Throws<ArgumentNullException>(() => new SlinqyQueueClient(null, s => null));
+        }
+
+        /// <summary>
+        /// Verifies the constructor checks the GetPhysicalQueueDelegate for null.
+        /// </summary>
+        [Fact]
+        public
+        static
+        void
+        Constructor_GetPhysicalQueueDelegateIsNull_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => new SlinqyQueueClient(s => null, null));
         }
 
         /// <summary>
@@ -38,9 +51,9 @@
                 createPhysicalQueueDelegate: queueName =>
                 {
                     delegateCalled = true;
-                    return Task.Run(() => new SlinqyQueue(queueName, 1));
-                }
-
+                    return Task.Run(() => new SlinqyQueueShard(queueName, 1));
+                },
+                listPhysicalQueuesDelegate: queueName => Task.Run(() => Enumerable.Empty<SlinqyQueueShard>())
             );
 
             // Act
@@ -64,7 +77,8 @@
             var queueName = string.Empty;
 
             var client = new SlinqyQueueClient(
-                createPhysicalQueueDelegate: name => null
+                createPhysicalQueueDelegate: name => null,
+                listPhysicalQueuesDelegate:  name => null
             );
 
             // Act

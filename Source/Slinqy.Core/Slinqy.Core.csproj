@@ -36,6 +36,7 @@
     </Compile>
     <Compile Include="SlinqyQueue.cs" />
     <Compile Include="SlinqyQueueClient.cs" />
+    <Compile Include="SlinqyQueueShard.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
