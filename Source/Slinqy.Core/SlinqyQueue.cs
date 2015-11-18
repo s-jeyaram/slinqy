@@ -114,11 +114,15 @@
         async Task
         PopulateShards()
         {
+            // Create and start the async task for listing queues.
+            var listTask = this.listPhysicalQueuesDelegate(this.Name);
+
+            // Wait for the task to complete...
             // Disable need to return to the original context thread, this prevents deadlocks if being hosted within ASP.NET.
             // For more info:
             // - http://stackoverflow.com/questions/13489065/best-practice-to-call-configureawait-for-all-server-side-code
             // - http://www.tugberkugurlu.com/archive/asynchronousnet-client-libraries-for-your-http-api-and-awareness-of-async-await-s-bad-effects
-            this.shards = await this.listPhysicalQueuesDelegate(this.Name).ConfigureAwait(false);
+            await listTask.ConfigureAwait(false);
         }
     }
 }
