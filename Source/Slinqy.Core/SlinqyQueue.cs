@@ -31,7 +31,7 @@
         /// <summary>
         /// Maintains the collection of physical shards that make up this virtual queue.
         /// </summary>
-        private readonly IEnumerable<SlinqyQueueShard> shards = Enumerable.Empty<SlinqyQueueShard>();
+        private IEnumerable<SlinqyQueueShard> shards = Enumerable.Empty<SlinqyQueueShard>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueue"/> class.
@@ -47,6 +47,11 @@
             this.listPhysicalQueuesDelegate = listPhysicalQueuesDelegate;
 
             this.Name = queueName;
+
+            var task = this.PopulateShards();
+
+            task.ConfigureAwait(false);
+            task.Wait(TimeSpan.FromSeconds(15));
 
             this.pollShardsTaskCancellationToken = new CancellationTokenSource();
             this.pollShardsTask = this.PollShards(this.pollShardsTaskCancellationToken.Token);
@@ -123,6 +128,8 @@
             // - http://stackoverflow.com/questions/13489065/best-practice-to-call-configureawait-for-all-server-side-code
             // - http://www.tugberkugurlu.com/archive/asynchronousnet-client-libraries-for-your-http-api-and-awareness-of-async-await-s-bad-effects
             await listTask.ConfigureAwait(false);
+
+            this.shards = listTask.Result;
         }
     }
 }
