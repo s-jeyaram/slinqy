@@ -31,7 +31,7 @@
         /// <summary>
         /// Maintains the collection of physical shards that make up this virtual queue.
         /// </summary>
-        private IEnumerable<SlinqyQueueShard> shards = Enumerable.Empty<SlinqyQueueShard>();
+        private readonly IEnumerable<SlinqyQueueShard> shards = Enumerable.Empty<SlinqyQueueShard>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueue"/> class.
