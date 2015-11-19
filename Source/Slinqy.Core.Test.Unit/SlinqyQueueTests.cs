@@ -21,8 +21,8 @@
         {
             // Arrange
             var fakeShards = new List<SlinqyQueueShard> {
-                new SlinqyQueueShard("test-01", 1024),
-                new SlinqyQueueShard("test-02", 1024)
+                new SlinqyQueueShard("test-01", 1024, 0),
+                new SlinqyQueueShard("test-02", 1024, 0)
             };
 
             using (var slinqyQueue = new SlinqyQueue("test", queueName => Task.Run(() => fakeShards.AsEnumerable())))

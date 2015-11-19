@@ -69,7 +69,7 @@
         {
             get
             {
-                return this.shards.Sum(s => s.MaxSizeInMegabytes);
+                return this.shards.Sum(s => s.MaxSizeMegabytes);
             }
         }
 

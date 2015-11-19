@@ -53,6 +53,7 @@
     <Compile Include="..\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
     </Compile>
+    <Compile Include="SlinqyAgentTests.cs" />
     <Compile Include="SlinqyQueueClientTests.cs" />
     <Compile Include="SlinqyQueueTests.cs" />
   </ItemGroup>

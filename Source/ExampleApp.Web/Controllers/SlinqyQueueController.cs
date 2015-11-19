@@ -90,7 +90,8 @@
 
             var slinqyQueueShard = new SlinqyQueueShard(
                 queueDescription.Path,
-                queueDescription.MaxSizeInMegabytes
+                queueDescription.MaxSizeInMegabytes,
+                queueDescription.SizeInBytes * 1024
             );
 
             return slinqyQueueShard;
@@ -115,7 +116,8 @@
             var slinqyQueueShards = serviceBusQueues.Select(q =>
                 new SlinqyQueueShard(
                     q.Path,
-                    q.MaxSizeInMegabytes
+                    q.MaxSizeInMegabytes,
+                    q.SizeInBytes * 1024
                 )
             );
 

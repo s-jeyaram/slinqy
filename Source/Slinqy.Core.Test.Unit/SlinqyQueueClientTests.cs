@@ -51,7 +51,7 @@
                 createPhysicalQueueDelegate: queueName =>
                 {
                     delegateCalled = true;
-                    return Task.Run(() => new SlinqyQueueShard(queueName, 1));
+                    return Task.Run(() => new SlinqyQueueShard(queueName, 1, 0));
                 },
                 listPhysicalQueuesDelegate: queueName => Task.Run(() => Enumerable.Empty<SlinqyQueueShard>())
             );

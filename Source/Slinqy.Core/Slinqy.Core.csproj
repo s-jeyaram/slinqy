@@ -34,6 +34,7 @@
     <Compile Include="..\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
     </Compile>
+    <Compile Include="SlinqyAgent.cs" />
     <Compile Include="SlinqyQueue.cs" />
     <Compile Include="SlinqyQueueClient.cs" />
     <Compile Include="SlinqyQueueShard.cs" />

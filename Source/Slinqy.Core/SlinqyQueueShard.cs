@@ -9,14 +9,17 @@
         /// Initializes a new instance of the <see cref="SlinqyQueueShard"/> class.
         /// </summary>
         /// <param name="shardName">Specifies the name of the phsyical queue shard.</param>
-        /// <param name="maxSizeInMegabytes">Specifies the max size of the phsical queue shard.</param>
+        /// <param name="maxSizeMegabytes">Specifies the max size of the physical queue shard, in megabytes.</param>
+        /// <param name="currentSizeMegabytes">Specifies the current size of the physical queue shard, in megabytes.</param>
         public
         SlinqyQueueShard(
         string  shardName,
-        long    maxSizeInMegabytes)
+        long    maxSizeMegabytes,
+        long    currentSizeMegabytes)
         {
-            this.ShardName          = shardName;
-            this.MaxSizeInMegabytes = maxSizeInMegabytes;
+            this.ShardName              = shardName;
+            this.MaxSizeMegabytes       = maxSizeMegabytes;
+            this.CurrentSizeMegabytes   = currentSizeMegabytes;
         }
 
         /// <summary>
@@ -27,6 +30,11 @@
         /// <summary>
         /// Gets the maximum capacity for this physical queue shard.
         /// </summary>
-        public long MaxSizeInMegabytes { get; private set; }
+        public long MaxSizeMegabytes { get; private set; }
+
+        /// <summary>
+        /// Gets the current size of the queue in megabytes.
+        /// </summary>
+        public long CurrentSizeMegabytes { get; private set; }
     }
 }
