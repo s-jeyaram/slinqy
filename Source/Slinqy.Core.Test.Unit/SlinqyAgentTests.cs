@@ -145,7 +145,7 @@
 
             var shardsClone = shards.ToList();
 
-            this.fakeListPhysicalQueueAutoGrowCallCount++;
+            this.fakeListPhysicalQueuesAutoGrowWriteCallCount++;
 
             // Find the write queue
             var writeQueue = shardsClone.Single(q => q.Writable);
