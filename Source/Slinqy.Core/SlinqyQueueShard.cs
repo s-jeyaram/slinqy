@@ -11,15 +11,18 @@
         /// <param name="shardName">Specifies the name of the phsyical queue shard.</param>
         /// <param name="maxSizeMegabytes">Specifies the max size of the physical queue shard, in megabytes.</param>
         /// <param name="currentSizeMegabytes">Specifies the current size of the physical queue shard, in megabytes.</param>
+        /// <param name="writable">Specifies if the queue is writable.</param>
         public
         SlinqyQueueShard(
         string  shardName,
         long    maxSizeMegabytes,
-        long    currentSizeMegabytes)
+        double  currentSizeMegabytes,
+        bool    writable)
         {
             this.ShardName              = shardName;
             this.MaxSizeMegabytes       = maxSizeMegabytes;
             this.CurrentSizeMegabytes   = currentSizeMegabytes;
+            this.Writable               = writable;
         }
 
         /// <summary>
@@ -35,6 +38,11 @@
         /// <summary>
         /// Gets the current size of the queue in megabytes.
         /// </summary>
-        public long CurrentSizeMegabytes { get; private set; }
+        public double CurrentSizeMegabytes { get; private set; }
+
+        /// <summary>
+        /// Gets a boolean value to indicate if the shard is writable (true) or not (false).
+        /// </summary>
+        public bool Writable { get; private set; }
     }
 }

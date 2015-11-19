@@ -8,6 +8,7 @@
     using System.Threading.Tasks;
     using System.Web.Http;
     using Microsoft.ServiceBus;
+    using Microsoft.ServiceBus.Messaging;
     using Models;
     using Slinqy.Core;
 
@@ -91,7 +92,8 @@
             var slinqyQueueShard = new SlinqyQueueShard(
                 queueDescription.Path,
                 queueDescription.MaxSizeInMegabytes,
-                queueDescription.SizeInBytes * 1024
+                queueDescription.SizeInBytes * 1024,
+                true
             );
 
             return slinqyQueueShard;
@@ -117,7 +119,8 @@
                 new SlinqyQueueShard(
                     q.Path,
                     q.MaxSizeInMegabytes,
-                    q.SizeInBytes * 1024
+                    q.SizeInBytes * 1024,
+                    q.Status == EntityStatus.Active || q.Status == EntityStatus.ReceiveDisabled
                 )
             );
 
