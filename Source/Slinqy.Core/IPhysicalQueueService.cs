@@ -6,7 +6,8 @@
 
     /// <summary>
     /// Represents a queuing service, such as Azure Service Bus, RabbitMQ, etc...
-    /// This interface defines methods that the queuing service can perform.
+    /// This interface defines methods that act against the queuing service.
+    /// This is the interface that users of the Slinqy library implement so that Slinqy can use their particular queuing service.
     /// </summary>
     public interface IPhysicalQueueService
     {
