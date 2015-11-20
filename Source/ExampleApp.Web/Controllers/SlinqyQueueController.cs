@@ -91,6 +91,7 @@
 
             var slinqyQueueShard = new SlinqyQueueShard(
                 queueDescription.Path,
+                0,
                 queueDescription.MaxSizeInMegabytes,
                 queueDescription.SizeInBytes * 1024,
                 true
@@ -118,6 +119,7 @@
             var slinqyQueueShards = serviceBusQueues.Select(q =>
                 new SlinqyQueueShard(
                     q.Path,
+                    0, // TODO: Maybe the SlinqyQueue class should be responsible for instantiating and providing it's path + index.
                     q.MaxSizeInMegabytes,
                     q.SizeInBytes * 1024,
                     q.Status == EntityStatus.Active || q.Status == EntityStatus.ReceiveDisabled
