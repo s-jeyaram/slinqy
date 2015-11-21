@@ -41,7 +41,7 @@
         /// </summary>
         public SlinqyQueueShard WriteShard
         {
-            get { return this.Shards.Single(s => s.Writable); }
+            get { return this.Shards.Last(s => s.Writable); }
         }
 
         /// <summary>
