@@ -129,5 +129,46 @@
                 this.monitor.WriteShard
             );
         }
+
+        /// <summary>
+        /// Verifies that the WriteShard property reflects the current write shard.
+        /// </summary>
+        /// <returns>Returns the async Task for the test.</returns>
+        [Fact]
+        public
+        async Task
+        WriteShard_OneReadManyDisabledOneWriteShardExists_SlinqyQueueWriteShardIsReturned()
+        {
+            // Arrange
+            var fakeReadPhysicalQueue      = A.Fake<SlinqyQueueShard>();
+            var fakeDisabled1PhysicalQueue = A.Fake<SlinqyQueueShard>();
+            var fakeDisabled2PhysicalQueue = A.Fake<SlinqyQueueShard>();
+            var fakeDisabled3PhysicalQueue = A.Fake<SlinqyQueueShard>();
+            var fakeWritePhysicalQueue     = A.Fake<SlinqyQueueShard>();
+
+            A.CallTo(() => fakeReadPhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => fakeDisabled1PhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => fakeDisabled2PhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => fakeDisabled3PhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => fakeWritePhysicalQueue.Writable).Returns(true);
+
+            var physicalQueues = new List<SlinqyQueueShard> {
+                fakeReadPhysicalQueue,
+                fakeWritePhysicalQueue
+            };
+
+            A.CallTo(() =>
+                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
+            ).Returns(physicalQueues);
+
+            // Act
+            await this.monitor.Start();
+
+            // Assert
+            Assert.Equal(
+                fakeWritePhysicalQueue,
+                this.monitor.WriteShard
+            );
+        }
     }
 }
