@@ -51,6 +51,6 @@
         /// <summary>
         /// Gets a boolean value to indicate if the shard is writable (true) or not (false).
         /// </summary>
-        public bool Writable { get; private set; }
+        public virtual bool Writable { get; private set; }
     }
 }

@@ -37,6 +37,14 @@
         public IEnumerable<SlinqyQueueShard> Shards { get; private set; }
 
         /// <summary>
+        /// Gets the current write shard.
+        /// </summary>
+        public SlinqyQueueShard WriteShard
+        {
+            get { return this.Shards.Single(s => s.Writable); }
+        }
+
+        /// <summary>
         /// Starts polling the physical resources to update the Shards property values.
         /// </summary>
         /// <returns>Returns the async Task for the work.</returns>
