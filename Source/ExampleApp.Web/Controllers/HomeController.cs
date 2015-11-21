@@ -37,7 +37,7 @@
             this.ViewBag.Title                  = "Home Page";
             this.ViewBag.ServiceBusNamespace    = this.serviceBusNamespaceManager.Address.ToString();
 
-            var defaultValues = new CreateQueueModel {
+            var defaultValues = new CreateQueueCommandModel {
                 MaxQueueSizeMegabytes = 1024
             };
 

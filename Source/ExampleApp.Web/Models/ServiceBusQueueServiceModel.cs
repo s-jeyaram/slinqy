@@ -10,7 +10,7 @@
     /// <summary>
     /// Implements the IPhysicalQueueService interface for the Azure Service Bus service.
     /// </summary>
-    public class ServiceBusQueueService : IPhysicalQueueService
+    public class ServiceBusQueueServiceModel : IPhysicalQueueService
     {
         /// <summary>
         /// Used to manage Service Bus resources.
@@ -18,11 +18,11 @@
         private readonly NamespaceManager serviceBusNamespaceManager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ServiceBusQueueService"/> class.
+        /// Initializes a new instance of the <see cref="ServiceBusQueueServiceModel"/> class.
         /// </summary>
         /// <param name="serviceBusConnectionString">Specifies the connection string for the Azure Service Bus.</param>
         public
-        ServiceBusQueueService(
+        ServiceBusQueueServiceModel(
             string serviceBusConnectionString)
         {
             this.serviceBusNamespaceManager = NamespaceManager.CreateFromConnectionString(

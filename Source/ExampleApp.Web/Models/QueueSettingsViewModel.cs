@@ -3,16 +3,16 @@
     /// <summary>
     /// Models changeable settings for a queue.
     /// </summary>
-    public class QueueSettingsModel
+    public class QueueSettingsViewModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="QueueSettingsModel"/> class.
+        /// Initializes a new instance of the <see cref="QueueSettingsViewModel"/> class.
         /// </summary>
         /// <param name="storageUtilizationScaleUpThreshold">
         /// Specifies at what point the queues storage capacity should be expanded.
         /// </param>
         public
-        QueueSettingsModel(
+        QueueSettingsViewModel(
             double storageUtilizationScaleUpThreshold)
         {
             this.StorageUtilizationScaleUpThreshold = storageUtilizationScaleUpThreshold;

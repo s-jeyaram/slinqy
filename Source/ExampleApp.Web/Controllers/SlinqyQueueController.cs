@@ -19,7 +19,7 @@
         /// <summary>
         /// The queue service for managing queue resources.
         /// </summary>
-        private static readonly IPhysicalQueueService PhysicalQueueService = new ServiceBusQueueService(
+        private static readonly IPhysicalQueueService PhysicalQueueService = new ServiceBusQueueServiceModel(
             ConfigurationManager.AppSettings["Microsoft.ServiceBus.ConnectionString"]
         );
 
@@ -47,13 +47,13 @@
         [HttpGet]
         [Route("api/slinqy-queue", Name = "GetQueue")]
         public
-        QueueInformationModel
+        QueueInformationViewModel
         GetQueue(
             string queueName)
         {
             var queue = SlinqyQueueClient.Get(queueName);
 
-            return new QueueInformationModel(
+            return new QueueInformationViewModel(
                 queue.Name,
                 queue.MaxQueueSizeMegabytes
             );
@@ -67,9 +67,9 @@
         [HttpPost]
         [Route("api/slinqy-queue", Name = "CreateQueue")]
         public
-        async Task<QueueInformationModel>
+        async Task<QueueInformationViewModel>
         CreateQueue(
-            CreateQueueModel createQueueModel)
+            CreateQueueCommandModel createQueueModel)
         {
             if (createQueueModel == null)
                 throw new ArgumentNullException(nameof(createQueueModel));
@@ -79,7 +79,7 @@
             slinqyAgent = new SlinqyAgent(queue.Name, PhysicalQueueService, 0.25);
             await slinqyAgent.Start();
 
-            return new QueueInformationModel(
+            return new QueueInformationViewModel(
                 queue.Name,
                 createQueueModel.MaxQueueSizeMegabytes
             );

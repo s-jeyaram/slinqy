@@ -174,11 +174,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\CreateQueueModel.cs" />
-    <Compile Include="Models\ManageQueueModel.cs" />
-    <Compile Include="Models\QueueInformationModel.cs" />
-    <Compile Include="Models\QueueSettingsModel.cs" />
-    <Compile Include="Models\ServiceBusQueueService.cs" />
+    <Compile Include="Models\CreateQueueCommandModel.cs" />
+    <Compile Include="Models\ManageQueueViewModel.cs" />
+    <Compile Include="Models\QueueInformationViewModel.cs" />
+    <Compile Include="Models\QueueSettingsViewModel.cs" />
+    <Compile Include="Models\ServiceBusQueueServiceModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
