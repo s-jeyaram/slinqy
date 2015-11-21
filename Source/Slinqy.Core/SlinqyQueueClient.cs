@@ -12,14 +12,14 @@
     public class SlinqyQueueClient
     {
         /// <summary>
-        /// Maintains a list of references to SlinqyQueue's that have been instantiated since they are expenstive to create.
+        /// Maintains a list of references to SlinqyQueue's that have been instantiated since they are expensive to create.
         /// </summary>
         private readonly ConcurrentDictionary<string, SlinqyQueue> slinqyQueues = new ConcurrentDictionary<string, SlinqyQueue>();
 
         /// <summary>
         /// The physical queue service to use for managing queue resources.
         /// </summary>
-        private IPhysicalQueueService physicalQueueService;
+        private readonly IPhysicalQueueService physicalQueueService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueClient"/> class.
