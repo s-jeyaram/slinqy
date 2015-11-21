@@ -1,10 +1,7 @@
 ﻿namespace Slinqy.Core
 {
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.Linq;
-    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -20,17 +17,17 @@
         /// <summary>
         /// The reference for managing the queue service to do things like create new queues.
         /// </summary>
-        private IPhysicalQueueService queueService;
+        private readonly IPhysicalQueueService queueService;
 
         /// <summary>
         /// The name of the queue.
         /// </summary>
-        private string queueName;
+        private readonly string queueName;
 
         /// <summary>
         /// Monitors the physical queue shards.
         /// </summary>
-        private SlinqyQueueShardMonitor queueShardMonitor;
+        private readonly SlinqyQueueShardMonitor queueShardMonitor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyAgent"/> class.
@@ -139,14 +136,21 @@
             return Task.Run(() => { });
         }
 
+        /// <summary>
+        /// Periodically evaluates the shards.
+        /// </summary>
+        /// <returns>Returns the async Task for the work.</returns>
         private
         async Task
         PollShardState()
         {
             while (true)
             {
+                // Evaluate the current state.
                 await this.EvaluateShards();
 
+                // Wait before checking again.
+                // TODO: Make duration more configurable.
                 await Task.Delay(1000).ConfigureAwait(false);
             }
         }
