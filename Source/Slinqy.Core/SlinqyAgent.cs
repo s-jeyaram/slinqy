@@ -147,7 +147,7 @@
             {
                 await this.EvaluateShards();
 
-                await Task.Delay(1000);
+                await Task.Delay(1000).ConfigureAwait(false);
             }
         }
     }
