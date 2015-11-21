@@ -3,13 +3,16 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using FakeItEasy;
     using Xunit;
 
     /// <summary>
     /// Tests functions of the SlinqyQueueClient class.
     /// </summary>
-    public static class SlinqyQueueClientTests
+    public class SlinqyQueueClientTests
     {
+        private readonly IPhysicalQueueService fakePhysicalQueueService = A.Fake<IPhysicalQueueService>();
+
         /// <summary>
         /// Verifies the constructor checks for null values.
         /// </summary>
@@ -17,21 +20,9 @@
         public
         static
         void
-        Constructor_CreatePhysicalQueueDelegateIsNull_ThrowsArgumentNullException()
+        Constructor_PhysicalQueueServiceIsNull_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new SlinqyQueueClient(null, s => null));
-        }
-
-        /// <summary>
-        /// Verifies the constructor checks the GetPhysicalQueueDelegate for null.
-        /// </summary>
-        [Fact]
-        public
-        static
-        void
-        Constructor_GetPhysicalQueueDelegateIsNull_ThrowsArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => new SlinqyQueueClient(s => null, null));
+            Assert.Throws<ArgumentNullException>(() => new SlinqyQueueClient(null));
         }
 
         /// <summary>
@@ -40,27 +31,19 @@
         /// <returns>Returns the async Task.</returns>
         [Fact]
         public
-        static
         async Task
         CreateAsync_QueueNameValid_CreateDelegateInvoked()
         {
             // Arrange
-            var delegateCalled = false;
-
-            var client = new SlinqyQueueClient(
-                createPhysicalQueueDelegate: queueName =>
-                {
-                    delegateCalled = true;
-                    return Task.Run(() => new SlinqyQueueShard(queueName, 0, 1, 0, true));
-                },
-                listPhysicalQueuesDelegate: queueName => Task.Run(() => Enumerable.Empty<SlinqyQueueShard>())
-            );
+            var client = new SlinqyQueueClient(this.fakePhysicalQueueService);
 
             // Act
             await client.CreateAsync("test");
 
             // Assert
-            Assert.True(delegateCalled);
+            A.CallTo(() =>
+                this.fakePhysicalQueueService.CreateQueue(A<string>.Ignored)
+            ).MustHaveHappened();
         }
 
         /// <summary>
@@ -69,16 +52,14 @@
         /// <returns>Returns the async Task.</returns>
         [Fact]
         public
-        static
         async Task
         CreateAsync_QueueNameIsEmpty_ThrowsArgumentNullException()
         {
             // Arrange
-            var queueName = string.Empty;
+            string queueName = null;
 
             var client = new SlinqyQueueClient(
-                createPhysicalQueueDelegate: name => null,
-                listPhysicalQueuesDelegate:  name => null
+                this.fakePhysicalQueueService
             );
 
             // Act

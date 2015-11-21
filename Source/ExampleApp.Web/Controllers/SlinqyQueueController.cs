@@ -1,14 +1,10 @@
 ﻿namespace ExampleApp.Web.Controllers
 {
     using System;
-    using System.Collections.Generic;
     using System.Configuration;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using Microsoft.ServiceBus;
-    using Microsoft.ServiceBus.Messaging;
     using Models;
     using Slinqy.Core;
 
@@ -17,10 +13,13 @@
     /// </summary>
     public class SlinqyQueueController : ApiController
     {
+        // The following static fields are making up for not having proper dependency injection in place.
+        // Use DI if dependencies become more than a handful of fields...
+
         /// <summary>
-        /// Used to manage Service Bus resources.
+        /// The queue service for managing queue resources.
         /// </summary>
-        private static readonly NamespaceManager ServiceBusNamespaceManager = NamespaceManager.CreateFromConnectionString(
+        private static readonly IPhysicalQueueService PhysicalQueueService = new ServiceBusQueueService(
             ConfigurationManager.AppSettings["Microsoft.ServiceBus.ConnectionString"]
         );
 
@@ -28,11 +27,18 @@
         /// Used to interact with virtual queues.
         /// </summary>
         private static readonly SlinqyQueueClient SlinqyQueueClient = new SlinqyQueueClient(
-            createPhysicalQueueDelegate: CreateServiceBusQueue,
-            listPhysicalQueuesDelegate: ListServiceBusQueues
+            PhysicalQueueService
         );
 
         /// <summary>
+        /// Tracks the last created queue.
+        /// This currently does not support running multiple instances of the website.
+        /// </summary>
+        // TODO: Modify to support running on multiple instances.
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Storing statically until proper DI is available.")]
+        private static SlinqyAgent slinqyAgent;
+
+            /// <summary>
         /// Handles the HTTP POST /Home/CreateQueue by creating a queue with the specified parameters.
         /// </summary>
         /// <param name="queueName">Specifies the name of the queue to get.</param>
@@ -70,63 +76,12 @@
 
             var queue = await SlinqyQueueClient.CreateAsync(createQueueModel.QueueName);
 
+            slinqyAgent = new SlinqyAgent(queue.Name, PhysicalQueueService, 0.25);
+
             return new QueueInformationModel(
                 queue.Name,
                 createQueueModel.MaxQueueSizeMegabytes
             );
-        }
-
-        /// <summary>
-        /// Creates a new physical queue with the specified name.
-        /// </summary>
-        /// <param name="queueName">Specifies the name of the queue to create.</param>
-        /// <returns>Returns a SlinqyQueueShard instance that represents the newly created queue shard.</returns>
-        private
-        static
-        async Task<SlinqyQueueShard>
-        CreateServiceBusQueue(
-            string queueName)
-        {
-            var queueDescription = await ServiceBusNamespaceManager.CreateQueueAsync(queueName);
-
-            var slinqyQueueShard = new SlinqyQueueShard(
-                queueDescription.Path,
-                0,
-                queueDescription.MaxSizeInMegabytes,
-                queueDescription.SizeInBytes * 1024,
-                true
-            );
-
-            return slinqyQueueShard;
-        }
-
-        /// <summary>
-        /// Lists all the physical queues starting with the specified name.
-        /// </summary>
-        /// <param name="queueNamePrefix">
-        /// Specifies the prefix to search for.
-        /// </param>
-        /// <returns>Returns a collection of match queues.</returns>
-        private
-        static
-        async Task<IEnumerable<SlinqyQueueShard>>
-        ListServiceBusQueues(
-            string queueNamePrefix)
-        {
-            var serviceBusQueues = (await ServiceBusNamespaceManager.GetQueuesAsync("startswith(path, '" + queueNamePrefix + "-') eq true").ConfigureAwait(false))
-                .ToArray();
-
-            var slinqyQueueShards = serviceBusQueues.Select(q =>
-                new SlinqyQueueShard(
-                    q.Path,
-                    0, // TODO: Maybe the SlinqyQueue class should be responsible for instantiating and providing it's path + index.
-                    q.MaxSizeInMegabytes,
-                    q.SizeInBytes * 1024,
-                    q.Status == EntityStatus.Active || q.Status == EntityStatus.ReceiveDisabled
-                )
-            );
-
-            return slinqyQueueShards;
         }
     }
 }

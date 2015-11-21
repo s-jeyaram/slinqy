@@ -178,6 +178,7 @@
     <Compile Include="Models\ManageQueueModel.cs" />
     <Compile Include="Models\QueueInformationModel.cs" />
     <Compile Include="Models\QueueSettingsModel.cs" />
+    <Compile Include="Models\ServiceBusQueueService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

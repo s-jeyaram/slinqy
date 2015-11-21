@@ -1,21 +1,21 @@
 ﻿namespace Slinqy.Core.Test.Unit
 {
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
+    using FakeItEasy;
     using Xunit;
 
     /// <summary>
     /// Tests functions of the SlinqyQueue class.
     /// </summary>
-    public static class SlinqyQueueTests
+    public class SlinqyQueueTests
     {
+        private readonly IPhysicalQueueService fakePhysicalQueueService = A.Fake<IPhysicalQueueService>();
+
         /// <summary>
         /// Verifies that the MaxQueueSizeMegabytes property returns a sum of all the capacities of its shards.
         /// </summary>
         [Fact]
         public
-        static
         void
         MaxQueueSizeMegabytes_Always_ReturnsSumOfAllShardSizes()
         {
@@ -25,14 +25,17 @@
                 new SlinqyQueueShard("test-02", 1, 1024, 0, true)
             };
 
-            using (var slinqyQueue = new SlinqyQueue("test", queueName => Task.Run(() => fakeShards.AsEnumerable())))
-            {
-                // Act
-                var actual = slinqyQueue.MaxQueueSizeMegabytes;
+            A.CallTo(() =>
+                this.fakePhysicalQueueService.ListQueues(A<string>.Ignored)
+            ).Returns(fakeShards);
 
-                // Assert
-                Assert.Equal(2048, actual);
-            }
+            var slinqyQueue = new SlinqyQueue("test", this.fakePhysicalQueueService);
+
+            // Act
+            var actual = slinqyQueue.MaxQueueSizeMegabytes;
+
+            // Assert
+            Assert.Equal(2048, actual);
         }
     }
 }

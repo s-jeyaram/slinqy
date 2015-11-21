@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Threading.Tasks;
@@ -13,43 +12,31 @@
     public class SlinqyQueueClient
     {
         /// <summary>
-        /// Delegate to the function for creating new physical queues.
-        /// </summary>
-        private readonly Func<string, Task<SlinqyQueueShard>> createPhysicalQueueDelegate;
-
-        /// <summary>
-        /// Delegate to the function for listing physical queues.
-        /// </summary>
-        private readonly Func<string, Task<IEnumerable<SlinqyQueueShard>>> listPhysicalQueuesDelegate;
-
-        /// <summary>
         /// Maintains a list of references to SlinqyQueue's that have been instantiated since they are expenstive to create.
         /// </summary>
         private readonly ConcurrentDictionary<string, SlinqyQueue> slinqyQueues = new ConcurrentDictionary<string, SlinqyQueue>();
 
-            /// <summary>
+        /// <summary>
+        /// The physical queue service to use for managing queue resources.
+        /// </summary>
+        private IPhysicalQueueService physicalQueueService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueClient"/> class.
         /// </summary>
-        /// <param name="createPhysicalQueueDelegate">
-        /// Specifies the function to use for creating new physical queue shards.
+        /// <param name="queueService">
+        /// Specifies the IPhysicalQueueService to use for managing queue resources.
         /// </param>
-        /// <param name="listPhysicalQueuesDelegate">
-        /// Specifies the function to use for listing all the physical queues whose names start with the specified string.
-        /// </param>
-        /// <exception cref="ArgumentNullException">Thrown if any of the specified delegate parameters are not specified.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if any of the specified parameters are not specified.</exception>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule was not designed for async calls.")]
         public
         SlinqyQueueClient(
-            Func<string, Task<SlinqyQueueShard>>                createPhysicalQueueDelegate,
-            Func<string, Task<IEnumerable<SlinqyQueueShard>>>   listPhysicalQueuesDelegate)
+            IPhysicalQueueService queueService)
         {
-            if (createPhysicalQueueDelegate == null)
-                throw new ArgumentNullException(nameof(createPhysicalQueueDelegate));
-            if (listPhysicalQueuesDelegate == null)
-                throw new ArgumentNullException(nameof(listPhysicalQueuesDelegate));
+            if (queueService == null)
+                throw new ArgumentNullException(nameof(queueService));
 
-            this.createPhysicalQueueDelegate = createPhysicalQueueDelegate;
-            this.listPhysicalQueuesDelegate  = listPhysicalQueuesDelegate;
+            this.physicalQueueService = queueService;
         }
 
         /// <summary>
@@ -76,11 +63,11 @@
 
             // Call the function to create the first physical queue shard to establish the virtual queue.
             // No need to do anything with the returned shard...
-            var shard = await this.createPhysicalQueueDelegate(queueShardName);
+            var shard = await this.physicalQueueService.CreateQueue(queueShardName);
 
             var queue = new SlinqyQueue(
                 queueName,
-                this.listPhysicalQueuesDelegate
+                this.physicalQueueService
             );
 
             this.slinqyQueues.TryAdd(queueName, queue);
@@ -100,7 +87,7 @@
         {
             var queue = this.slinqyQueues.GetOrAdd(
                 queueName,
-                name => new SlinqyQueue(queueName, this.listPhysicalQueuesDelegate)
+                name => new SlinqyQueue(queueName, this.physicalQueueService)
             );
 
             return queue;
