@@ -44,7 +44,17 @@
                 this.physicalQueueService
             );
 
-            this.queueShardMonitor.Start().Wait();
+            // Start monitoring.
+            var task = this.queueShardMonitor.Start();
+
+            // Disable need to return to the original context thread, this prevents deadlocks if being hosted within ASP.NET.
+            // For more info:
+            // - http://stackoverflow.com/questions/13489065/best-practice-to-call-configureawait-for-all-server-side-code
+            // - http://www.tugberkugurlu.com/archive/asynchronousnet-client-libraries-for-your-http-api-and-awareness-of-async-await-s-bad-effects
+            task.ConfigureAwait(false);
+
+            // Wait for the task to complete before continuing.
+            task.Wait();
         }
 
         /// <summary>

@@ -63,7 +63,9 @@
 
             // Call the function to create the first physical queue shard to establish the virtual queue.
             // No need to do anything with the returned shard...
-            var shard = await this.physicalQueueService.CreateQueue(queueShardName);
+            var shard = await this.physicalQueueService
+                .CreateQueue(queueShardName)
+                .ConfigureAwait(false);
 
             var queue = new SlinqyQueue(
                 queueName,
