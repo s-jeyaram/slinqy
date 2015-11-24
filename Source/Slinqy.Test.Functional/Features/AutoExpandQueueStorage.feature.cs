@@ -34,8 +34,8 @@ namespace Slinqy.Test.Functional.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "AutoExpandQueueStorage", "As a Queue Writer\nI want my queue storage capacity to expand when it nears capaci" +
-                    "ty\nSo that I can always store my messages", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "AutoExpandQueueStorage", "As a Queue Writer\r\nI want my queue storage capacity to expand when it nears capac" +
+                    "ity\r\nSo that I can always store my messages", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         

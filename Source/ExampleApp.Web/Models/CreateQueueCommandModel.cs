@@ -5,7 +5,7 @@
     /// <summary>
     /// Defines the model for creating a new queue.
     /// </summary>
-    public class CreateQueueModel
+    public class CreateQueueCommandModel
     {
         /// <summary>
         /// Gets or sets the name of the queue to create.

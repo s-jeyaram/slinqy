@@ -20,7 +20,7 @@
             BundleCollection bundles)
         {
             if (bundles == null)
-                throw new ArgumentNullException("bundles");
+                throw new ArgumentNullException(nameof(bundles));
 
             var jqueryBundle = new ScriptBundle("~/bundles/jquery");
 

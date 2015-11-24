@@ -1,12 +1,9 @@
 ﻿namespace ExampleApp.Web.Controllers
 {
-    using System;
     using System.Configuration;
-    using System.Threading.Tasks;
     using System.Web.Mvc;
     using Microsoft.ServiceBus;
     using Models;
-    using Slinqy.Core;
 
     /// <summary>
     /// Defines supported actions for the Homepage.
@@ -19,20 +16,11 @@
         private readonly NamespaceManager   serviceBusNamespaceManager;
 
         /// <summary>
-        /// Used to interact with physical queues.
-        /// </summary>
-        private readonly SlinqyQueueClient  slinqyQueueClient;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="HomeController"/> class.
         /// </summary>
         public
         HomeController()
         {
-            this.slinqyQueueClient = new SlinqyQueueClient(
-                createPhysicalQueueDelegate: this.CreateServiceBusQueue
-            );
-
             this.serviceBusNamespaceManager = NamespaceManager.CreateFromConnectionString(
                 ConfigurationManager.AppSettings["Microsoft.ServiceBus.ConnectionString"]
             );
@@ -46,68 +34,44 @@
         ActionResult
         Index()
         {
-            this.ViewBag.Title = "Home Page";
+            this.ViewBag.Title                  = "Home Page";
+            this.ViewBag.ServiceBusNamespace    = this.serviceBusNamespaceManager.Address.ToString();
 
-            return this.View();
+            var defaultValues = new CreateQueueCommandModel {
+                MaxQueueSizeMegabytes = 1024
+            };
+
+            return this.View(defaultValues);
         }
 
         /// <summary>
-        /// Creates a queue with the specified parameters.
+        /// Handles the HTTP GET /QueueInformation.
         /// </summary>
-        /// <param name="createQueueModel">Specifies the parameters of the queue to create.</param>
-        /// <returns>Returns the result of the action.</returns>
+        /// <param name="queueName">Specifies the name of the queue to get information for.</param>
+        /// <returns>Returns a partial view containing the queues information.</returns>
         public
-        async Task<ActionResult>
-        CreateQueue(
-            CreateQueueModel createQueueModel)
-        {
-            if (createQueueModel == null)
-                throw new ArgumentNullException("createQueueModel");
-
-            var queue = await this.slinqyQueueClient.CreateAsync(createQueueModel.QueueName);
-
-            return this.PartialView(
-                "ManageQueue",
-                new ManageQueueModel(
-                    queue.Name,
-                    queue.MaximumSizeInMegabytes
-                )
-            );
-        }
-
-        /// <summary>
-        /// Applies the specified settings to the queue.
-        /// </summary>
-        /// <param name="manageQueueModel">Specifies new settings for the queue.</param>
-        public
-        void
-        ManageQueue(
-            ManageQueueModel manageQueueModel)
-        {
-            this.ToString();
-
-            if (manageQueueModel != null)
-                manageQueueModel.ToString();
-        }
-
-        /// <summary>
-        /// Initializes a new instance.
-        /// </summary>
-        /// <param name="queueName">Specifies the name of the queue to create.</param>
-        /// <returns>Returns a SlinqyQueue instance that represents the virtual queue.</returns>
-        private
-        async Task<SlinqyQueue>
-        CreateServiceBusQueue(
+        ActionResult
+        QueueInformation(
             string queueName)
         {
-            var queueDescription = await this.serviceBusNamespaceManager.CreateQueueAsync(queueName);
+            this.ViewBag.QueueName = queueName;
 
-            var slinqyQueue = new SlinqyQueue(
-                queueDescription.Path,
-                queueDescription.MaxSizeInMegabytes
-            );
+            return this.PartialView("QueueInformation");
+        }
 
-            return slinqyQueue;
+        /// <summary>
+        /// Handles the HTTP GET /ManageQueue request.
+        /// </summary>
+        /// <param name="queueName">Specifies the name of the queue.</param>
+        /// <returns>Returns a partial view of the queue management UI.</returns>
+        public
+        ActionResult
+        ManageQueue(
+            string queueName)
+        {
+            this.ViewBag.QueueName = queueName;
+
+            return this.PartialView("ManageQueue");
         }
     }
 }

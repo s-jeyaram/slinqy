@@ -1,16 +1,11 @@
-﻿@model ExampleApp.Web.Models.CreateQueueModel
+﻿@model ExampleApp.Web.Models.CreateQueueCommandModel
 
-@using (Ajax.BeginForm("CreateQueue", "Home", new AjaxOptions{ HttpMethod = "POST", UpdateTargetId = "MainBody", OnBegin = "CreateQueueStarted", OnComplete = "CreateQueueCompleted", OnSuccess = "CreateQueueSucceeded", OnFailure = "CreateQueueFailed" }, new { Id = "CreateQueueForm"}))
-{
-    @Html.AntiForgeryToken()
+<h2>Create a Queue to Get Started</h2>
 
-    <h2>Create a Queue to Get Started</h2>
-
-    <div>
-        @Html.EditorForModel()
-        <input id="CreateQueueButton" type="submit" value="Create"/>
-    </div>
-}
+<form id="CreateQueueForm">
+    @Html.EditorForModel()
+    <input id="CreateQueueButton" type="button" value="Create"/>
+</form>
 
 <script type="text/javascript">
     // Called when the user initiates a create queue AJAX request.
@@ -19,9 +14,14 @@
         $('#AjaxStatusMessage').text('Request submitting, awaiting a response from the server.');
     }
 
-    function CreateQueueSucceeded() {
+    function CreateQueueSucceeded(response) {
         $('#AjaxResult').text('SUCCEEDED');
         $('#AjaxStatusMessage').text('The last request was successful.');
+
+        var url = '@Url.Action("ManageQueue")?queueName=' + response.QueueName;
+
+        // Swap out the Create Queue form for the Manage Queue form
+        $('#MainBody').load(url);
     }
 
     function CreateQueueFailed(response) {
@@ -32,4 +32,17 @@
     function CreateQueueCompleted(xhr) {
         $('#AjaxStatus').text('COMPLETED');
     }
+
+    function CreateQueue() {
+        $.post('@Url.HttpRouteUrl("CreateQueue", null)', $('#CreateQueueForm').serialize())
+            .done(CreateQueueSucceeded)
+            .fail(CreateQueueFailed)
+            .always(CreateQueueCompleted);
+
+        CreateQueueStarted();
+    }
+
+    $(function () {
+        $('#CreateQueueButton').click(CreateQueue);
+    });
 </script>

@@ -34,8 +34,12 @@
     <Compile Include="..\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
     </Compile>
+    <Compile Include="IPhysicalQueueService.cs" />
+    <Compile Include="SlinqyAgent.cs" />
     <Compile Include="SlinqyQueue.cs" />
     <Compile Include="SlinqyQueueClient.cs" />
+    <Compile Include="SlinqyQueueShard.cs" />
+    <Compile Include="SlinqyQueueShardMonitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

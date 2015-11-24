@@ -3,15 +3,15 @@
     /// <summary>
     /// Models standard queue information.
     /// </summary>
-    public class QueueInformationModel
+    public class QueueInformationViewModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="QueueInformationModel"/> class.
+        /// Initializes a new instance of the <see cref="QueueInformationViewModel"/> class.
         /// </summary>
         /// <param name="queueName">Specifies the name of the queue.</param>
         /// <param name="storageCapacityMegabytesMegabytes">Specifies the storage capacity of the queue.</param>
         public
-        QueueInformationModel(
+        QueueInformationViewModel(
             string queueName,
             long storageCapacityMegabytesMegabytes)
         {

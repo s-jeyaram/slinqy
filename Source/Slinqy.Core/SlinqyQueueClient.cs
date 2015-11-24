@@ -1,6 +1,7 @@
 ﻿namespace Slinqy.Core
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Threading.Tasks;
@@ -11,25 +12,31 @@
     public class SlinqyQueueClient
     {
         /// <summary>
-        /// Delegate to the function for creating new physical queues.
+        /// Maintains a list of references to SlinqyQueue's that have been instantiated since they are expensive to create.
         /// </summary>
-        private readonly Func<string, Task<SlinqyQueue>> createPhysicalQueueDelegate;
+        private readonly ConcurrentDictionary<string, SlinqyQueue> slinqyQueues = new ConcurrentDictionary<string, SlinqyQueue>();
+
+        /// <summary>
+        /// The physical queue service to use for managing queue resources.
+        /// </summary>
+        private readonly IPhysicalQueueService physicalQueueService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueClient"/> class.
         /// </summary>
-        /// <param name="createPhysicalQueueDelegate">
-        /// Specifies the function to use for creating new physical queue shards.
+        /// <param name="queueService">
+        /// Specifies the IPhysicalQueueService to use for managing queue resources.
         /// </param>
+        /// <exception cref="ArgumentNullException">Thrown if any of the specified parameters are not specified.</exception>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule was not designed for async calls.")]
         public
         SlinqyQueueClient(
-            Func<string, Task<SlinqyQueue>> createPhysicalQueueDelegate)
+            IPhysicalQueueService queueService)
         {
-            if (createPhysicalQueueDelegate == null)
-                throw new ArgumentNullException(nameof(createPhysicalQueueDelegate));
+            if (queueService == null)
+                throw new ArgumentNullException(nameof(queueService));
 
-            this.createPhysicalQueueDelegate = createPhysicalQueueDelegate;
+            this.physicalQueueService = queueService;
         }
 
         /// <summary>
@@ -40,7 +47,7 @@
         /// </param>
         /// <returns>Returns the resulting SlinqyQueue that was created.</returns>
         public
-        Task<SlinqyQueue>
+        async Task<SlinqyQueue>
         CreateAsync(
             string queueName)
         {
@@ -54,8 +61,38 @@
                 0
             );
 
-            // Call the function to create the physical queue shard.
-            return this.createPhysicalQueueDelegate(queueShardName);
+            // Call the function to create the first physical queue shard to establish the virtual queue.
+            // No need to do anything with the returned shard...
+            var shard = await this.physicalQueueService
+                .CreateQueue(queueShardName)
+                .ConfigureAwait(false);
+
+            var queue = new SlinqyQueue(
+                queueName,
+                this.physicalQueueService
+            );
+
+            this.slinqyQueues.TryAdd(queueName, queue);
+
+            return queue;
+        }
+
+        /// <summary>
+        /// Gets the specified Slinqy queue.
+        /// </summary>
+        /// <param name="queueName">Specifies the name of the virtual queue to get.</param>
+        /// <returns>Returns a SlinqyQueue instance that can be used to interact with the Slinqy queue.</returns>
+        public
+        SlinqyQueue
+        Get(
+            string queueName)
+        {
+            var queue = this.slinqyQueues.GetOrAdd(
+                queueName,
+                name => new SlinqyQueue(queueName, this.physicalQueueService)
+            );
+
+            return queue;
         }
     }
 }
