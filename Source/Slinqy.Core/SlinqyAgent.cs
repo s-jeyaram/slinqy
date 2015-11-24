@@ -91,7 +91,7 @@
 
             // Calculate it's storage utilization.
             // TODO: Move to property on SlinqyQueueShard...?
-            var utilizationPercentage = writeShard.CurrentSizeMegabytes / writeShard.MaxSizeMegabytes;
+            var utilizationPercentage = (writeShard.CurrentSizeBytes / 1024) / writeShard.MaxSizeMegabytes;
 
             // Nothing to do as long as utilization is under the threshold.
             if (!(utilizationPercentage > this.storageCapacityScaleOutThreshold))

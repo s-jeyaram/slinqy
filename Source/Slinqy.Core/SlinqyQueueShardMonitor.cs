@@ -63,7 +63,9 @@
         async Task
         UpdateShards()
         {
-            this.Shards = await this.queueService.ListQueues(this.queueName);
+            var physicalShards = await this.queueService.ListQueues(this.queueName);
+
+            this.Shards = physicalShards.Select(ps => new SlinqyQueueShard(ps));
         }
 
         /// <summary>

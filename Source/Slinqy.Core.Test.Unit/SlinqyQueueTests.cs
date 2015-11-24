@@ -9,6 +9,8 @@
     /// </summary>
     public class SlinqyQueueTests
     {
+        private const string ValidSlinqyQueueName = "queue-name";
+
         private readonly IPhysicalQueueService fakePhysicalQueueService = A.Fake<IPhysicalQueueService>();
 
         /// <summary>
@@ -20,16 +22,25 @@
         MaxQueueSizeMegabytes_Always_ReturnsSumOfAllShardSizes()
         {
             // Arrange
-            var fakeShards = new List<SlinqyQueueShard> {
-                new SlinqyQueueShard("test-01", 0, 1024, 1024, false),
-                new SlinqyQueueShard("test-02", 1, 1024, 0, true)
+            var fakePhysicalQueue1 = A.Fake<IPhysicalQueue>();
+            var fakePhysicalQueue2 = A.Fake<IPhysicalQueue>();
+
+            A.CallTo(() => fakePhysicalQueue1.MaxSizeMegabytes).Returns(1024);
+            A.CallTo(() => fakePhysicalQueue2.MaxSizeMegabytes).Returns(1024);
+
+            var fakeShards = new List<IPhysicalQueue> {
+                fakePhysicalQueue1,
+                fakePhysicalQueue2
             };
 
             A.CallTo(() =>
                 this.fakePhysicalQueueService.ListQueues(A<string>.Ignored)
             ).Returns(fakeShards);
 
-            var slinqyQueue = new SlinqyQueue("test", this.fakePhysicalQueueService);
+            var slinqyQueue = new SlinqyQueue(
+                ValidSlinqyQueueName,
+                this.fakePhysicalQueueService
+            );
 
             // Act
             var actual = slinqyQueue.MaxQueueSizeMegabytes;

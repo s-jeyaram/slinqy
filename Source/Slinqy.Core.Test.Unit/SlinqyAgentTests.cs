@@ -1,5 +1,6 @@
 ﻿namespace Slinqy.Core.Test.Unit
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -35,6 +36,11 @@
         private readonly IPhysicalQueueService fakeQueueService = A.Fake<IPhysicalQueueService>();
 
         /// <summary>
+        /// A fake queue configured for writing.
+        /// </summary>
+        private readonly IPhysicalQueue fakeWritePhysicalQueue = A.Fake<IPhysicalQueue>();
+
+        /// <summary>
         /// The SlinqyAgent instance being tested.
         /// </summary>
         private readonly SlinqyAgent slinqyAgent;
@@ -50,6 +56,10 @@
                 queueService:                       this.fakeQueueService,
                 storageCapacityScaleOutThreshold:   ValidStorageCapacityScaleOutThreshold
             );
+
+            // Configure default/typical behaviors and values.
+            A.CallTo(() => this.fakeWritePhysicalQueue.Writable).Returns(true);
+            A.CallTo(() => this.fakeWritePhysicalQueue.MaxSizeMegabytes).Returns(ValidMaxSizeMegabytes);
         }
 
         /// <summary>
@@ -63,13 +73,16 @@
         SlinqyAgent_WriteQueueShardExceedsCapacityThreshold_AnotherShardIsAdded()
         {
             // Arrange
-            var fakeQueues = new List<SlinqyQueueShard> {
-                new SlinqyQueueShard(ValidSlinqyQueueName + "1", ValidMaxSizeMegabytes, 0, ValidMaxSizeMegabytes, true)
+            var fakeQueues = new List<IPhysicalQueue> {
+                this.fakeWritePhysicalQueue
             };
 
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(A<string>.Ignored)
-            ).Returns(fakeQueues);
+            // Calculate minimum size to trigger scaling.
+            var scaleOutSizeMegabytes = ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold;
+            var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024);
+
+            A.CallTo(() => this.fakeWritePhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
+            A.CallTo(() => this.fakeQueueService.ListQueues(ValidSlinqyQueueName)).Returns(fakeQueues);
 
             // Act
             await this.slinqyAgent.Start();
@@ -88,16 +101,14 @@
         [Fact]
         public
         async Task
-        SlinqyAgent_WriteQueueShardSizeIncreasesRemainingUnderCapacityThreshold_AnotherShardIsNotAdded()
+        SlinqyAgent_WriteQueueShardSizeUnderCapacityThreshold_AnotherShardIsNotAdded()
         {
             // Arrange
-            var fakeQueues = new List<SlinqyQueueShard> {
-                new SlinqyQueueShard(ValidSlinqyQueueName, 0, ValidMaxSizeMegabytes, 0, true)
+            var fakeQueues = new List<IPhysicalQueue> {
+                this.fakeWritePhysicalQueue
             };
 
-            A.CallTo(
-                () => this.fakeQueueService.ListQueues(A<string>.Ignored)
-            ).Returns(Task.Run(() => fakeQueues.AsEnumerable()));
+            A.CallTo(() => this.fakeQueueService.ListQueues(ValidSlinqyQueueName)).Returns(fakeQueues);
 
             // Act
             await this.slinqyAgent.Start();

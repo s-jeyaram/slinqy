@@ -18,7 +18,7 @@
         /// Specifies the name of the queue to create.
         /// </param>
         /// <returns>Returns the queue that was created.</returns>
-        Task<SlinqyQueueShard> CreateQueue(string name);
+        Task<IPhysicalQueue> CreateQueue(string name);
 
         /// <summary>
         /// Lists the physical queues whose names matches the specified prefix.
@@ -30,6 +30,6 @@
         /// Returns a list of matching queues.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule wasn't designed for async Tasks.")]
-        Task<IEnumerable<SlinqyQueueShard>> ListQueues(string namePrefix);
+        Task<IEnumerable<IPhysicalQueue>> ListQueues(string namePrefix);
     }
 }
