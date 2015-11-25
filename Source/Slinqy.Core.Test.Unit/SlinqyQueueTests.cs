@@ -48,5 +48,41 @@
             // Assert
             Assert.Equal(2048, actual);
         }
+
+        /// <summary>
+        /// Verifies that the CurrentQueueSizeBytes property returns a sum of all the current sizes of its shards.
+        /// </summary>
+        [Fact]
+        public
+        void
+        CurrentQueueSizeBytes_Always_ReturnsSumOfAllShardSizes()
+        {
+            // Arrange
+            var fakePhysicalQueue1 = A.Fake<IPhysicalQueue>();
+            var fakePhysicalQueue2 = A.Fake<IPhysicalQueue>();
+
+            A.CallTo(() => fakePhysicalQueue1.CurrentSizeBytes).Returns(1);
+            A.CallTo(() => fakePhysicalQueue2.CurrentSizeBytes).Returns(2);
+
+            var fakeShards = new List<IPhysicalQueue> {
+                fakePhysicalQueue1,
+                fakePhysicalQueue2
+            };
+
+            A.CallTo(() =>
+                this.fakePhysicalQueueService.ListQueues(A<string>.Ignored)
+            ).Returns(fakeShards);
+
+            var slinqyQueue = new SlinqyQueue(
+                ValidSlinqyQueueName,
+                this.fakePhysicalQueueService
+            );
+
+            // Act
+            var actual = slinqyQueue.CurrentQueueSizeBytes;
+
+            // Assert
+            Assert.Equal(3, actual);
+        }
     }
 }

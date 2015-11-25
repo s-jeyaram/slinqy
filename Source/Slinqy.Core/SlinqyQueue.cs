@@ -1,7 +1,9 @@
 ﻿namespace Slinqy.Core
 {
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Models a virtual queue that is made up of n number of physical shards.
@@ -71,6 +73,30 @@
             {
                 return this.queueShardMonitor.Shards.Sum(s => s.MaxSizeMegabytes);
             }
+        }
+
+        /// <summary>
+        /// Gets the current size of all the data stored in the queue.
+        /// </summary>
+        public long CurrentQueueSizeBytes
+        {
+            get
+            {
+                return this.queueShardMonitor.Shards.Sum(s => s.CurrentSizeBytes);
+            }
+        }
+
+        /// <summary>
+        /// Sends the specified batch of messages to the current write queue.
+        /// </summary>
+        /// <param name="batch">Specifies the batch to submit to the write queue.</param>
+        /// <returns>Returns the async Task for the work.</returns>
+        public
+        Task
+        SendBatch(
+            IEnumerable<object> batch)
+        {
+            return this.queueShardMonitor.WriteShard.SendBatch(batch);
         }
     }
 }

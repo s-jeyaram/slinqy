@@ -46,7 +46,8 @@
         CreateQueue(
             string name)
         {
-            var queueDescription = await this.serviceBusNamespaceManager.CreateQueueAsync(path: name);
+            var queueDescription = await this.serviceBusNamespaceManager.CreateQueueAsync(path: name)
+                .ConfigureAwait(false);
 
             var physicalQueue = new ServiceBusQueueModel(
                 this.serviceBusConnectionString,

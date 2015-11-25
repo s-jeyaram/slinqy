@@ -41,7 +41,7 @@
         /// <summary>
         /// Gets the current size of the queue in megabytes.
         /// </summary>
-        public double CurrentSizeBytes => this.physicalQueue.CurrentSizeBytes;
+        public long CurrentSizeBytes => this.physicalQueue.CurrentSizeBytes;
 
         /// <summary>
         /// Gets a boolean value to indicate if the shard is writable (true) or not (false).
