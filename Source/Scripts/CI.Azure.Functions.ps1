@@ -6,8 +6,7 @@ function Check-AzureResourceGroupExists {
         $ResourceGroupName
     )
 
-    Switch-AzureMode AzureResourceManager
-    $resourceGroups = Get-AzureResourceGroup
+    $resourceGroups = Get-AzureRmResourceGroup
     $appGroup = $resourceGroups | where {$_.ResourceGroupName -eq $ResourceGroupName}
 
     if ($appGroup) {

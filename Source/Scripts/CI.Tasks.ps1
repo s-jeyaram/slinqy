@@ -152,8 +152,6 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
     $TemplatesPath	  = Join-Path $ArtifactsPath "Templates"
     $TemplateFilePath = Join-Path $TemplatesPath "ExampleApp.json"
 
-    Switch-AzureMode AzureResourceManager
-
     $templateParameters                     = @{}
     $templateParameters.environmentName     = $Settings.EnvironmentName
     $templateParameters.environmentLocation = $Settings.EnvironmentLocation
@@ -162,7 +160,7 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
     if (-not (Check-AzureResourceGroupExists $Settings.ResourceGroupName)) {
         Write-Host "Creating resource group $($Settings.ResourceGroupName)..." -NoNewline
 
-        New-AzureResourceGroup `
+        New-AzureRmResourceGroup `
             -Name			            $Settings.ResourceGroupName `
             -Location                   $Settings.EnvironmentLocation
 
@@ -171,7 +169,7 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
 
     Write-Host "Updating resource group $($Settings.ResourceGroupName)..." -NoNewline
 
-    $result = New-AzureResourceGroupDeployment `
+    $result = New-AzureRmResourceGroupDeployment `
         -ResourceGroupName			$Settings.ResourceGroupName `
         -TemplateParameterObject    $templateParameters `
         -TemplateFile               $TemplateFilePath `
@@ -205,7 +203,6 @@ Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from t
 
     Write-Host "Deploying $ExampleAppPackagePath to $($Settings.ExampleAppSiteName)..."
 
-    Switch-AzureMode AzureServiceManagement
     Publish-AzureWebsiteProject `
         -Package $ExampleAppPackagePath `
         -Name    $Settings.ExampleAppSiteName
@@ -258,8 +255,7 @@ Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes 
         -Prompt "Are you use you want to permanently delete all services and data from the target environment $($Settings.EnvironmentName)? (y/n)"
 
     if ($answer -eq 'y'){
-        Switch-AzureMode AzureResourceManager
-        Remove-AzureResourceGroup `
+        Remove-AzureRmResourceGroup `
             -Name $Settings.ResourceGroupName `
             -Force
     }

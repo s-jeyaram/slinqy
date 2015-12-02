@@ -16,3 +16,6 @@ cinst nuget.commandline --version 2.8.6                       --confirm
 
 # PSake is a tool that coordinates CI tasks.
 nuget install psake -version 4.4.2
+
+# Install Azure SDK 2.8
+webpicmd /Install /Products:VWDOrVs2015AzurePack.2.8 /AcceptEula
