@@ -131,11 +131,11 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
                 $AzureDeployPassSecure = $AzureDeployPass | ConvertTo-SecureString -AsPlainText -Force
                 $AzureCredential       = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AzureDeployUser,$AzureDeployPassSecure
 
-                $Account = Add-AzureAccount -Credential $AzureCredential
+                $Account = Login-AzureRmAccount -Credential $AzureCredential
             } else {
                 Write-Host "Could not find any Azure credentials on the local machine, prompting console user..."
                 # Prompt the console user for credentials
-                $Account = Add-AzureAccount
+                $Account = Login-AzureRmAccount
             }
 
             if (-not $Account){
