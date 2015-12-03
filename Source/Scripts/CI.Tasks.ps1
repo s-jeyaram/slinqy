@@ -116,35 +116,39 @@ Task Build -depends Clean -description "Compiles all source code." {
 }
 
 Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed resources are set up in the target runtime environment." {
-    # First, make sure some Azure credentials are loaded
-    $AzureAccount = Get-AzureAccount
+    $AzureSubscriptions = $null
 
-    if (-not $AzureAccount) {
-        $AzureSubscription = Get-AzureSubscription -Current -ErrorAction SilentlyContinue
+    try {
+        # Check for any existing Resource Manager contexts.
+        $Context = Get-AzureRmContext
+    }
+    catch
+    {
+        if ($_.Exception.Message -ne 'Run Login-AzureRmAccount to login.') {
+            throw
+        }
+        
+        # Check environment variables for credentials
+        $AzureDeployUser = $env:AzureDeployUser
+        $AzureDeployPass = $env:AzureDeployPass
 
-        if (-not $AzureSubscription) {
-            # Check environment variables for credentials
-            $AzureDeployUser = $env:AzureDeployUser
-            $AzureDeployPass = $env:AzureDeployPass
+        if ($AzureDeployUser -and $AzureDeployPass) {
+            $AzureDeployPassSecure = $AzureDeployPass | ConvertTo-SecureString -AsPlainText -Force
+            $AzureCredential       = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AzureDeployUser,$AzureDeployPassSecure
 
-            if ($AzureDeployUser -and $AzureDeployPass) {
-                $AzureDeployPassSecure = $AzureDeployPass | ConvertTo-SecureString -AsPlainText -Force
-                $AzureCredential       = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AzureDeployUser,$AzureDeployPassSecure
+            $Context = Login-AzureRmAccount -Credential $AzureCredential
+        } else {
+            Write-Host "Could not find any Azure credentials on the local machine, prompting console user..."
+            # Prompt the console user for credentials
+            $Context = Login-AzureRmAccount
+        }
 
-                $Account = Login-AzureRmAccount -Credential $AzureCredential
-            } else {
-                Write-Host "Could not find any Azure credentials on the local machine, prompting console user..."
-                # Prompt the console user for credentials
-                $Account = Login-AzureRmAccount
-            }
-
-            if (-not $Account){
-                throw 'No Azure account found or specified!'
-            }
+        if (-not $Context){
+            throw 'No Azure account found or specified!'
         }
     }
 
-    $AzureSubscription = (Get-AzureSubscription -Current).SubscriptionName
+    $AzureSubscription = $Context.Subscription.SubscriptionName
 
     Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $AzureSubscription..."
 
