@@ -37,7 +37,7 @@ function Assert-HttpStatusCode {
     $statusCode = $response.StatusCode
     
     if ($statusCode -ne $ExpectedStatusCode) {
-        throw "Unexpected response: $response"
+        throw "Unexpected status code: $response"
     }
 }
 
