@@ -40,3 +40,24 @@ function Assert-HttpStatusCode {
         throw "Unexpected response: $response"
     }
 }
+
+function Write-EnvironmentSecrets {
+    Param(
+        $SecretsPath,
+        $ServiceBusConnectionString
+    )
+
+    Write-Host "Saving secrets to $SecretsPath..." -NoNewline
+
+    Set-Content $SecretsPath `
+        -Value "<?xml version='1.0' encoding='utf-8'?>
+<appSettings>
+  <add 
+    key=""Microsoft.ServiceBus.ConnectionString""
+    value=""$ServiceBusConnectionString""
+  />
+</appSettings>" `
+        -Force
+
+    Write-Host "done!"
+}

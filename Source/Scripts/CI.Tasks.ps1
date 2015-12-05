@@ -186,19 +186,9 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
     $environmentSecretsPath     = Join-Path $BasePath "environment-secrets.config"
     $serviceBusConnectionString = $result.Outputs["serviceBusConnectionString"].Value    
     
-    Write-Host "Saving connection strings to $environmentSecretsPath..." -NoNewline
-
-    Set-Content $environmentSecretsPath `
-        -Value "<?xml version='1.0' encoding='utf-8'?>
-<appSettings>
-  <add 
-    key=""Microsoft.ServiceBus.ConnectionString""
-    value=""$serviceBusConnectionString""
-  />
-</appSettings>" `
-        -Force
-
-    Write-Host "done!"
+    Write-EnvironmentSecrets `
+        -SecretsPath                $environmentSecretsPath `
+        -ServiceBusConnectionString $serviceBusConnectionString
 
     # Hit the Example App website to make sure it's alive
     $exampleWebsiteHostName = (Get-AzureRmWebApp -Name $Settings.ExampleAppSiteName).HostNames
@@ -232,6 +222,12 @@ Task FunctionalTest -depends LoadSettings -description 'Tests that the required 
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
+    # Make sure we're authenticated with Azure so the script can deploy.
+    GetOrLogin-AzureRmContext `
+        -AzureDeployUser $env:AzureDeployUser `
+        -AzureDeployPass $env:AzureDeployPass |
+            Out-Null
+
     if (-not (Check-AzureResourceGroupExists $Settings.ResourceGroupName)) {
         Write-Host "The resource group $($Settings.ResourceGroupName) doesn't exist, nothing to delete..."
         return
