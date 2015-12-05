@@ -27,18 +27,16 @@ function Update-AssemblyInfoVersion {
     Write-Host "done!"
 }
 
-function Assert-HttpResponseCode {
+function Assert-HttpStatusCode {
     Param(
         $GetUri,
-        $ExpectedResponseCode
+        $ExpectedStatusCode
     )
 
     $response   = Invoke-WebRequest $GetUri -UseBasicParsing
     $statusCode = $response.StatusCode
-
-    Write-Host "Response Code: $statusCode"
-
-    if (-not ($statusCode -eq $ExpectedResponseCode)) {
+    
+    if ($statusCode -ne $ExpectedStatusCode) {
         throw "Unexpected response: $response"
     }
 }

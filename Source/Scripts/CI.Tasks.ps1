@@ -156,13 +156,12 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
 
     Write-Host "Uploading package $exampleAppPackagePath to container '$deployContainerName'..." -NoNewline
     
-    $uploadedPackageUri = Upload-FileToBlob `
+    [string]$uploadedPackageUri = Upload-FileToBlob `
         -StorageContext $storageCtx `
         -LocalFilePath  $exampleAppPackagePath `
         -ContainerName  $deployContainerName
 
     Write-Host "done!"
-
     Write-Host "Updating application resources..." -NoNewline
 
     $sasToken = ConvertTo-SecureString(
@@ -206,7 +205,7 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
 
     Write-Host "Checking $exampleWebsiteHostName..." -NoNewline
 
-    Assert-HttpResonseCode `
+    Assert-HttpStatusCode `
         -GetUri             $exampleWebsiteHostName `
         -ExpectedStatusCode 200
 

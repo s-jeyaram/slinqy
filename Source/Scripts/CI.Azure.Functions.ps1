@@ -82,5 +82,5 @@ function Upload-FileToBlob {
         -Force |
             Out-Null
 
-    Write-Output $container.CloudBlobContainer.Uri.ToString() + '/' + $fileName
+    Write-Output ($container.CloudBlobContainer.Uri.ToString() + '/' + $fileName)
 }
