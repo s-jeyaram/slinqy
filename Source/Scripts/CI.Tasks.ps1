@@ -259,7 +259,7 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
     Write-Host "Provisioning completed!"
 
     # Hit the Example App website to make sure it's alive
-    $exampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
+    $exampleWebsiteHostName = (Get-AzureRmWebApp -Name $Settings.ExampleAppSiteName).HostNames
 
     Write-Host "Checking $exampleWebsiteHostName..." -NoNewline
 
@@ -278,7 +278,7 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
 Task FunctionalTest -depends LoadSettings -description 'Tests that the required features and use cases are working in the target environment.' {
     Write-Host 'Getting Base URI...' -NoNewline
 
-    $exampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
+    $exampleWebsiteHostName = (Get-AzureRmWebApp -Name $Settings.ExampleAppSiteName).HostNames
     $ExampleWebsiteBaseUri = "http://$exampleWebsiteHostName"
 
     Write-Host $ExampleWebsiteBaseUri
