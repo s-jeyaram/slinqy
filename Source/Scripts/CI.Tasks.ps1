@@ -115,7 +115,7 @@ Task Build -depends Clean -description "Compiles all source code." {
     Write-Host "done!"
 }
 
-Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed resources are set up in the target runtime environment." {
+Task Deploy -depends LoadSettings -description "Deploys the physical infrastructure, configuration settings and application code required to operate." {
     $AzureSubscriptions = $null
 
     try {
@@ -153,13 +153,9 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
     Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $AzureSubscription..."
 
     # Set up paths to the Resource Manager template
-    $TemplatesPath	  = Join-Path $ArtifactsPath "Templates"
-    $TemplateFilePath = Join-Path $TemplatesPath "ExampleApp.json"
-
-    $templateParameters                     = @{}
-    $templateParameters.environmentName     = $Settings.EnvironmentName
-    $templateParameters.environmentLocation = $Settings.EnvironmentLocation
-    $templateParameters.exampleAppSiteName  = $Settings.ExampleAppSiteName
+    $TemplatesPath	               = Join-Path $ArtifactsPath "Templates"
+    $DeployStorageTemplateFilePath = Join-Path $TemplatesPath "DeploymentStorage.json"
+    $TemplateFilePath              = Join-Path $TemplatesPath "ExampleApp.json"
 
     if (-not (Check-AzureResourceGroupExists $Settings.ResourceGroupName)) {
         Write-Host "Creating resource group $($Settings.ResourceGroupName)..." -NoNewline
@@ -171,13 +167,74 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
         Write-Host "done!"
     }
 
-    Write-Host "Updating resource group $($Settings.ResourceGroupName)..." -NoNewline
+    Write-Host "Updating resource group $($Settings.ResourceGroupName)..."
+    Write-Host "Checking deployment storage account..." -NoNewline
 
     $result = New-AzureRmResourceGroupDeployment `
         -ResourceGroupName			$Settings.ResourceGroupName `
-        -TemplateParameterObject    $templateParameters `
-        -TemplateFile               $TemplateFilePath `
+        -TemplateFile               $DeployStorageTemplateFilePath `
         -Force
+
+    Write-Host "done!"
+
+    $deployStorageAccountName      = $result.Outputs['deployStorageAccountName'].Value
+    $deployStorageConnectionString = $result.Outputs['deployStorageConnectionString'].Value
+
+    # Upload the application package to storage
+    $deployContainerName = "packages"
+    $storageCtx = New-AzureStorageContext `
+        -ConnectionString $deployStorageConnectionString
+
+    $exampleAppPackagePath = Join-Path $PublishedWebsitesPath "ExampleApp.Web_Package\ExampleApp.Web.zip"
+
+    Write-Host "Uploading package $exampleAppPackagePath to container '$deployContainerName'..." -NoNewline
+    
+    $containers = Get-AzureStorageContainer `
+        -Context $storageCtx
+
+    $container =  $containers | Where-Object {
+        $_.Name -eq $deployContainerName
+    }
+
+    if (-not $container) {
+        $container = New-AzureStorageContainer `
+            -Name       $deployContainerName `
+            -Context    $storageCtx `
+            -Permission Off
+    }
+
+    $fileName = Split-Path `
+        -Path $exampleAppPackagePath `
+        -Leaf
+
+    $result = Set-AzureStorageBlobContent `
+        -File      $exampleAppPackagePath `
+        -Container $deployContainerName `
+        -Blob      $fileName `
+        -Context   $storageCtx `
+        -Force
+
+    Write-Host "done!"
+
+    $uploadedPackageUri = $container.CloudBlobContainer.Uri.ToString() + '/' + $fileName
+
+    $sasToken = ConvertTo-SecureString(
+        New-AzureStorageContainerSASToken `
+            -Container  $deployContainerName `
+            -Context    $storageCtx `
+            -Permission r
+    ) -AsPlainText -Force
+
+    Write-Host "Updating application resources..." -NoNewline
+
+    $result = New-AzureRmResourceGroupDeployment `
+        -ResourceGroupName			$Settings.ResourceGroupName `
+        -TemplateFile               $TemplateFilePath `
+        -environmentName            $Settings.EnvironmentName `
+        -environmentLocation        $Settings.EnvironmentLocation `
+        -exampleAppSiteName         $Settings.ExampleAppSiteName `
+        -deployPackageUri           $uploadedPackageUri `
+        -deployPackageSasToken      $sasToken
 
     Write-Host "done!"
 
@@ -200,25 +257,13 @@ Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed
     Write-Host "done!"
     Write-Host
     Write-Host "Provisioning completed!"
-}
-
-Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from the last build that occurred to the target environment." {
-    $ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "ExampleApp.Web_Package\ExampleApp.Web.zip"
-
-    Write-Host "Deploying $ExampleAppPackagePath to $($Settings.ExampleAppSiteName)..."
-
-    Publish-AzureWebsiteProject `
-        -Package $ExampleAppPackagePath `
-        -Name    $Settings.ExampleAppSiteName
-
-    Write-Host "done!"
 
     # Hit the Example App website to make sure it's alive
-    $ExampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
+    $exampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
 
-    Write-Host "Checking $ExampleWebsiteHostName..." -NoNewline
+    Write-Host "Checking $exampleWebsiteHostName..." -NoNewline
 
-    $Response = Invoke-WebRequest $ExampleWebsiteHostName -UseBasicParsing
+    $Response = Invoke-WebRequest $exampleWebsiteHostName -UseBasicParsing
     $StatusCode = $Response.StatusCode
 
     Write-Host "Response Code: $StatusCode"
@@ -233,8 +278,8 @@ Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from t
 Task FunctionalTest -depends LoadSettings -description 'Tests that the required features and use cases are working in the target environment.' {
     Write-Host 'Getting Base URI...' -NoNewline
 
-    $ExampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
-    $ExampleWebsiteBaseUri = "http://$ExampleWebsiteHostName"
+    $exampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
+    $ExampleWebsiteBaseUri = "http://$exampleWebsiteHostName"
 
     Write-Host $ExampleWebsiteBaseUri
 
