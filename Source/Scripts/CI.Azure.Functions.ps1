@@ -44,6 +44,8 @@ function GetOrLogin-AzureRmContext {
         if (-not $context){
             throw 'No Azure account found or specified!'
         }
+
+        # TODO: Ask user about multiple subscriptions, which to use...?
     }
 
     Write-Output $context
