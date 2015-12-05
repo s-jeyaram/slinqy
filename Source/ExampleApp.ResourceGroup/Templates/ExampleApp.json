@@ -31,6 +31,12 @@
     "exampleAppSiteName": {
       "type": "string",
       "defaultValue": "ExampleApp"
+    },
+    "deployPackageUri": {
+      "type": "string"
+    },
+    "deployPackageSasToken": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -89,7 +95,27 @@
             }
           ]
         }
-      }
+      },
+        "resources": [{
+          "name": "MSDeploy",
+          "type": "extensions",
+          "location": "[parameters('environmentLocation')]",
+          "apiVersion": "2014-06-01",
+          "dependsOn": [
+              "[concat('Microsoft.Web/sites/', parameters('exampleAppSiteName'))]"
+          ],
+          "tags": {
+              "displayName": "MSDeploy"
+          },
+          "properties": {
+            "packageUri": "[concat(parameters('deployPackageUri'), parameters('deployPackageSasToken'))]",
+            "dbType": "None",
+            "connectionString": "",
+            "setParameters": {
+                "IIS Web Application Name": "[parameters('exampleAppSiteName')]"
+            }
+          }
+      }]
     },
     {
       "apiVersion": "2014-04-01",

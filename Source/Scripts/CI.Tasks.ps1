@@ -115,125 +115,98 @@ Task Build -depends Clean -description "Compiles all source code." {
     Write-Host "done!"
 }
 
-Task ProvisionEnvironment -depends LoadSettings -description "Ensures the needed resources are set up in the target runtime environment." {
-    # First, make sure some Azure credentials are loaded
-    $AzureAccount = Get-AzureAccount
+Task Deploy -depends LoadSettings -description "Deploys the physical infrastructure, configuration settings and application code required to operate." {
+    # Make sure we're authenticated with Azure so the script can deploy.
+    $context = GetOrLogin-AzureRmContext `
+        -AzureDeployUser $env:AzureDeployUser `
+        -AzureDeployPass $env:AzureDeployPass
 
-    if (-not $AzureAccount) {
-        $AzureSubscription = Get-AzureSubscription -Current -ErrorAction SilentlyContinue
-
-        if (-not $AzureSubscription) {
-            # Check environment variables for credentials
-            $AzureDeployUser = $env:AzureDeployUser
-            $AzureDeployPass = $env:AzureDeployPass
-
-            if ($AzureDeployUser -and $AzureDeployPass) {
-                $AzureDeployPassSecure = $AzureDeployPass | ConvertTo-SecureString -AsPlainText -Force
-                $AzureCredential       = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AzureDeployUser,$AzureDeployPassSecure
-
-                $Account = Add-AzureAccount -Credential $AzureCredential
-            } else {
-                Write-Host "Could not find any Azure credentials on the local machine, prompting console user..."
-                # Prompt the console user for credentials
-                $Account = Add-AzureAccount
-            }
-
-            if (-not $Account){
-                throw 'No Azure account found or specified!'
-            }
-        }
-    }
-
-    $AzureSubscription = (Get-AzureSubscription -Current).SubscriptionName
-
-    Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $AzureSubscription..."
+    Write-Host "Provisioning Resource Group $($Settings.ResourceGroupName) in $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $($context.Subscription.SubscriptionName)"
 
     # Set up paths to the Resource Manager template
-    $TemplatesPath	  = Join-Path $ArtifactsPath "Templates"
-    $TemplateFilePath = Join-Path $TemplatesPath "ExampleApp.json"
-
-    Switch-AzureMode AzureResourceManager
-
-    $templateParameters                     = @{}
-    $templateParameters.environmentName     = $Settings.EnvironmentName
-    $templateParameters.environmentLocation = $Settings.EnvironmentLocation
-    $templateParameters.exampleAppSiteName  = $Settings.ExampleAppSiteName
+    $TemplatesPath	               = Join-Path $ArtifactsPath "Templates"
+    $DeployStorageTemplateFilePath = Join-Path $TemplatesPath "DeploymentStorage.json"
+    $appTemplateFilePath           = Join-Path $TemplatesPath "ExampleApp.json"
 
     if (-not (Check-AzureResourceGroupExists $Settings.ResourceGroupName)) {
         Write-Host "Creating resource group $($Settings.ResourceGroupName)..." -NoNewline
 
-        New-AzureResourceGroup `
+        New-AzureRmResourceGroup `
             -Name			            $Settings.ResourceGroupName `
             -Location                   $Settings.EnvironmentLocation
 
         Write-Host "done!"
     }
 
-    Write-Host "Updating resource group $($Settings.ResourceGroupName)..." -NoNewline
+    Write-Host "Provisioning application package deployment storage..." -NoNewline
 
-    $result = New-AzureResourceGroupDeployment `
+    $result = New-AzureRmResourceGroupDeployment `
         -ResourceGroupName			$Settings.ResourceGroupName `
-        -TemplateParameterObject    $templateParameters `
-        -TemplateFile               $TemplateFilePath `
+        -TemplateFile               $DeployStorageTemplateFilePath `
         -Force
 
     Write-Host "done!"
 
-    # Save connection strings locally.
+    # Upload the application package to storage
+    $deployContainerName = "packages"
+    $storageCtx = New-AzureStorageContext `
+        -ConnectionString $result.Outputs['deployStorageConnectionString'].Value
+
+    $exampleAppPackagePath = Join-Path $PublishedWebsitesPath "ExampleApp.Web_Package\ExampleApp.Web.zip"
+
+    Write-Host "Uploading package $exampleAppPackagePath to container '$deployContainerName'..." -NoNewline
+    
+    [string]$uploadedPackageUri = Upload-FileToBlob `
+        -StorageContext $storageCtx `
+        -LocalFilePath  $exampleAppPackagePath `
+        -ContainerName  $deployContainerName
+
+    Write-Host "done!"
+    Write-Host "Updating application resources..." -NoNewline
+
+    $sasToken = ConvertTo-SecureString(
+        New-AzureStorageContainerSASToken `
+            -Container  $deployContainerName `
+            -Context    $storageCtx `
+            -Permission r
+    ) -AsPlainText -Force
+
+    $result = New-AzureRmResourceGroupDeployment `
+        -ResourceGroupName			$Settings.ResourceGroupName `
+        -TemplateFile               $appTemplateFilePath `
+        -environmentName            $Settings.EnvironmentName `
+        -environmentLocation        $Settings.EnvironmentLocation `
+        -exampleAppSiteName         $Settings.ExampleAppSiteName `
+        -deployPackageUri           $uploadedPackageUri `
+        -deployPackageSasToken      $sasToken
+
+    Write-Host "done!"
+
+    # Save connection strings locally so that the app can also be run locally.
     $environmentSecretsPath     = Join-Path $BasePath "environment-secrets.config"
     $serviceBusConnectionString = $result.Outputs["serviceBusConnectionString"].Value    
     
-    Write-Host "Saving connection strings to $environmentSecretsPath..." -NoNewline
-
-    Set-Content $environmentSecretsPath `
-        -Value "<?xml version='1.0' encoding='utf-8'?>
-<appSettings>
-  <add 
-    key=""Microsoft.ServiceBus.ConnectionString""
-    value=""$serviceBusConnectionString""
-  />
-</appSettings>" `
-        -Force
-
-    Write-Host "done!"
-    Write-Host
-    Write-Host "Provisioning completed!"
-}
-
-Task Deploy -depends ProvisionEnvironment -description "Deploys artifacts from the last build that occurred to the target environment." {
-    $ExampleAppPackagePath = Join-Path $PublishedWebsitesPath "ExampleApp.Web_Package\ExampleApp.Web.zip"
-
-    Write-Host "Deploying $ExampleAppPackagePath to $($Settings.ExampleAppSiteName)..."
-
-    Switch-AzureMode AzureServiceManagement
-    Publish-AzureWebsiteProject `
-        -Package $ExampleAppPackagePath `
-        -Name    $Settings.ExampleAppSiteName
-
-    Write-Host "done!"
+    Write-EnvironmentSecrets `
+        -SecretsPath                $environmentSecretsPath `
+        -ServiceBusConnectionString $serviceBusConnectionString
 
     # Hit the Example App website to make sure it's alive
-    $ExampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
+    $exampleWebsiteHostName = (Get-AzureRmWebApp -Name $Settings.ExampleAppSiteName).HostNames
 
-    Write-Host "Checking $ExampleWebsiteHostName..." -NoNewline
+    Write-Host "Checking $exampleWebsiteHostName..." -NoNewline
 
-    $Response = Invoke-WebRequest $ExampleWebsiteHostName -UseBasicParsing
-    $StatusCode = $Response.StatusCode
+    Assert-HttpStatusCode `
+        -GetUri             $exampleWebsiteHostName `
+        -ExpectedStatusCode 200
 
-    Write-Host "Response Code: $StatusCode"
-
-    if (-not ($StatusCode -eq 200)) {
-        throw "Unexpected response: $Response"
-    }
-
-    Write-Host "Deployment Completed"
+    Write-Host "OK!"
 }
 
 Task FunctionalTest -depends LoadSettings -description 'Tests that the required features and use cases are working in the target environment.' {
     Write-Host 'Getting Base URI...' -NoNewline
 
-    $ExampleWebsiteHostName = (Get-AzureWebsite -Name $Settings.ExampleAppSiteName).HostNames[0]
-    $ExampleWebsiteBaseUri = "http://$ExampleWebsiteHostName"
+    $exampleWebsiteHostName = (Get-AzureRmWebApp -Name $Settings.ExampleAppSiteName).HostNames
+    $ExampleWebsiteBaseUri = "http://$exampleWebsiteHostName"
 
     Write-Host $ExampleWebsiteBaseUri
 
@@ -249,6 +222,12 @@ Task FunctionalTest -depends LoadSettings -description 'Tests that the required 
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
+    # Make sure we're authenticated with Azure so the script can deploy.
+    GetOrLogin-AzureRmContext `
+        -AzureDeployUser $env:AzureDeployUser `
+        -AzureDeployPass $env:AzureDeployPass |
+            Out-Null
+
     if (-not (Check-AzureResourceGroupExists $Settings.ResourceGroupName)) {
         Write-Host "The resource group $($Settings.ResourceGroupName) doesn't exist, nothing to delete..."
         return
@@ -258,8 +237,7 @@ Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes 
         -Prompt "Are you use you want to permanently delete all services and data from the target environment $($Settings.EnvironmentName)? (y/n)"
 
     if ($answer -eq 'y'){
-        Switch-AzureMode AzureResourceManager
-        Remove-AzureResourceGroup `
+        Remove-AzureRmResourceGroup `
             -Name $Settings.ResourceGroupName `
             -Force
     }
