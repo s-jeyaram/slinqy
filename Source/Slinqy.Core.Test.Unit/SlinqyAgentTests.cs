@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using FakeItEasy;
     using Xunit;
@@ -78,8 +77,8 @@
             };
 
             // Calculate minimum size to trigger scaling.
-            var scaleOutSizeMegabytes = ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold;
-            var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024);
+            var scaleOutSizeMegabytes = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
+            var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
 
             A.CallTo(() => this.fakeWritePhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
             A.CallTo(() => this.fakeQueueService.ListQueues(ValidSlinqyQueueName)).Returns(fakeQueues);
