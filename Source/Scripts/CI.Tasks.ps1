@@ -138,7 +138,7 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
         Write-Host "done!"
     }
 
-    Write-Host "Provisioning deployment storage..." -NoNewline
+    Write-Host "Provisioning application package deployment storage..." -NoNewline
 
     $result = New-AzureRmResourceGroupDeployment `
         -ResourceGroupName			$Settings.ResourceGroupName `
