@@ -121,7 +121,7 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
         -AzureDeployUser $env:AzureDeployUser `
         -AzureDeployPass $env:AzureDeployPass
 
-    Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $($context.Subscription.SubscriptionName)"
+    Write-Host "Provisioning Resource Group $($Settings.ResourceGroupName) in $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $($context.Subscription.SubscriptionName)"
 
     # Set up paths to the Resource Manager template
     $TemplatesPath	               = Join-Path $ArtifactsPath "Templates"
@@ -137,8 +137,6 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
 
         Write-Host "done!"
     }
-
-    Write-Host "Provisioning resource group $($Settings.ResourceGroupName)"
 
     Write-Host "Provisioning deployment storage..." -NoNewline
 
@@ -185,7 +183,7 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
 
     Write-Host "done!"
 
-    # Save connection strings locally.
+    # Save connection strings locally so that the app can also be run locally.
     $environmentSecretsPath     = Join-Path $BasePath "environment-secrets.config"
     $serviceBusConnectionString = $result.Outputs["serviceBusConnectionString"].Value    
     
