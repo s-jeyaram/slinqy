@@ -2,7 +2,7 @@
 
 # Make sure all the system level prerequisites that require Admin rights are installed.
 
-# Chocolately: Used to install subsequent dependencies.
+# Chocolatey: Used to install subsequent dependencies.
 if (-not ($env:Path -ilike "*chocolatey*")) {
     Write-Host "Chocolatey not found in PATH environment variable, installing..."
     iex ((New-Object Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
@@ -16,3 +16,6 @@ cinst nuget.commandline --version 2.8.6                       --confirm
 
 # PSake is a tool that coordinates CI tasks.
 nuget install psake -version 4.4.2
+
+# Install Azure PowerShell Cmdlets
+webpicmd /Install /Products:WindowsAzurePowerShell /AcceptEula

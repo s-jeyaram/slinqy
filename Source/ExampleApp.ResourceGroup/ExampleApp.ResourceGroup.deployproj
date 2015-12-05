@@ -25,6 +25,9 @@
       <Visible>False</Visible>
     </None>
     <Content Include="Templates\ExampleApp.json" />
+    <Content Include="Templates\DeploymentStorage.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
 </Project>
