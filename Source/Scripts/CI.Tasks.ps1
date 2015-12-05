@@ -116,46 +116,17 @@ Task Build -depends Clean -description "Compiles all source code." {
 }
 
 Task Deploy -depends LoadSettings -description "Deploys the physical infrastructure, configuration settings and application code required to operate." {
-    $AzureSubscriptions = $null
+    # Make sure we're authenticated with Azure so the script can deploy.
+    $context = GetOrLogin-AzureRmContext `
+        -AzureDeployUser $env:AzureDeployUser `
+        -AzureDeployPass $env:AzureDeployPass
 
-    try {
-        # Check for any existing Resource Manager contexts.
-        $Context = Get-AzureRmContext
-    }
-    catch
-    {
-        if ($_.Exception.Message -ne 'Run Login-AzureRmAccount to login.') {
-            throw
-        }
-        
-        # Check environment variables for credentials
-        $AzureDeployUser = $env:AzureDeployUser
-        $AzureDeployPass = $env:AzureDeployPass
-
-        if ($AzureDeployUser -and $AzureDeployPass) {
-            $AzureDeployPassSecure = $AzureDeployPass | ConvertTo-SecureString -AsPlainText -Force
-            $AzureCredential       = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AzureDeployUser,$AzureDeployPassSecure
-
-            $Context = Login-AzureRmAccount -Credential $AzureCredential
-        } else {
-            Write-Host "Could not find any Azure credentials on the local machine, prompting console user..."
-            # Prompt the console user for credentials
-            $Context = Login-AzureRmAccount
-        }
-
-        if (-not $Context){
-            throw 'No Azure account found or specified!'
-        }
-    }
-
-    $AzureSubscription = $Context.Subscription.SubscriptionName
-
-    Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $AzureSubscription..."
+    Write-Host "Provisioning $($Settings.EnvironmentName) ($($Settings.EnvironmentLocation)) in Azure Subscription $($context.Subscription.SubscriptionName)"
 
     # Set up paths to the Resource Manager template
     $TemplatesPath	               = Join-Path $ArtifactsPath "Templates"
     $DeployStorageTemplateFilePath = Join-Path $TemplatesPath "DeploymentStorage.json"
-    $TemplateFilePath              = Join-Path $TemplatesPath "ExampleApp.json"
+    $appTemplateFilePath           = Join-Path $TemplatesPath "ExampleApp.json"
 
     if (-not (Check-AzureResourceGroupExists $Settings.ResourceGroupName)) {
         Write-Host "Creating resource group $($Settings.ResourceGroupName)..." -NoNewline
@@ -167,8 +138,9 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
         Write-Host "done!"
     }
 
-    Write-Host "Updating resource group $($Settings.ResourceGroupName)..."
-    Write-Host "Checking deployment storage account..." -NoNewline
+    Write-Host "Provisioning resource group $($Settings.ResourceGroupName)"
+
+    Write-Host "Provisioning deployment storage..." -NoNewline
 
     $result = New-AzureRmResourceGroupDeployment `
         -ResourceGroupName			$Settings.ResourceGroupName `
@@ -177,46 +149,23 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
 
     Write-Host "done!"
 
-    $deployStorageAccountName      = $result.Outputs['deployStorageAccountName'].Value
-    $deployStorageConnectionString = $result.Outputs['deployStorageConnectionString'].Value
-
     # Upload the application package to storage
     $deployContainerName = "packages"
     $storageCtx = New-AzureStorageContext `
-        -ConnectionString $deployStorageConnectionString
+        -ConnectionString $result.Outputs['deployStorageConnectionString'].Value
 
     $exampleAppPackagePath = Join-Path $PublishedWebsitesPath "ExampleApp.Web_Package\ExampleApp.Web.zip"
 
     Write-Host "Uploading package $exampleAppPackagePath to container '$deployContainerName'..." -NoNewline
     
-    $containers = Get-AzureStorageContainer `
-        -Context $storageCtx
-
-    $container =  $containers | Where-Object {
-        $_.Name -eq $deployContainerName
-    }
-
-    if (-not $container) {
-        $container = New-AzureStorageContainer `
-            -Name       $deployContainerName `
-            -Context    $storageCtx `
-            -Permission Off
-    }
-
-    $fileName = Split-Path `
-        -Path $exampleAppPackagePath `
-        -Leaf
-
-    $result = Set-AzureStorageBlobContent `
-        -File      $exampleAppPackagePath `
-        -Container $deployContainerName `
-        -Blob      $fileName `
-        -Context   $storageCtx `
-        -Force
+    $uploadedPackageUri = Upload-FileToBlob `
+        -StorageContext $storageCtx `
+        -LocalFilePath  $exampleAppPackagePath `
+        -ContainerName  $deployContainerName
 
     Write-Host "done!"
 
-    $uploadedPackageUri = $container.CloudBlobContainer.Uri.ToString() + '/' + $fileName
+    Write-Host "Updating application resources..." -NoNewline
 
     $sasToken = ConvertTo-SecureString(
         New-AzureStorageContainerSASToken `
@@ -225,11 +174,9 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
             -Permission r
     ) -AsPlainText -Force
 
-    Write-Host "Updating application resources..." -NoNewline
-
     $result = New-AzureRmResourceGroupDeployment `
         -ResourceGroupName			$Settings.ResourceGroupName `
-        -TemplateFile               $TemplateFilePath `
+        -TemplateFile               $appTemplateFilePath `
         -environmentName            $Settings.EnvironmentName `
         -environmentLocation        $Settings.EnvironmentLocation `
         -exampleAppSiteName         $Settings.ExampleAppSiteName `
@@ -255,24 +202,17 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
         -Force
 
     Write-Host "done!"
-    Write-Host
-    Write-Host "Provisioning completed!"
 
     # Hit the Example App website to make sure it's alive
     $exampleWebsiteHostName = (Get-AzureRmWebApp -Name $Settings.ExampleAppSiteName).HostNames
 
     Write-Host "Checking $exampleWebsiteHostName..." -NoNewline
 
-    $Response = Invoke-WebRequest $exampleWebsiteHostName -UseBasicParsing
-    $StatusCode = $Response.StatusCode
+    Assert-HttpResonseCode `
+        -GetUri             $exampleWebsiteHostName `
+        -ExpectedStatusCode 200
 
-    Write-Host "Response Code: $StatusCode"
-
-    if (-not ($StatusCode -eq 200)) {
-        throw "Unexpected response: $Response"
-    }
-
-    Write-Host "Deployment Completed"
+    Write-Host "OK!"
 }
 
 Task FunctionalTest -depends LoadSettings -description 'Tests that the required features and use cases are working in the target environment.' {

@@ -33,10 +33,6 @@
     }
   ],
   "outputs": {
-    "DeployStorageAccountName": {
-      "type": "string",
-      "value": "[variables('deployName')]"
-    },
     "DeployStorageConnectionString": {
       "type": "string",
       "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('deployName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('deployName')),'2015-05-01-preview').key1)]"
