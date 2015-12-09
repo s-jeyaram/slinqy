@@ -1,7 +1,5 @@
 ﻿namespace Slinqy.Core
 {
-    using System;
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
@@ -146,19 +144,14 @@
         {
             while (true)
             {
-                try
-                {
-                    // Evaluate the current state.
-                    await this.EvaluateShards().ConfigureAwait(false);
+                // TODO: Add try/catch block and log exceptions so that exceptions don't stop the agent from polling.
 
-                    // Wait before checking again.
-                    // TODO: Make duration more configurable.
-                    await Task.Delay(1000).ConfigureAwait(false);
-                }
-                catch (Exception exception)
-                {
-                    Trace.TraceError(exception.ToString());
-                }
+                // Evaluate the current state.
+                await this.EvaluateShards().ConfigureAwait(false);
+
+                // Wait before checking again.
+                // TODO: Make duration more configurable.
+                await Task.Delay(1000).ConfigureAwait(false);
             }
         }
     }
