@@ -18,7 +18,7 @@
         /// <summary>
         /// A proxy reference to the element in the web browser.
         /// </summary>
-        [FindsBy(How = How.Id, Using = "QueueInformation_StorageCapacityMegabytes")] private IWebElement storageCapacityMegabytes = null;
+        [FindsBy(How = How.Id, Using = "QueueInformation_MaxQueueSize")] private IWebElement storageCapacityMegabytes = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueueInformationSection"/> class.
