@@ -1,6 +1,7 @@
 ﻿namespace Slinqy.Core.Test.Unit
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using FakeItEasy;
     using Xunit;
 
@@ -83,6 +84,47 @@
 
             // Assert
             Assert.Equal(3, actual);
+        }
+
+        /// <summary>
+        /// Verifies that the SendBatch method properly submits the batch to the underlying write shard.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [Fact]
+        public
+        async Task
+        SendBatch_BatchIsValid_BatchSentToWriteShard()
+        {
+            // Arrange
+            var fakeReadablePhysicalQueue = A.Fake<IPhysicalQueue>();
+            var fakeWritablePhysicalQueue = A.Fake<IPhysicalQueue>();
+
+            A.CallTo(() => fakeReadablePhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => fakeWritablePhysicalQueue.Writable).Returns(true);
+
+            var fakeShards = new List<IPhysicalQueue> {
+                fakeReadablePhysicalQueue,
+                fakeWritablePhysicalQueue
+            };
+
+            A.CallTo(() =>
+                this.fakePhysicalQueueService.ListQueues(A<string>.Ignored)
+            ).Returns(fakeShards);
+
+            var slinqyQueue = new SlinqyQueue(
+                ValidSlinqyQueueName,
+                this.fakePhysicalQueueService
+            );
+
+            var validBatch = new List<string> { "message 1", "message 2" };
+
+            // Act
+            await slinqyQueue.SendBatch(validBatch);
+
+            // Assert
+            A.CallTo(() =>
+                fakeWritablePhysicalQueue.SendBatch(A<IEnumerable<object>>.Ignored)
+            ).MustHaveHappened();
         }
     }
 }
