@@ -222,21 +222,22 @@ Task FunctionalTest -depends LoadSettings -description 'Tests that the required 
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
-    # Make sure we're authenticated with Azure so the script can deploy.
-    GetOrLogin-AzureRmContext `
+    # Make sure we're authenticated with Azure.
+    $context = GetOrLogin-AzureRmContext `
         -AzureDeployUser $env:AzureDeployUser `
-        -AzureDeployPass $env:AzureDeployPass |
-            Out-Null
+        -AzureDeployPass $env:AzureDeployPass
+
+    $subscriptionName = $context.Subscription.SubscriptionName
 
     if (-not (Check-AzureResourceGroupExists $Settings.ResourceGroupName)) {
-        Write-Host "The resource group $($Settings.ResourceGroupName) doesn't exist, nothing to delete..."
+        Write-Host "The resource group $($Settings.ResourceGroupName) doesn't exist in Azure Subscription $subscriptionName, nothing to delete..."
         return
     }
 
     $answer = Read-Host `
-        -Prompt "Are you use you want to permanently delete all services and data from the target environment $($Settings.EnvironmentName)? (y/n)"
+        -Prompt "Are you use you want to permanently delete all services and data from the target environment $($Settings.EnvironmentName) in Azure Subscription $subscriptionName? (y/n)"
 
-    if ($answer -eq 'y'){
+    if ($answer -eq 'y') {
         Remove-AzureRmResourceGroup `
             -Name $Settings.ResourceGroupName `
             -Force
