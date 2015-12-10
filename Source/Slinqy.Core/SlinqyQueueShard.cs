@@ -11,10 +11,26 @@
     /// </summary>
     public class SlinqyQueueShard
     {
+        /// <summary>
+        /// Specifies a regular expression that can extract the index number from a given queue shard name.
+        /// This expression will use all numerical characters found at the end of the name as the index value.
+        /// For example, all the following should work:
+        /// my-queue1234
+        /// my-queue-1234
+        /// my1queue1234
+        /// my1queue-1234
+        /// And return 1234 as the index.
+        /// </summary>
         private const string ShardIndexRegularExpression = @"\d+$";
 
+        /// <summary>
+        /// Instantiates the regular expression as a .NET Regex instance.
+        /// </summary>
         private static readonly Regex ShardIndexRegEx = new Regex(ShardIndexRegularExpression, RegexOptions.Compiled);
 
+        /// <summary>
+        /// The physical queue underlying this shard.
+        /// </summary>
         private readonly IPhysicalQueue physicalQueue;
 
         /// <summary>

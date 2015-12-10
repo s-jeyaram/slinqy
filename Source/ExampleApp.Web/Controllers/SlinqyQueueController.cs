@@ -35,9 +35,8 @@
         /// Tracks the last created queue.
         /// This currently does not support running multiple instances of the website.
         /// </summary>
-        // TODO: Modify to support running on multiple instances.
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Storing statically until proper DI is available.")]
-        private static SlinqyAgent slinqyAgent;
+        private static SlinqyAgent slinqyAgent; // TODO: Modify to support running on multiple instances.
 
         /// <summary>
         /// Handles HTTP GET /api/slinqy-queue/{queueName} by returning information about the requested queue.

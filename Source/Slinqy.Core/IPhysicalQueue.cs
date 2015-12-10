@@ -28,7 +28,7 @@
         long CurrentSizeBytes { get; }
 
         /// <summary>
-        /// Gets a boolean value that indicates if the queue is writable (true) or not (false).
+        /// Gets a value indicating whether the queue is writable (true) or not (false).
         /// </summary>
         bool Writable { get; }
 

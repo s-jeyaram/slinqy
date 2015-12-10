@@ -26,7 +26,7 @@
         /// </summary>
         /// <param name="queueName">The name of the queue.</param>
         /// <param name="physicalQueueService">
-        /// Specifies the IPhsicalQueueService to use for managing queue resources.
+        /// Specifies the IPhysicalQueueService to use for managing queue resources.
         /// </param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule was not designed for async calls.")]
         public

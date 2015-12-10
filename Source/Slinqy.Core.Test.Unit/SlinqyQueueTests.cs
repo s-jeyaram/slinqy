@@ -10,14 +10,26 @@
     /// </summary>
     public class SlinqyQueueTests
     {
+        /// <summary>
+        /// Represents a valid value where one is needed for a Slinqy queue name parameters.
+        /// Should not be a special value other than it is guaranteed to be valid.
+        /// </summary>
         private const string ValidSlinqyQueueName = "queue-name";
 
+        /// <summary>
+        /// The fake that simulates a physical queue service.
+        /// </summary>
         private readonly IPhysicalQueueService fakePhysicalQueueService = A.Fake<IPhysicalQueueService>();
 
+        /// <summary>
+        /// The fake that simulates a read-only physical queue.
+        /// </summary>
         private readonly IPhysicalQueue fakeReadOnlyPhysicalQueue = A.Fake<IPhysicalQueue>();
-        private readonly IPhysicalQueue fakeWritablePhysicalQueue = A.Fake<IPhysicalQueue>();
 
-        private readonly List<IPhysicalQueue> fakeShards;
+        /// <summary>
+        /// The fake that simulates a writable physical queue.
+        /// </summary>
+        private readonly IPhysicalQueue fakeWritablePhysicalQueue = A.Fake<IPhysicalQueue>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueTests"/> class.
@@ -25,7 +37,7 @@
         public
         SlinqyQueueTests()
         {
-            this.fakeShards = new List<IPhysicalQueue> {
+            var fakeShards = new List<IPhysicalQueue> {
                 this.fakeReadOnlyPhysicalQueue,
                 this.fakeWritablePhysicalQueue
             };
@@ -38,7 +50,7 @@
 
             A.CallTo(() =>
                 this.fakePhysicalQueueService.ListQueues(A<string>.Ignored)
-            ).Returns(this.fakeShards);
+            ).Returns(fakeShards);
         }
 
         /// <summary>

@@ -9,8 +9,19 @@
     /// </summary>
     public class SlinqyQueueShardMonitor
     {
+        /// <summary>
+        /// The name of the Slinqy queue being monitored.
+        /// </summary>
         private string                  queueName;
+
+        /// <summary>
+        /// The physical queue service hosting the Slinqy queue.
+        /// </summary>
         private IPhysicalQueueService   queueService;
+
+        /// <summary>
+        /// The async Task that is running the queue polling operations.
+        /// </summary>
         private Task                    pollQueuesTask;
 
         /// <summary>
@@ -58,6 +69,10 @@
             var awaitResult = this.pollQueuesTask.ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Updates the instances Shards collection based on the latest data from the physical queue service.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         private
         async Task
         UpdateShards()
