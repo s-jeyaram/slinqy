@@ -11,6 +11,9 @@
     /// </summary>
     public class ServiceBusQueueModel : IPhysicalQueue
     {
+        /// <summary>
+        /// The client to the Azure Service Bus Queue.
+        /// </summary>
         private readonly QueueClient queueClient;
 
         /// <summary>
@@ -57,7 +60,7 @@
         public long CurrentSizeBytes { get; }
 
         /// <summary>
-        /// Gets a boolean value that indicates if the queue is writable (true) or not (false).
+        /// Gets a value indicating whether the queue is writable (true) or not (false).
         /// </summary>
         public bool Writable { get; }
 

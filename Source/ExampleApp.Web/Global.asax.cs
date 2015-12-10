@@ -3,6 +3,7 @@
     "SA1649:FileHeaderFileNameDocumentationMustMatchTypeName",
     Justification = "Can't get Global.asax to match the class name."
 )]
+
 namespace ExampleApp.Web
 {
     using System.Diagnostics.CodeAnalysis;
