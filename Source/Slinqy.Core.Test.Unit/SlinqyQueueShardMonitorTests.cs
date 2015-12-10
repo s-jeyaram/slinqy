@@ -11,10 +11,20 @@
     /// </summary>
     public class SlinqyQueueShardMonitorTests
     {
+        /// <summary>
+        /// Represents a valid value where one is needed for a Slinqy queue name parameters.
+        /// Should not be a special value other than it is guaranteed to be valid.
+        /// </summary>
         private const string ValidSlinqyQueueName = "queue-name";
 
+        /// <summary>
+        /// The fake that simulates a physical queue service.
+        /// </summary>
         private readonly IPhysicalQueueService fakeQueueService = A.Fake<IPhysicalQueueService>();
 
+        /// <summary>
+        /// The instance under test.
+        /// </summary>
         private readonly SlinqyQueueShardMonitor monitor;
 
         /// <summary>

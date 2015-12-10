@@ -10,7 +10,14 @@
     /// </summary>
     public class SlinqyQueueClientTests
     {
+        /// <summary>
+        /// The instance under test.
+        /// </summary>
         private readonly SlinqyQueueClient client;
+
+        /// <summary>
+        /// The fake that simulates a physical queue service.
+        /// </summary>
         private readonly IPhysicalQueueService fakePhysicalQueueService = A.Fake<IPhysicalQueueService>();
 
         /// <summary>
@@ -44,10 +51,10 @@
         CreateAsync_QueueNameValid_CreateDelegateInvoked()
         {
             // Arrange
-            const string queueName = "test";
+            const string QueueName = "test";
 
             // Act
-            await this.client.CreateAsync(queueName);
+            await this.client.CreateAsync(QueueName);
 
             // Assert
             A.CallTo(() =>
@@ -83,13 +90,13 @@
         Get_SlinqyQueueDoesNotExistInCollection_IsReturned()
         {
             // Arrange
-            const string queueName = "test";
+            const string QueueName = "test";
 
             // Act
-            var actualQueueName = this.client.Get(queueName).Name;
+            var actualQueueName = this.client.Get(QueueName).Name;
 
             // Assert
-            Assert.Equal(queueName, actualQueueName);
+            Assert.Equal(QueueName, actualQueueName);
         }
     }
 }

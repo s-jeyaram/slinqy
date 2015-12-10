@@ -11,8 +11,15 @@
     /// </summary>
     public class SlinqyQueueShardTests
     {
+        /// <summary>
+        /// Represents a valid value where one is needed for a Slinqy shard name parameters.
+        /// Should not be a special value other than it is guaranteed to be valid.
+        /// </summary>
         private const string ValidSlinqyShardName = "queue-name-0";
 
+        /// <summary>
+        /// The fake that simulates a physical queue.
+        /// </summary>
         private readonly IPhysicalQueue fakePhysicalQueue = A.Fake<IPhysicalQueue>();
 
         /// <summary>
