@@ -1,7 +1,6 @@
 ﻿namespace Slinqy.Core
 {
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -12,7 +11,6 @@
     {
         private string                  queueName;
         private IPhysicalQueueService   queueService;
-        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Temp")] // TODO: REMOVE
         private Task                    pollQueuesTask;
 
         /// <summary>
