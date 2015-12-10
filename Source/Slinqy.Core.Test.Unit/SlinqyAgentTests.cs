@@ -18,6 +18,12 @@
         private const string ValidSlinqyQueueName = "queue-name";
 
         /// <summary>
+        /// Represents a valid value where one is needed for a physical queue name parameters.
+        /// Should not be a special value other than it is guaranteed to be valid.
+        /// </summary>
+        private const string ValidShardPhysicalQueueName = "queue-name-1";
+
+        /// <summary>
         /// Represents a valid value where one is needed for max size parameters.
         /// Should not be a special value other than it is guaranteed to be valid.
         /// </summary>
@@ -58,6 +64,7 @@
 
             // Configure default/typical behaviors and values.
             A.CallTo(() => this.fakeWritePhysicalQueue.Writable).Returns(true);
+            A.CallTo(() => this.fakeWritePhysicalQueue.Name).Returns(ValidShardPhysicalQueueName);
             A.CallTo(() => this.fakeWritePhysicalQueue.MaxSizeMegabytes).Returns(ValidMaxSizeMegabytes);
         }
 

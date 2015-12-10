@@ -42,8 +42,8 @@
             var fakePhysicalQueue1 = A.Fake<IPhysicalQueue>();
             var fakePhysicalQueue2 = A.Fake<IPhysicalQueue>();
 
-            ////A.CallTo(() => fakePhysicalQueue1.ShardName).Returns(ValidSlinqyQueueName + "1");
-            ////A.CallTo(() => fakePhysicalQueue2.ShardName).Returns(ValidSlinqyQueueName + "2");
+            A.CallTo(() => fakePhysicalQueue1.Name).Returns(ValidSlinqyQueueName + "1");
+            A.CallTo(() => fakePhysicalQueue2.Name).Returns(ValidSlinqyQueueName + "2");
 
             var physicalQueues = new List<IPhysicalQueue> {
                 fakePhysicalQueue1,
@@ -77,6 +77,10 @@
         {
             // Arrange
             var fakeReadWritePhysicalQueue = A.Fake<IPhysicalQueue>();
+
+            A.CallTo(() =>
+                fakeReadWritePhysicalQueue.Name
+            ).Returns(ValidSlinqyQueueName + "0");
 
             A.CallTo(() =>
                 fakeReadWritePhysicalQueue.Writable

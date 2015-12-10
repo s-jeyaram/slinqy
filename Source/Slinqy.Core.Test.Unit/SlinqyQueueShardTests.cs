@@ -11,7 +11,18 @@
     /// </summary>
     public class SlinqyQueueShardTests
     {
+        private const string ValidSlinqyShardName = "queue-name-0";
+
         private readonly IPhysicalQueue fakePhysicalQueue = A.Fake<IPhysicalQueue>();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SlinqyQueueShardTests"/> class.
+        /// </summary>
+        public
+        SlinqyQueueShardTests()
+        {
+            A.CallTo(() => this.fakePhysicalQueue.Name).Returns(ValidSlinqyShardName);
+        }
 
         /// <summary>
         /// Verifies that the constructor checks the physicalQueue parameter.

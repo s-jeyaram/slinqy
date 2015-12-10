@@ -14,6 +14,33 @@
 
         private readonly IPhysicalQueueService fakePhysicalQueueService = A.Fake<IPhysicalQueueService>();
 
+        private readonly IPhysicalQueue fakeReadOnlyPhysicalQueue = A.Fake<IPhysicalQueue>();
+        private readonly IPhysicalQueue fakeWritablePhysicalQueue = A.Fake<IPhysicalQueue>();
+
+        private readonly List<IPhysicalQueue> fakeShards;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SlinqyQueueTests"/> class.
+        /// </summary>
+        public
+        SlinqyQueueTests()
+        {
+            this.fakeShards = new List<IPhysicalQueue> {
+                this.fakeReadOnlyPhysicalQueue,
+                this.fakeWritablePhysicalQueue
+            };
+
+            A.CallTo(() => this.fakeReadOnlyPhysicalQueue.Name).Returns(ValidSlinqyQueueName + "0");
+            A.CallTo(() => this.fakeWritablePhysicalQueue.Name).Returns(ValidSlinqyQueueName + "1");
+
+            A.CallTo(() => this.fakeReadOnlyPhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => this.fakeWritablePhysicalQueue.Writable).Returns(true);
+
+            A.CallTo(() =>
+                this.fakePhysicalQueueService.ListQueues(A<string>.Ignored)
+            ).Returns(this.fakeShards);
+        }
+
         /// <summary>
         /// Verifies that the MaxQueueSizeMegabytes property returns a sum of all the capacities of its shards.
         /// </summary>
@@ -23,20 +50,8 @@
         MaxQueueSizeMegabytes_Always_ReturnsSumOfAllShardSizes()
         {
             // Arrange
-            var fakePhysicalQueue1 = A.Fake<IPhysicalQueue>();
-            var fakePhysicalQueue2 = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() => fakePhysicalQueue1.MaxSizeMegabytes).Returns(1024);
-            A.CallTo(() => fakePhysicalQueue2.MaxSizeMegabytes).Returns(1024);
-
-            var fakeShards = new List<IPhysicalQueue> {
-                fakePhysicalQueue1,
-                fakePhysicalQueue2
-            };
-
-            A.CallTo(() =>
-                this.fakePhysicalQueueService.ListQueues(A<string>.Ignored)
-            ).Returns(fakeShards);
+            A.CallTo(() => this.fakeReadOnlyPhysicalQueue.MaxSizeMegabytes).Returns(1024);
+            A.CallTo(() => this.fakeWritablePhysicalQueue.MaxSizeMegabytes).Returns(1024);
 
             var slinqyQueue = new SlinqyQueue(
                 ValidSlinqyQueueName,
@@ -59,20 +74,8 @@
         CurrentQueueSizeBytes_Always_ReturnsSumOfAllShardSizes()
         {
             // Arrange
-            var fakePhysicalQueue1 = A.Fake<IPhysicalQueue>();
-            var fakePhysicalQueue2 = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() => fakePhysicalQueue1.CurrentSizeBytes).Returns(1);
-            A.CallTo(() => fakePhysicalQueue2.CurrentSizeBytes).Returns(2);
-
-            var fakeShards = new List<IPhysicalQueue> {
-                fakePhysicalQueue1,
-                fakePhysicalQueue2
-            };
-
-            A.CallTo(() =>
-                this.fakePhysicalQueueService.ListQueues(A<string>.Ignored)
-            ).Returns(fakeShards);
+            A.CallTo(() => this.fakeReadOnlyPhysicalQueue.CurrentSizeBytes).Returns(1);
+            A.CallTo(() => this.fakeWritablePhysicalQueue.CurrentSizeBytes).Returns(2);
 
             var slinqyQueue = new SlinqyQueue(
                 ValidSlinqyQueueName,
@@ -96,21 +99,6 @@
         SendBatch_BatchIsValid_BatchSentToWriteShard()
         {
             // Arrange
-            var fakeReadablePhysicalQueue = A.Fake<IPhysicalQueue>();
-            var fakeWritablePhysicalQueue = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() => fakeReadablePhysicalQueue.Writable).Returns(false);
-            A.CallTo(() => fakeWritablePhysicalQueue.Writable).Returns(true);
-
-            var fakeShards = new List<IPhysicalQueue> {
-                fakeReadablePhysicalQueue,
-                fakeWritablePhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakePhysicalQueueService.ListQueues(A<string>.Ignored)
-            ).Returns(fakeShards);
-
             var slinqyQueue = new SlinqyQueue(
                 ValidSlinqyQueueName,
                 this.fakePhysicalQueueService
@@ -123,7 +111,7 @@
 
             // Assert
             A.CallTo(() =>
-                fakeWritablePhysicalQueue.SendBatch(A<IEnumerable<object>>.Ignored)
+                this.fakeWritablePhysicalQueue.SendBatch(A<IEnumerable<object>>.Ignored)
             ).MustHaveHappened();
         }
     }
