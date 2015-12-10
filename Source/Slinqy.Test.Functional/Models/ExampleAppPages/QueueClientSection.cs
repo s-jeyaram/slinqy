@@ -8,6 +8,10 @@
     /// </summary>
     public class QueueClientSection : SeleniumWebBase
     {
+        /// <summary>
+        /// A proxy reference to the element in the web browser.
+        /// </summary>
+        /// <remarks>This field is automatically populated by SpecFlow.</remarks>
         [FindsBy(How = How.Id, Using = "FillQueueButton")]
         private IWebElement fillQueueButton = null;
 
