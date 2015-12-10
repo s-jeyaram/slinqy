@@ -3,6 +3,7 @@
     using System;
     using System.Configuration;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Threading.Tasks;
     using System.Web.Http;
     using Models;
@@ -38,14 +39,14 @@
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Storing statically until proper DI is available.")]
         private static SlinqyAgent slinqyAgent;
 
-            /// <summary>
-        /// Handles the HTTP POST /Home/CreateQueue by creating a queue with the specified parameters.
+        /// <summary>
+        /// Handles HTTP GET /api/slinqy-queue/{queueName} by returning information about the requested queue.
         /// </summary>
         /// <param name="queueName">Specifies the name of the queue to get.</param>
         /// <returns>Returns the result of the action.</returns>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "WebAPI will not route static methods.")]
         [HttpGet]
-        [Route("api/slinqy-queue", Name = "GetQueue")]
+        [Route("api/slinqy-queue/{queueName}", Name = "GetQueue")]
         public
         QueueInformationViewModel
         GetQueue(
@@ -55,12 +56,13 @@
 
             return new QueueInformationViewModel(
                 queue.Name,
-                queue.MaxQueueSizeMegabytes
+                queue.MaxQueueSizeMegabytes,
+                queue.CurrentQueueSizeBytes
             );
         }
 
         /// <summary>
-        /// Handles the HTTP POST /Home/CreateQueue by creating a queue with the specified parameters.
+        /// Handles the HTTP POST /api/slinqy-queue by creating a queue with the specified parameters.
         /// </summary>
         /// <param name="createQueueModel">Specifies the parameters of the queue to create.</param>
         /// <returns>Returns the result of the action.</returns>
@@ -76,13 +78,66 @@
 
             var queue = await SlinqyQueueClient.CreateAsync(createQueueModel.QueueName);
 
-            slinqyAgent = new SlinqyAgent(queue.Name, PhysicalQueueService, 0.25);
+            slinqyAgent = new SlinqyAgent(queue.Name, PhysicalQueueService, 0.01);
             await slinqyAgent.Start();
 
             return new QueueInformationViewModel(
                 queue.Name,
-                createQueueModel.MaxQueueSizeMegabytes
+                queue.MaxQueueSizeMegabytes,
+                queue.CurrentQueueSizeBytes
             );
+        }
+
+        /// <summary>
+        /// Handles the HTTP POST /api/slinqy-queue/{queueName}/ by submitting randomly generated messages.
+        /// </summary>
+        /// <param name="queueName">Specifies the name of the Slinqy queue to fill.</param>
+        [HttpPost]
+        [Route("api/slinqy-queue/{queueName}/fill-request", Name = "FillQueue")]
+        public
+        void
+        StartFillQueue(
+            string queueName)
+        {
+            // Start the async task.
+            this.FillQueue(queueName)
+                .ConfigureAwait(false);
+
+            // Return while the task continues to run in the background.
+        }
+
+        /// <summary>
+        /// Attempts to fill the specified Slinqy queue with random data.
+        /// </summary>
+        /// <param name="queueName">
+        /// Specifies the name of the Slinqy queue to fill.
+        /// </param>
+        /// <returns>Returns an async Task for the work.</returns>
+        private
+        async Task
+        FillQueue(
+            string queueName)
+        {
+            // Get the queue.
+            var queue = SlinqyQueueClient.Get(queueName);
+
+            // Prepare to generate some random data.
+            var randomData = new byte[1024];
+            var ranGen = new Random(DateTime.UtcNow.Millisecond);
+
+            while (true)
+            {
+                // Generate random data for each item in the batch.
+                var batch = Enumerable.Range(0, 100).Select(i => {
+                    // Generate random data.
+                    ranGen.NextBytes(randomData);
+
+                    return randomData;
+                });
+
+                // Send the batch of random data.
+                await queue.SendBatch(batch).ConfigureAwait(false);
+            }
         }
     }
 }

@@ -1,15 +1,61 @@
 ﻿@using ExampleApp.Web.Models
 @model ManageQueueViewModel
 
-@Html.Partial("QueueInformation", new QueueInformationViewModel(ViewBag.QueueName, 0))
+<style type="text/css">
+    button:disabled {
+        cursor:             default;
+        pointer-events:     none;
+        color:              #c0c0c0;
+        background-color:   #ffffff;
+    }
+</style>
+
+@Html.Partial("QueueInformation", new QueueInformationViewModel(ViewBag.QueueName, 0, 0))
 
 <hr />
 
-@using (Ajax.BeginForm("ManageQueue", "Home", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "ManageQueueForm" }, new { Id = "ManageQueueForm" }))
-{
-    <div>
-        @Html.LabelFor(m => m.QueueSettings) @Html.EditorFor(m => m.QueueSettings)
+<div id="ManageQueue">
+    <button id="FillQueueButton" type="button">Fill Queue</button>
+</div>
 
-        <input id="UpdateQueueButton" type="submit" value="Update"/>
-    </div>
-}
+<script type="text/javascript">
+    function FillQueue() {
+        var fillQueueUrl = '@Url.HttpRouteUrl("FillQueue", new { queueName = ViewBag.QueueName })';
+
+        $.post(fillQueueUrl)
+            .done(StartFillQueueSucceeded)
+            .fail(StartFillQueueFailed)
+            .always(StartFillQueueCompleted);
+
+        StartFillQueueStarted();
+    }
+
+    function StartFillQueueStarted() {
+        // Disable the button so it cannot be double clicked, or more.
+        $('#FillQueueButton')
+            .text('Filling...')
+            .prop('disabled', true);
+
+        $('#AjaxStatus').text('STARTED');
+        $('#AjaxStatusMessage').text('Request submitting, awaiting a response from the server.');
+    }
+
+    function StartFillQueueSucceeded() {
+        $('#AjaxResult').text('SUCCEEDED');
+        $('#AjaxStatusMessage').text('The queue is now being filled...');
+    }
+
+    function StartFillQueueFailed(response) {
+        $('#AjaxResult').text('FAILED');
+        $('#AjaxStatusMessage').text(response.responseText);
+    }
+
+    function StartFillQueueCompleted() {
+        $('#AjaxStatus').text('COMPLETED');
+    }
+
+    $(function () {
+        // Tie the button to the function.
+        $('#FillQueueButton').click(FillQueue);
+    });
+</script>

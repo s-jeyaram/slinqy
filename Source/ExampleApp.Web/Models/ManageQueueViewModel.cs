@@ -10,13 +10,19 @@
         /// </summary>
         /// <param name="queueName">Specifies the name of the queue this instance represents.</param>
         /// <param name="storageCapacityMegabytes">Specifies the storage capacity of the queue.</param>
+        /// <param name="currentQueueSizeBytes">Specifies the current size of all the data stored in the queue.</param>
         public
         ManageQueueViewModel(
             string  queueName,
-            long     storageCapacityMegabytes)
+            long    storageCapacityMegabytes,
+            long    currentQueueSizeBytes)
         {
             this.QueueSettings    = new QueueSettingsViewModel(0.5);
-            this.QueueInformation = new QueueInformationViewModel(queueName, storageCapacityMegabytes);
+            this.QueueInformation = new QueueInformationViewModel(
+                queueName,
+                storageCapacityMegabytes,
+                currentQueueSizeBytes
+            );
         }
 
         /// <summary>

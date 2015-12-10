@@ -3,7 +3,6 @@
 	I want my queue storage capacity to expand when it nears capacity
 	So that I can always store my messages
 
-@Ignore
 Scenario: Queue Storage Expands When Utilization Reaches Threshold
 	Given a Queue with Storage Utilization Scale Up Threshold set
 	When the Queue Storage Utilization reaches the Scale Up Threshold

@@ -1,7 +1,6 @@
 ﻿namespace Slinqy.Core
 {
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -12,7 +11,6 @@
     {
         private string                  queueName;
         private IPhysicalQueueService   queueService;
-        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Temp")] // TODO: REMOVE
         private Task                    pollQueuesTask;
 
         /// <summary>
@@ -57,13 +55,17 @@
 
             // Start polling
             this.pollQueuesTask = this.PollQueues();
+            var awaitResult = this.pollQueuesTask.ConfigureAwait(false);
         }
 
         private
         async Task
         UpdateShards()
         {
-            this.Shards = await this.queueService.ListQueues(this.queueName);
+            var physicalShards = await this.queueService.ListQueues(this.queueName)
+                .ConfigureAwait(false);
+
+            this.Shards = physicalShards.Select(ps => new SlinqyQueueShard(ps)).ToArray();
         }
 
         /// <summary>
@@ -76,9 +78,8 @@
         {
             while (true)
             {
-                await this.UpdateShards();
-
-                await Task.Delay(1000);
+                await this.UpdateShards().ConfigureAwait(false);
+                await Task.Delay(1000).ConfigureAwait(false);
             }
         }
     }

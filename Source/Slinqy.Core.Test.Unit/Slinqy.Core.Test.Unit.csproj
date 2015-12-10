@@ -56,6 +56,7 @@
     <Compile Include="SlinqyAgentTests.cs" />
     <Compile Include="SlinqyQueueClientTests.cs" />
     <Compile Include="SlinqyQueueShardMonitorTests.cs" />
+    <Compile Include="SlinqyQueueShardTests.cs" />
     <Compile Include="SlinqyQueueTests.cs" />
   </ItemGroup>
   <ItemGroup>

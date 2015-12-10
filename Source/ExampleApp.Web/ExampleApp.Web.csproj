@@ -178,6 +178,7 @@
     <Compile Include="Models\ManageQueueViewModel.cs" />
     <Compile Include="Models\QueueInformationViewModel.cs" />
     <Compile Include="Models\QueueSettingsViewModel.cs" />
+    <Compile Include="Models\ServiceBusQueueModel.cs" />
     <Compile Include="Models\ServiceBusQueueServiceModel.cs" />
   </ItemGroup>
   <ItemGroup>

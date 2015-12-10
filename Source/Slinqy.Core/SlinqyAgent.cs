@@ -69,13 +69,13 @@
         Start()
         {
             // Start the monitor.
-            await this.queueShardMonitor.Start();
+            await this.queueShardMonitor.Start().ConfigureAwait(false);
 
             // Perform a manual first check before returning.
-            await this.EvaluateShards();
+            await this.EvaluateShards().ConfigureAwait(false);
 
             // Start checking the monitor periodically to respond if need be.
-            var task = this.PollShardState();
+            var task = this.PollShardState().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -91,14 +91,11 @@
 
             // Calculate it's storage utilization.
             // TODO: Move to property on SlinqyQueueShard...?
-            var utilizationPercentage = writeShard.CurrentSizeMegabytes / writeShard.MaxSizeMegabytes;
+            var utilizationPercentage = (((double)writeShard.CurrentSizeBytes / 1024) / 1024) / writeShard.MaxSizeMegabytes;
 
-            // Nothing to do as long as utilization is under the threshold.
-            if (!(utilizationPercentage > this.storageCapacityScaleOutThreshold))
-                return;
-
-            // Scale out!
-            await this.ScaleOut(writeShard);
+            // Scale up if needed
+            if (utilizationPercentage > this.storageCapacityScaleOutThreshold)
+                await this.ScaleOut(writeShard).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -118,7 +115,8 @@
             var nextShardIndex = currentWriteShard.ShardIndex + 1;
 
             // Create a new shard!
-            var newWriteShard = await this.queueService.CreateQueue(currentWriteShard.ShardName + nextShardIndex);
+            var newWriteShard = await this.queueService.CreateQueue(currentWriteShard.ShardName + nextShardIndex)
+                .ConfigureAwait(false);
 
             // Set the previous write shards new state.
             await this.SetShardStates();
@@ -146,8 +144,10 @@
         {
             while (true)
             {
+                // TODO: Add try/catch block and log exceptions so that exceptions don't stop the agent from polling.
+
                 // Evaluate the current state.
-                await this.EvaluateShards();
+                await this.EvaluateShards().ConfigureAwait(false);
 
                 // Wait before checking again.
                 // TODO: Make duration more configurable.

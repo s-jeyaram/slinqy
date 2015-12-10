@@ -4,7 +4,6 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.ServiceBus;
-    using Microsoft.ServiceBus.Messaging;
     using Slinqy.Core;
 
     /// <summary>
@@ -12,6 +11,11 @@
     /// </summary>
     public class ServiceBusQueueServiceModel : IPhysicalQueueService
     {
+        /// <summary>
+        /// The connection string used to interact with the Service Bus.
+        /// </summary>
+        private readonly string serviceBusConnectionString;
+
         /// <summary>
         /// Used to manage Service Bus resources.
         /// </summary>
@@ -25,8 +29,10 @@
         ServiceBusQueueServiceModel(
             string serviceBusConnectionString)
         {
+            this.serviceBusConnectionString = serviceBusConnectionString;
+
             this.serviceBusNamespaceManager = NamespaceManager.CreateFromConnectionString(
-                serviceBusConnectionString
+                this.serviceBusConnectionString
             );
         }
 
@@ -36,21 +42,19 @@
         /// <param name="name">Specifies the queue path.</param>
         /// <returns>Returns the created queue as a SlinqyQueueShard.</returns>
         public
-        async Task<SlinqyQueueShard>
+        async Task<IPhysicalQueue>
         CreateQueue(
             string name)
         {
-            var queueDescription = await this.serviceBusNamespaceManager.CreateQueueAsync(name);
+            var queueDescription = await this.serviceBusNamespaceManager.CreateQueueAsync(path: name)
+                .ConfigureAwait(false);
 
-            var slinqyQueueShard = new SlinqyQueueShard(
-                queueDescription.Path,
-                0,
-                queueDescription.MaxSizeInMegabytes,
-                queueDescription.SizeInBytes * 1024,
-                true
+            var physicalQueue = new ServiceBusQueueModel(
+                this.serviceBusConnectionString,
+                queueDescription
             );
 
-            return slinqyQueueShard;
+            return physicalQueue;
         }
 
         /// <summary>
@@ -59,24 +63,18 @@
         /// <param name="namePrefix">Specifies the prefix to search for.</param>
         /// <returns>Returns the matching shards.</returns>
         public
-        async Task<IEnumerable<SlinqyQueueShard>>
+        async Task<IEnumerable<IPhysicalQueue>>
         ListQueues(
             string namePrefix)
         {
-            var serviceBusQueues = (await this.serviceBusNamespaceManager.GetQueuesAsync("startswith(path, '" + namePrefix + "-') eq true").ConfigureAwait(false))
+            var getFilter = "startswith(path, '" + namePrefix + "-') eq true";
+
+            var queues = (await this.serviceBusNamespaceManager.GetQueuesAsync(getFilter)
+                .ConfigureAwait(false))
+                .Select(sbq => new ServiceBusQueueModel(this.serviceBusConnectionString, sbq))
                 .ToArray();
 
-            var slinqyQueueShards = serviceBusQueues.Select(q =>
-                new SlinqyQueueShard(
-                    q.Path,
-                    0, // TODO: Maybe the SlinqyQueue class should be responsible for instantiating and providing it's path + index.
-                    q.MaxSizeInMegabytes,
-                    q.SizeInBytes * 1024,
-                    q.Status == EntityStatus.Active || q.Status == EntityStatus.ReceiveDisabled
-                )
-            );
-
-            return slinqyQueueShards;
+            return queues;
         }
     }
 }

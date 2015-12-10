@@ -36,7 +36,7 @@
         {
             ContextGet<ManageQueueSection>()
                 .QueueClient
-                .GenerateQueueMessages();
+                .FillQueue();
         }
 
         /// <summary>
