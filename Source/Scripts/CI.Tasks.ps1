@@ -236,7 +236,7 @@ Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes 
     }
 
     $answer = Read-Host `
-        -Prompt "Are you use you want to permanently delete all services and data from the target environment $($Settings.EnvironmentName) in Azure Subscription $subscriptionName? (y/n)"
+        -Prompt "Are you use you want to permanently delete all services and data from the target environment $($Settings.EnvironmentName) in Azure Subscription ${subscriptionName}? (y/n)"
 
     if ($answer -eq 'y') {
         Remove-AzureRmResourceGroup `

@@ -34,16 +34,19 @@ function GetOrLogin-AzureRmContext {
             $AzureDeployPassSecure = $AzureDeployPass | ConvertTo-SecureString -AsPlainText -Force
             $AzureCredential       = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AzureDeployUser,$AzureDeployPassSecure
 
-            $context = Login-AzureRmAccount -Credential $AzureCredential
+            $profile = Login-AzureRmAccount -Credential $AzureCredential
         } else {
             Write-Host "Could not find any Azure credentials on the local machine, prompting console user..."
+
             # Prompt the console user for credentials
-            $context = Login-AzureRmAccount
+            $profile = Login-AzureRmAccount
         }
 
-        if (-not $context){
+        if (-not $profile){
             throw 'No Azure account found or specified!'
         }
+
+        $context = Get-AzureRmContext
 
         # TODO: Ask user about multiple subscriptions, which to use...?
     }
