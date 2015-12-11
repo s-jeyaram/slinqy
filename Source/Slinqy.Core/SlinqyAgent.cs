@@ -53,7 +53,6 @@
         /// Starts the agent to begin monitoring the queue shards and taking action if needed.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "task", Justification = "temp")] // TODO: REMOVE
         public
         async Task
         Start()
