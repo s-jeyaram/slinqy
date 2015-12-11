@@ -38,24 +38,12 @@
         /// <summary>
         /// Gets the current maximum storage capacity of the virtual queue.
         /// </summary>
-        public long MaxQueueSizeMegabytes
-        {
-            get
-            {
-                return this.queueShardMonitor.Shards.Sum(s => s.MaxSizeMegabytes);
-            }
-        }
+        public long MaxQueueSizeMegabytes => this.queueShardMonitor.Shards.Sum(s => s.MaxSizeMegabytes);
 
         /// <summary>
         /// Gets the current size of all the data stored in the queue.
         /// </summary>
-        public long CurrentQueueSizeBytes
-        {
-            get
-            {
-                return this.queueShardMonitor.Shards.Sum(s => s.CurrentSizeBytes);
-            }
-        }
+        public long CurrentQueueSizeBytes => this.queueShardMonitor.Shards.Sum(s => s.CurrentSizeBytes);
 
         /// <summary>
         /// Sends the specified batch of messages to the current write queue.
