@@ -93,7 +93,7 @@ Task Build -depends Clean -description "Compiles all source code." {
     exec { . $OpenCoverPath -target:$XUnitPath -targetargs:$TestDlls -returntargetcode -register:user -output:$OpenCoverOutputPath -filter:'+[Slinqy.Core]*' }
     Set-Location $currentDir
 
-    $ReportGeneratorPath       = Join-Path $SourcePath 'packages\ReportGenerator.2.3.2.0\tools\ReportGenerator.exe'
+    $ReportGeneratorPath       = Join-Path $SourcePath 'packages\ReportGenerator.2.3.5.0\tools\ReportGenerator.exe'
     $ReportGeneratorOutputPath = Join-Path $ArtifactsPath 'CoverageReport'
 
     exec { . $ReportGeneratorPath $OpenCoverOutputPath $ReportGeneratorOutputPath }
