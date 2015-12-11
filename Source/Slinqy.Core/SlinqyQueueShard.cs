@@ -57,7 +57,7 @@
         /// <summary>
         /// Gets the index of this shard within the SlinqyQueue.
         /// </summary>
-        public int ShardIndex => ParseQueueNameForIndex(this.physicalQueue.Name);
+        public virtual int ShardIndex => ParseQueueNameForIndex(this.physicalQueue.Name);
 
         /// <summary>
         /// Gets the maximum capacity for this physical queue shard.

@@ -77,7 +77,19 @@
 
             var queue = await SlinqyQueueClient.CreateAsync(createQueueModel.QueueName);
 
-            slinqyAgent = new SlinqyAgent(queue.Name, PhysicalQueueService, 0.01);
+            var monitor = new SlinqyQueueShardMonitor(
+                createQueueModel.QueueName,
+                PhysicalQueueService
+            );
+
+            await monitor.Start();
+
+            slinqyAgent = new SlinqyAgent(
+                PhysicalQueueService,
+                monitor,
+                0.01
+            );
+
             await slinqyAgent.Start();
 
             return new QueueInformationViewModel(

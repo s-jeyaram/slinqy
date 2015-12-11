@@ -20,11 +20,6 @@
         private readonly IPhysicalQueueService queueService;
 
         /// <summary>
-        /// The name of the queue.
-        /// </summary>
-        private readonly string queueName;
-
-        /// <summary>
         /// Monitors the physical queue shards.
         /// </summary>
         private readonly SlinqyQueueShardMonitor queueShardMonitor;
@@ -32,11 +27,11 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyAgent"/> class.
         /// </summary>
-        /// <param name="queueName">
-        /// Specifies the name of the virtual queue.
-        /// </param>
         /// <param name="queueService">
         /// Specifies the reference to use for managing the queue service.
+        /// </param>
+        /// <param name="slinqyQueueShardMonitor">
+        /// Specifies the monitor of the queue shards.
         /// </param>
         /// <param name="storageCapacityScaleOutThreshold">
         /// Specifies at what percentage of the current physical write queues storage
@@ -45,18 +40,13 @@
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule was not designed for async calls.")]
         public
         SlinqyAgent(
-            string                  queueName,
             IPhysicalQueueService   queueService,
+            SlinqyQueueShardMonitor slinqyQueueShardMonitor,
             double                  storageCapacityScaleOutThreshold)
         {
-            this.queueName                          = queueName;
             this.queueService                       = queueService;
+            this.queueShardMonitor                  = slinqyQueueShardMonitor;
             this.storageCapacityScaleOutThreshold   = storageCapacityScaleOutThreshold;
-
-            this.queueShardMonitor = new SlinqyQueueShardMonitor(
-                this.queueName,
-                this.queueService
-            );
         }
 
         /// <summary>
