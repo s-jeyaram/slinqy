@@ -16,7 +16,7 @@ properties {
     $PublishedWebsitesPath = Join-Path $ArtifactsPath "_PublishedWebsites"
     $SolutionFileName      = "$ProductName.sln"
     $SolutionPath          = Join-Path $SourcePath $SolutionFileName
-    $XUnitPath             = Join-Path $Env:ChocolateyInstall 'bin\xunit.console.exe'
+    $PackagesPath          = Join-Path $SourcePath "packages"
 }
 
 # Define the Task to call when none was specified by the caller.
@@ -83,27 +83,17 @@ Task Build -depends Clean -description "Compiles all source code." {
         (Join-Path $ArtifactsPath 'Slinqy.Core.Test.Unit.dll')
     )
 
+    Write-Host
     Write-Host "Unit testing $TestDlls..."
 
-    $OpenCoverPath       = Join-Path $SourcePath 'packages\OpenCover.4.6.166\tools\OpenCover.Console.exe'
-    $OpenCoverOutputPath = Join-Path $ArtifactsPath "coverage.xml"
-
-    $currentDir = Get-Location
-    Set-Location $ArtifactsPath
-    exec { . $OpenCoverPath -target:$XUnitPath -targetargs:$TestDlls -returntargetcode -register:user -output:$OpenCoverOutputPath -filter:'+[Slinqy.Core]*' }
-    Set-Location $currentDir
-
-    $ReportGeneratorPath       = Join-Path $SourcePath 'packages\ReportGenerator.2.3.5.0\tools\ReportGenerator.exe'
-    $ReportGeneratorOutputPath = Join-Path $ArtifactsPath 'CoverageReport'
-
-    exec { . $ReportGeneratorPath $OpenCoverOutputPath $ReportGeneratorOutputPath }
-
-    $CoverallsPath = Join-Path $SourcePath 'packages\coveralls.io.1.3.4\tools\coveralls.net.exe'
-
-    exec { . $CoverallsPath --opencover $OpenCoverOutputPath }
+    Run-Tests `
+        -PackagesPath  $PackagesPath `
+        -ArtifactsPath $ArtifactsPath `
+        -TestDlls      $TestDlls `
+        -ReportCodeCoverage
 
     Write-Host "done!"
-
+    Write-Host
     Write-Host "Packaging..."
 
     # Package up deployables
@@ -219,7 +209,10 @@ Task FunctionalTest -depends LoadSettings -description 'Tests that the required 
     
     Write-Host "Running tests in $TestDlls"
 
-    exec { & $XUnitPath $TestDlls }
+    Run-Tests `
+        -PackagesPath  $PackagesPath `
+        -ArtifactsPath $ArtifactsPath `
+        -TestDlls      $TestDlls
 }
 
 Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes and removes all services and data from the target environment." {
@@ -246,9 +239,12 @@ Task DestroyEnvironment -depends LoadSettings -description "Permanently deletes 
         -Prompt "ARE YOU SURE? (y/n)"
 
     if ($answer -eq 'y') {
+        Write-Host
+        Write-Host "Deleting resource group $($Settings.ResourceGroupName)..." -NoNewline
         Remove-AzureRmResourceGroup `
             -Name $Settings.ResourceGroupName `
             -Force
+        Write-Host "done!"
     }
 }
 
