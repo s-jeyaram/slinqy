@@ -48,10 +48,7 @@
         /// <summary>
         /// Gets the current write shard.
         /// </summary>
-        public SlinqyQueueShard WriteShard
-        {
-            get { return this.Shards.Last(s => s.Writable); }
-        }
+        public SlinqyQueueShard WriteShard => this.Shards.Last(s => s.Writable);
 
         /// <summary>
         /// Starts polling the physical resources to update the Shards property values.
