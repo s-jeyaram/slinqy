@@ -260,5 +260,5 @@ Task Push -depends Pull,Full -description "Performs pre-push actions before actu
     exec { git push }
 }
 
-Task Full -depends DestroyEnvironment,Build,Deploy,FunctionalTest,DestroyEnvironment -description "Runs all pertinent CI tasks and cleans up afterward (destroys the environment)." {
+Task Full -depends DestroyEnvironment,Build,Deploy,FunctionalTest -description "Runs all pertinent CI tasks." {
 }
