@@ -12,17 +12,17 @@
         /// <summary>
         /// The name of the Slinqy queue being monitored.
         /// </summary>
-        private string                  queueName;
+        private readonly string queueName;
 
         /// <summary>
         /// The physical queue service hosting the Slinqy queue.
         /// </summary>
-        private IPhysicalQueueService   queueService;
+        private readonly IPhysicalQueueService queueService;
 
         /// <summary>
         /// The async Task that is running the queue polling operations.
         /// </summary>
-        private Task                    pollQueuesTask;
+        private Task pollQueuesTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueShardMonitor"/> class.
