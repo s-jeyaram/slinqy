@@ -133,7 +133,8 @@ Task Deploy -depends LoadSettings -description "Deploys the physical infrastruct
 
         New-AzureRmResourceGroup `
             -Name			            $Settings.ResourceGroupName `
-            -Location                   $Settings.EnvironmentLocation
+            -Location                   $Settings.EnvironmentLocation |
+                Out-Null
 
         Write-Host "done!"
     }
