@@ -30,28 +30,42 @@ function GetOrLogin-AzureRmContext {
             throw
         }
 
-        if ($AzureDeployUser -and $AzureDeployPass) {
-            $AzureDeployPassSecure = $AzureDeployPass | ConvertTo-SecureString -AsPlainText -Force
-            $AzureCredential       = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AzureDeployUser,$AzureDeployPassSecure
-
-            $profile = Login-AzureRmAccount -Credential $AzureCredential
-        } else {
-            Write-Host "Could not find any Azure credentials on the local machine, prompting console user..."
-
-            # Prompt the console user for credentials
-            $profile = Login-AzureRmAccount
-        }
-
-        if (-not $profile){
-            throw 'No Azure account found or specified!'
-        }
-
-        $context = Get-AzureRmContext
-
-        # TODO: Ask user about multiple subscriptions, which to use...?
+        $context = Login-AzureResourceManager `
+            -AzureDeployUser $AzureDeployUser `
+            -AzureDeployPass $AzureDeployPass
     }
 
     Write-Output $context
+}
+
+# Authenticates with the Azure Resource Manager either by specifying the credentials as parameters,
+# or the console user will be prompted for them if they are not specified.
+# Returns an AzureRmContext.
+function Login-AzureResourceManager {
+    Param(
+        $AzureDeployUser,
+        $AzureDeployPass
+    )
+
+    if ($AzureDeployUser -and $AzureDeployPass) {
+        $AzureDeployPassSecure = $AzureDeployPass | ConvertTo-SecureString -AsPlainText -Force
+        $AzureCredential       = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AzureDeployUser,$AzureDeployPassSecure
+
+        $profile = Login-AzureRmAccount -Credential $AzureCredential
+    } else {
+        Write-Host "Could not find any Azure credentials on the local machine, prompting console user..."
+
+        # Prompt the console user for credentials
+        $profile = Login-AzureRmAccount
+    }
+
+    if (-not $profile){
+        throw 'No Azure account found or specified!'
+    }
+
+    # TODO: Ask user about multiple subscriptions, which to use...?
+
+    Write-Output (Get-AzureRmContext)
 }
 
 function Upload-FileToBlob {
