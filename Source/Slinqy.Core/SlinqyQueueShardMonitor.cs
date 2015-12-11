@@ -41,6 +41,11 @@
         }
 
         /// <summary>
+        /// Gets the name of the Slinqy Queue being monitored.
+        /// </summary>
+        public string QueueName => this.queueName;
+
+        /// <summary>
         /// Gets a list of SlinqyQueueShards for each physical queue found.  This list refreshes periodically.
         /// </summary>
         public virtual IEnumerable<SlinqyQueueShard> Shards { get; private set; }

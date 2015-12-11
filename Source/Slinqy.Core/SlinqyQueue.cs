@@ -19,25 +19,21 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueue"/> class.
         /// </summary>
-        /// <param name="queueName">The name of the queue.</param>
         /// <param name="slinqyQueueShardMonitor">
         /// Specifies the SlinqyQueueShardMonitor to use for staying in sync with physical queue resources.
         /// </param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule was not designed for async calls.")]
         public
         SlinqyQueue(
-            string                  queueName,
             SlinqyQueueShardMonitor slinqyQueueShardMonitor)
         {
-            // Save the queue name and monitor.
-            this.Name = queueName;
             this.queueShardMonitor = slinqyQueueShardMonitor;
         }
 
         /// <summary>
         /// Gets the name of the queue.
         /// </summary>
-        public string Name { get; }
+        public string Name => this.queueShardMonitor.QueueName;
 
         /// <summary>
         /// Gets the current maximum storage capacity of the virtual queue.

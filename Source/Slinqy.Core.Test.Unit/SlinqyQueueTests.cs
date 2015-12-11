@@ -11,12 +11,6 @@
     public class SlinqyQueueTests
     {
         /// <summary>
-        /// Represents a valid value where one is needed for a Slinqy queue name parameters.
-        /// Should not be a special value other than it is guaranteed to be valid.
-        /// </summary>
-        private const string ValidSlinqyQueueName = "queue-name";
-
-        /// <summary>
         /// The fake that simulates a queue shard monitor.
         /// </summary>
         private readonly SlinqyQueueShardMonitor fakeQueueShardMonitor = A.Fake<SlinqyQueueShardMonitor>();
@@ -64,7 +58,6 @@
             A.CallTo(() => this.fakeWriteShard.MaxSizeMegabytes).Returns(1024);
 
             var slinqyQueue = new SlinqyQueue(
-                ValidSlinqyQueueName,
                 this.fakeQueueShardMonitor
             );
 
@@ -88,7 +81,6 @@
             A.CallTo(() => this.fakeWriteShard.CurrentSizeBytes).Returns(2);
 
             var slinqyQueue = new SlinqyQueue(
-                ValidSlinqyQueueName,
                 this.fakeQueueShardMonitor
             );
 
@@ -110,7 +102,6 @@
         {
             // Arrange
             var slinqyQueue = new SlinqyQueue(
-                ValidSlinqyQueueName,
                 this.fakeQueueShardMonitor
             );
 
