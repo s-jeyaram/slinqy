@@ -43,7 +43,7 @@
         /// <summary>
         /// Gets a list of SlinqyQueueShards for each physical queue found.  This list refreshes periodically.
         /// </summary>
-        public IEnumerable<SlinqyQueueShard> Shards { get; private set; }
+        public virtual IEnumerable<SlinqyQueueShard> Shards { get; private set; }
 
         /// <summary>
         /// Gets the current write shard.

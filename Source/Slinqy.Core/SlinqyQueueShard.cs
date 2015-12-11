@@ -47,8 +47,6 @@
                 throw new ArgumentNullException(nameof(physicalQueue));
 
             this.physicalQueue = physicalQueue;
-
-            this.ShardIndex = ParseQueueNameForIndex(this.physicalQueue.Name);
         }
 
         /// <summary>
@@ -59,17 +57,17 @@
         /// <summary>
         /// Gets the index of this shard within the SlinqyQueue.
         /// </summary>
-        public int ShardIndex { get; }
+        public int ShardIndex => ParseQueueNameForIndex(this.physicalQueue.Name);
 
         /// <summary>
         /// Gets the maximum capacity for this physical queue shard.
         /// </summary>
-        public long MaxSizeMegabytes => this.physicalQueue.MaxSizeMegabytes;
+        public virtual long MaxSizeMegabytes => this.physicalQueue.MaxSizeMegabytes;
 
         /// <summary>
         /// Gets the current size of the queue in megabytes.
         /// </summary>
-        public long CurrentSizeBytes => this.physicalQueue.CurrentSizeBytes;
+        public virtual long CurrentSizeBytes => this.physicalQueue.CurrentSizeBytes;
 
         /// <summary>
         /// Gets a boolean value to indicate if the shard is writable (true) or not (false).
@@ -84,6 +82,7 @@
         /// </param>
         /// <returns>Returns an async Task for the work.</returns>
         public
+        virtual
         Task
         SendBatch(
             IEnumerable<object> batch)
