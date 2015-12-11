@@ -52,27 +52,27 @@
         /// <summary>
         /// Gets the name for this physical queue shard.
         /// </summary>
-        public virtual string ShardName => this.physicalQueue.Name;
+        public virtual string   ShardName           => this.physicalQueue.Name;
 
         /// <summary>
         /// Gets the index of this shard within the SlinqyQueue.
         /// </summary>
-        public virtual int ShardIndex => ParseQueueNameForIndex(this.physicalQueue.Name);
+        public virtual int      ShardIndex          => ParseQueueNameForIndex(this.physicalQueue.Name);
 
         /// <summary>
         /// Gets the maximum capacity for this physical queue shard.
         /// </summary>
-        public virtual long MaxSizeMegabytes => this.physicalQueue.MaxSizeMegabytes;
+        public virtual long     MaxSizeMegabytes    => this.physicalQueue.MaxSizeMegabytes;
 
         /// <summary>
         /// Gets the current size of the queue in megabytes.
         /// </summary>
-        public virtual long CurrentSizeBytes => this.physicalQueue.CurrentSizeBytes;
+        public virtual long     CurrentSizeBytes    => this.physicalQueue.CurrentSizeBytes;
 
         /// <summary>
         /// Gets a boolean value to indicate if the shard is writable (true) or not (false).
         /// </summary>
-        public virtual bool Writable => this.physicalQueue.Writable;
+        public virtual bool     Writable            => this.physicalQueue.Writable;
 
         /// <summary>
         /// Sends the batch of messages to the physical queue shard.
