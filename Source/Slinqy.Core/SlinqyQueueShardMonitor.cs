@@ -10,11 +10,6 @@
     public class SlinqyQueueShardMonitor
     {
         /// <summary>
-        /// The name of the Slinqy queue being monitored.
-        /// </summary>
-        private readonly string queueName;
-
-        /// <summary>
         /// The physical queue service hosting the Slinqy queue.
         /// </summary>
         private readonly IPhysicalQueueService queueService;
@@ -34,7 +29,7 @@
             string                  queueName,
             IPhysicalQueueService   queueService)
         {
-            this.queueName    = queueName;
+            this.QueueName    = queueName;
             this.queueService = queueService;
 
             this.Shards = Enumerable.Empty<SlinqyQueueShard>();
@@ -43,7 +38,7 @@
         /// <summary>
         /// Gets the name of the Slinqy Queue being monitored.
         /// </summary>
-        public string QueueName => this.queueName;
+        public string QueueName { get; }
 
         /// <summary>
         /// Gets a list of SlinqyQueueShards for each physical queue found.  This list refreshes periodically.
@@ -82,7 +77,7 @@
         async Task
         UpdateShards()
         {
-            var physicalShards = await this.queueService.ListQueues(this.queueName)
+            var physicalShards = await this.queueService.ListQueues(this.QueueName)
                 .ConfigureAwait(false);
 
             this.Shards = physicalShards.Select(ps => new SlinqyQueueShard(ps)).ToArray();
