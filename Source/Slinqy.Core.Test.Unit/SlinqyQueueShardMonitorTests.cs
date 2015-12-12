@@ -127,9 +127,9 @@
             var fakeReadPhysicalQueue  = A.Fake<IPhysicalQueue>();
             var fakeWritePhysicalQueue = A.Fake<IPhysicalQueue>();
 
-            A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard-0");
+            A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard0");
             A.CallTo(() => fakeReadPhysicalQueue.Writable).Returns(false);
-            A.CallTo(() => fakeWritePhysicalQueue.Name).Returns("shard-1");
+            A.CallTo(() => fakeWritePhysicalQueue.Name).Returns("shard1");
             A.CallTo(() => fakeWritePhysicalQueue.Writable).Returns(true);
 
             var physicalQueues = new List<IPhysicalQueue> {
@@ -168,15 +168,15 @@
             var fakeWritePhysicalQueue     = A.Fake<IPhysicalQueue>();
 
             A.CallTo(() => fakeReadPhysicalQueue.Writable).Returns(false);
-            A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard-0");
+            A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard0");
             A.CallTo(() => fakeDisabled1PhysicalQueue.Writable).Returns(false);
-            A.CallTo(() => fakeDisabled1PhysicalQueue.Name).Returns("shard-1");
+            A.CallTo(() => fakeDisabled1PhysicalQueue.Name).Returns("shard1");
             A.CallTo(() => fakeDisabled2PhysicalQueue.Writable).Returns(false);
-            A.CallTo(() => fakeDisabled2PhysicalQueue.Name).Returns("shard-2");
+            A.CallTo(() => fakeDisabled2PhysicalQueue.Name).Returns("shard2");
             A.CallTo(() => fakeDisabled3PhysicalQueue.Writable).Returns(false);
-            A.CallTo(() => fakeDisabled3PhysicalQueue.Name).Returns("shard-3");
+            A.CallTo(() => fakeDisabled3PhysicalQueue.Name).Returns("shard3");
             A.CallTo(() => fakeWritePhysicalQueue.Writable).Returns(true);
-            A.CallTo(() => fakeWritePhysicalQueue.Name).Returns("shard-4");
+            A.CallTo(() => fakeWritePhysicalQueue.Name).Returns("shard4");
 
             var physicalQueues = new List<IPhysicalQueue> {
                 fakeReadPhysicalQueue,
@@ -218,11 +218,11 @@
             var fakeNewWritePhysicalQueue = A.Fake<IPhysicalQueue>();
 
             A.CallTo(() => fakeReadPhysicalQueue.Writable).Returns(false);
-            A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard-0");
+            A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard0");
             A.CallTo(() => fakeOldWritePhysicalQueue.Writable).Returns(true);
-            A.CallTo(() => fakeOldWritePhysicalQueue.Name).Returns("shard-1");
+            A.CallTo(() => fakeOldWritePhysicalQueue.Name).Returns("shard1");
             A.CallTo(() => fakeNewWritePhysicalQueue.Writable).Returns(true);
-            A.CallTo(() => fakeNewWritePhysicalQueue.Name).Returns("shard-2");
+            A.CallTo(() => fakeNewWritePhysicalQueue.Name).Returns("shard2");
 
             var physicalQueues = new List<IPhysicalQueue> {
                 fakeReadPhysicalQueue,
