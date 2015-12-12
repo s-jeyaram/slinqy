@@ -17,74 +17,33 @@
         private readonly SlinqyQueueShardMonitor queueShardMonitor;
 
         /// <summary>
-        /// Used to manage the physical queue resources.
-        /// </summary>
-        private IPhysicalQueueService physicalQueueService;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueue"/> class.
         /// </summary>
-        /// <param name="queueName">The name of the queue.</param>
-        /// <param name="physicalQueueService">
-        /// Specifies the IPhysicalQueueService to use for managing queue resources.
+        /// <param name="slinqyQueueShardMonitor">
+        /// Specifies the SlinqyQueueShardMonitor to use for staying in sync with physical queue resources.
         /// </param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule was not designed for async calls.")]
         public
         SlinqyQueue(
-            string                  queueName,
-            IPhysicalQueueService   physicalQueueService)
+            SlinqyQueueShardMonitor slinqyQueueShardMonitor)
         {
-            // Save the service reference.
-            this.physicalQueueService = physicalQueueService;
-
-            // Save the queue name.
-            this.Name = queueName;
-
-            // Create a queue monitor.
-            this.queueShardMonitor = new SlinqyQueueShardMonitor(
-                queueName,
-                this.physicalQueueService
-            );
-
-            // Start monitoring.
-            var task = this.queueShardMonitor.Start();
-
-            // Disable need to return to the original context thread, this prevents deadlocks if being hosted within ASP.NET.
-            // For more info:
-            // - http://stackoverflow.com/questions/13489065/best-practice-to-call-configureawait-for-all-server-side-code
-            // - http://www.tugberkugurlu.com/archive/asynchronousnet-client-libraries-for-your-http-api-and-awareness-of-async-await-s-bad-effects
-            task.ConfigureAwait(false);
-
-            // Wait for the task to complete before continuing.
-            task.Wait();
+            this.queueShardMonitor = slinqyQueueShardMonitor;
         }
 
         /// <summary>
         /// Gets the name of the queue.
         /// </summary>
-        public string Name { get; }
+        public string Name => this.queueShardMonitor.QueueName;
 
         /// <summary>
         /// Gets the current maximum storage capacity of the virtual queue.
         /// </summary>
-        public long MaxQueueSizeMegabytes
-        {
-            get
-            {
-                return this.queueShardMonitor.Shards.Sum(s => s.MaxSizeMegabytes);
-            }
-        }
+        public long MaxQueueSizeMegabytes => this.queueShardMonitor.Shards.Sum(s => s.PhysicalQueue.MaxSizeMegabytes);
 
         /// <summary>
         /// Gets the current size of all the data stored in the queue.
         /// </summary>
-        public long CurrentQueueSizeBytes
-        {
-            get
-            {
-                return this.queueShardMonitor.Shards.Sum(s => s.CurrentSizeBytes);
-            }
-        }
+        public long CurrentQueueSizeBytes => this.queueShardMonitor.Shards.Sum(s => s.PhysicalQueue.CurrentSizeBytes);
 
         /// <summary>
         /// Sends the specified batch of messages to the current write queue.

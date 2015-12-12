@@ -11,22 +11,6 @@
     public class HomeController : Controller
     {
         /// <summary>
-        /// Used to manage Service Bus resources.
-        /// </summary>
-        private readonly NamespaceManager   serviceBusNamespaceManager;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HomeController"/> class.
-        /// </summary>
-        public
-        HomeController()
-        {
-            this.serviceBusNamespaceManager = NamespaceManager.CreateFromConnectionString(
-                ConfigurationManager.AppSettings["Microsoft.ServiceBus.ConnectionString"]
-            );
-        }
-
-        /// <summary>
         /// Handles the default HTTP GET /.
         /// </summary>
         /// <returns>Returns the default Homepage view.</returns>
@@ -34,8 +18,12 @@
         ActionResult
         Index()
         {
+            var serviceBusNamespaceManager = NamespaceManager.CreateFromConnectionString(
+                ConfigurationManager.AppSettings["Microsoft.ServiceBus.ConnectionString"]
+            );
+
             this.ViewBag.Title                  = "Home Page";
-            this.ViewBag.ServiceBusNamespace    = this.serviceBusNamespaceManager.Address.ToString();
+            this.ViewBag.ServiceBusNamespace    = serviceBusNamespaceManager.Address.ToString();
 
             var defaultValues = new CreateQueueCommandModel {
                 MaxQueueSizeMegabytes = 1024

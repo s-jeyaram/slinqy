@@ -61,3 +61,33 @@ function Write-EnvironmentSecrets {
 
     Write-Host "done!"
 }
+
+# Executes tests found in the specified DLLs.
+function Run-Tests {
+    Param(
+        $PackagesPath,
+        $ArtifactsPath,
+        $TestDlls,
+        [switch]$ReportCodeCoverage
+    )
+
+    $xUnitPath           = Join-Path $Env:ChocolateyInstall 'bin\xunit.console.exe'
+    $openCoverPath       = Join-Path $PackagesPath 'OpenCover.4.6.166\tools\OpenCover.Console.exe'
+    $openCoverOutputPath = Join-Path $ArtifactsPath "coverage.xml"
+
+    $currentDir = Get-Location
+    Set-Location $ArtifactsPath
+    exec { . $openCoverPath -target:$xUnitPath -targetargs:$TestDlls -returntargetcode -register:user -output:$openCoverOutputPath -filter:'+[Slinqy.Core]*' }
+    Set-Location $currentDir
+
+    if ($ReportCodeCoverage) {
+        $reportGeneratorPath       = Join-Path $PackagesPath 'ReportGenerator.2.3.5.0\tools\ReportGenerator.exe'
+        $reportGeneratorOutputPath = Join-Path $ArtifactsPath 'CoverageReport'
+
+        exec { . $reportGeneratorPath $openCoverOutputPath $reportGeneratorOutputPath }
+
+        $coverallsPath = Join-Path $PackagesPath 'coveralls.io.1.3.4\tools\coveralls.net.exe'
+
+        exec { . $coverallsPath --opencover $openCoverOutputPath }
+    }
+}

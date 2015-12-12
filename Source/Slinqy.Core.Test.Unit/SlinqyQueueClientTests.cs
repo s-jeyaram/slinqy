@@ -11,6 +11,12 @@
     public class SlinqyQueueClientTests
     {
         /// <summary>
+        /// Represents a valid value where one is needed for a Slinqy queue name parameters.
+        /// Should not be a special value other than it is guaranteed to be valid.
+        /// </summary>
+        private const string ValidSlinqyQueueName = "queue-name";
+
+        /// <summary>
         /// The instance under test.
         /// </summary>
         private readonly SlinqyQueueClient client;
@@ -50,11 +56,8 @@
         async Task
         CreateAsync_QueueNameValid_CreateDelegateInvoked()
         {
-            // Arrange
-            const string QueueName = "test";
-
             // Act
-            await this.client.CreateAsync(QueueName);
+            await this.client.CreateAsync(ValidSlinqyQueueName);
 
             // Assert
             A.CallTo(() =>
@@ -89,14 +92,11 @@
         void
         Get_SlinqyQueueDoesNotExistInCollection_IsReturned()
         {
-            // Arrange
-            const string QueueName = "test";
-
             // Act
-            var actualQueueName = this.client.Get(QueueName).Name;
+            var actualQueueName = this.client.Get(ValidSlinqyQueueName).Name;
 
             // Assert
-            Assert.Equal(QueueName, actualQueueName);
+            Assert.Equal(ValidSlinqyQueueName, actualQueueName);
         }
     }
 }

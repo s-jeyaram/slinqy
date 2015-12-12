@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Threading.Tasks;
     using FakeItEasy;
     using Xunit;
@@ -18,10 +19,10 @@
         private const string ValidSlinqyQueueName = "queue-name";
 
         /// <summary>
-        /// Represents a valid value where one is needed for a physical queue name parameters.
+        /// Represents a valid value where one is needed for queue shard index parameters.
         /// Should not be a special value other than it is guaranteed to be valid.
         /// </summary>
-        private const string ValidShardPhysicalQueueName = "queue-name-1";
+        private const int ValidShardIndex = 0;
 
         /// <summary>
         /// Represents a valid value where one is needed for max size parameters.
@@ -36,14 +37,15 @@
         private const double ValidStorageCapacityScaleOutThreshold = 0.80;
 
         /// <summary>
+        /// Represents a valid value where one is needed for a physical queue name parameters.
+        /// Should not be a special value other than it is guaranteed to be valid.
+        /// </summary>
+        private static readonly string ValidShardPhysicalQueueName = string.Format(CultureInfo.InvariantCulture, "{0}-{1}", ValidSlinqyQueueName, ValidShardIndex);
+
+        /// <summary>
         /// A fake queue service to be used for test purposes.
         /// </summary>
         private readonly IPhysicalQueueService fakeQueueService = A.Fake<IPhysicalQueueService>();
-
-        /// <summary>
-        /// A fake queue configured for writing.
-        /// </summary>
-        private readonly IPhysicalQueue fakeWritePhysicalQueue = A.Fake<IPhysicalQueue>();
 
         /// <summary>
         /// The SlinqyAgent instance being tested.
@@ -51,21 +53,34 @@
         private readonly SlinqyAgent slinqyAgent;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SlinqyAgentTests"/> class.
+        /// A fake SlinqyQueueShard that is configured to be writable.
+        /// </summary>
+        private readonly SlinqyQueueShard fakeWritableShard;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SlinqyAgentTests"/> class with default/common behaviors and values.
         /// </summary>
         public
         SlinqyAgentTests()
         {
+            // Configures one writable shard since that's the minimum valid state.
+            this.fakeWritableShard = A.Fake<SlinqyQueueShard>();
+
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.Writable).Returns(true);
+            A.CallTo(() => this.fakeWritableShard.ShardIndex).Returns(ValidShardIndex);
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.Name).Returns(ValidShardPhysicalQueueName);
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.MaxSizeMegabytes).Returns(ValidMaxSizeMegabytes);
+
+            // Configures the fake shard monitor to use the fake shards.
+            var fakeQueueShardMonitor = A.Fake<SlinqyQueueShardMonitor>();
+            A.CallTo(() => fakeQueueShardMonitor.Shards).Returns(new List<SlinqyQueueShard> { this.fakeWritableShard });
+
+            // Configure the agent that will be tested.
             this.slinqyAgent = new SlinqyAgent(
-                queueName:                          ValidSlinqyQueueName,
                 queueService:                       this.fakeQueueService,
+                slinqyQueueShardMonitor:            fakeQueueShardMonitor,
                 storageCapacityScaleOutThreshold:   ValidStorageCapacityScaleOutThreshold
             );
-
-            // Configure default/typical behaviors and values.
-            A.CallTo(() => this.fakeWritePhysicalQueue.Writable).Returns(true);
-            A.CallTo(() => this.fakeWritePhysicalQueue.Name).Returns(ValidShardPhysicalQueueName);
-            A.CallTo(() => this.fakeWritePhysicalQueue.MaxSizeMegabytes).Returns(ValidMaxSizeMegabytes);
         }
 
         /// <summary>
@@ -79,16 +94,10 @@
         SlinqyAgent_WriteQueueShardExceedsCapacityThreshold_AnotherShardIsAdded()
         {
             // Arrange
-            var fakeQueues = new List<IPhysicalQueue> {
-                this.fakeWritePhysicalQueue
-            };
-
-            // Calculate minimum size to trigger scaling.
             var scaleOutSizeMegabytes = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
             var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
 
-            A.CallTo(() => this.fakeWritePhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
-            A.CallTo(() => this.fakeQueueService.ListQueues(ValidSlinqyQueueName)).Returns(fakeQueues);
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
 
             // Act
             await this.slinqyAgent.Start();
@@ -110,11 +119,10 @@
         SlinqyAgent_WriteQueueShardSizeUnderCapacityThreshold_AnotherShardIsNotAdded()
         {
             // Arrange
-            var fakeQueues = new List<IPhysicalQueue> {
-                this.fakeWritePhysicalQueue
-            };
+            var scaleOutSizeMegabytes = Math.Floor(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
+            var sizeBytes             = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
 
-            A.CallTo(() => this.fakeQueueService.ListQueues(ValidSlinqyQueueName)).Returns(fakeQueues);
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.CurrentSizeBytes).Returns(sizeBytes);
 
             // Act
             await this.slinqyAgent.Start();

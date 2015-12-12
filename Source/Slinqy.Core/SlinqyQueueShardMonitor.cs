@@ -10,19 +10,14 @@
     public class SlinqyQueueShardMonitor
     {
         /// <summary>
-        /// The name of the Slinqy queue being monitored.
-        /// </summary>
-        private string                  queueName;
-
-        /// <summary>
         /// The physical queue service hosting the Slinqy queue.
         /// </summary>
-        private IPhysicalQueueService   queueService;
+        private readonly IPhysicalQueueService queueService;
 
         /// <summary>
         /// The async Task that is running the queue polling operations.
         /// </summary>
-        private Task                    pollQueuesTask;
+        private Task pollQueuesTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueShardMonitor"/> class.
@@ -34,24 +29,26 @@
             string                  queueName,
             IPhysicalQueueService   queueService)
         {
-            this.queueName    = queueName;
+            this.QueueName    = queueName;
             this.queueService = queueService;
 
             this.Shards = Enumerable.Empty<SlinqyQueueShard>();
         }
 
         /// <summary>
+        /// Gets the name of the Slinqy Queue being monitored.
+        /// </summary>
+        public string QueueName { get; }
+
+        /// <summary>
         /// Gets a list of SlinqyQueueShards for each physical queue found.  This list refreshes periodically.
         /// </summary>
-        public IEnumerable<SlinqyQueueShard> Shards { get; private set; }
+        public virtual IEnumerable<SlinqyQueueShard> Shards { get; private set; }
 
         /// <summary>
         /// Gets the current write shard.
         /// </summary>
-        public SlinqyQueueShard WriteShard
-        {
-            get { return this.Shards.Last(s => s.Writable); }
-        }
+        public SlinqyQueueShard WriteShard => this.Shards.Last(s => s.PhysicalQueue.Writable);
 
         /// <summary>
         /// Starts polling the physical resources to update the Shards property values.
@@ -62,7 +59,7 @@
         Start()
         {
             // Perform a manual poll now to validate that it works before returning.
-            await this.UpdateShards();
+            await this.UpdateShards().ConfigureAwait(false);
 
             // Start polling
             this.pollQueuesTask = this.PollQueues();
@@ -77,7 +74,7 @@
         async Task
         UpdateShards()
         {
-            var physicalShards = await this.queueService.ListQueues(this.queueName)
+            var physicalShards = await this.queueService.ListQueues(this.QueueName)
                 .ConfigureAwait(false);
 
             this.Shards = physicalShards.Select(ps => new SlinqyQueueShard(ps)).ToArray();

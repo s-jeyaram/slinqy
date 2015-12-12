@@ -67,9 +67,15 @@
                 .CreateQueue(queueShardName)
                 .ConfigureAwait(false);
 
-            var queue = new SlinqyQueue(
+            var shardMonitor = new SlinqyQueueShardMonitor(
                 queueName,
                 this.physicalQueueService
+            );
+
+            await shardMonitor.Start().ConfigureAwait(false);
+
+            var queue = new SlinqyQueue(
+                shardMonitor
             );
 
             this.slinqyQueues.TryAdd(queueName, queue);
@@ -89,7 +95,7 @@
         {
             var queue = this.slinqyQueues.GetOrAdd(
                 queueName,
-                name => new SlinqyQueue(queueName, this.physicalQueueService)
+                name => new SlinqyQueue(new SlinqyQueueShardMonitor(queueName, this.physicalQueueService))
             );
 
             return queue;

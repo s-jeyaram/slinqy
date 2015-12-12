@@ -1,7 +1,6 @@
 ﻿namespace Slinqy.Core
 {
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -20,11 +19,6 @@
         private readonly IPhysicalQueueService queueService;
 
         /// <summary>
-        /// The name of the queue.
-        /// </summary>
-        private readonly string queueName;
-
-        /// <summary>
         /// Monitors the physical queue shards.
         /// </summary>
         private readonly SlinqyQueueShardMonitor queueShardMonitor;
@@ -32,11 +26,11 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyAgent"/> class.
         /// </summary>
-        /// <param name="queueName">
-        /// Specifies the name of the virtual queue.
-        /// </param>
         /// <param name="queueService">
         /// Specifies the reference to use for managing the queue service.
+        /// </param>
+        /// <param name="slinqyQueueShardMonitor">
+        /// Specifies the monitor of the queue shards.
         /// </param>
         /// <param name="storageCapacityScaleOutThreshold">
         /// Specifies at what percentage of the current physical write queues storage
@@ -45,25 +39,19 @@
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule was not designed for async calls.")]
         public
         SlinqyAgent(
-            string                  queueName,
             IPhysicalQueueService   queueService,
+            SlinqyQueueShardMonitor slinqyQueueShardMonitor,
             double                  storageCapacityScaleOutThreshold)
         {
-            this.queueName                          = queueName;
             this.queueService                       = queueService;
+            this.queueShardMonitor                  = slinqyQueueShardMonitor;
             this.storageCapacityScaleOutThreshold   = storageCapacityScaleOutThreshold;
-
-            this.queueShardMonitor = new SlinqyQueueShardMonitor(
-                this.queueName,
-                this.queueService
-            );
         }
 
         /// <summary>
         /// Starts the agent to begin monitoring the queue shards and taking action if needed.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "task", Justification = "temp")] // TODO: REMOVE
         public
         async Task
         Start()
@@ -87,14 +75,10 @@
         EvaluateShards()
         {
             // Get the write queue shard.
-            var writeShard = this.queueShardMonitor.Shards.Single(q => q.Writable);
-
-            // Calculate it's storage utilization.
-            // TODO: Move to property on SlinqyQueueShard...?
-            var utilizationPercentage = (((double)writeShard.CurrentSizeBytes / 1024) / 1024) / writeShard.MaxSizeMegabytes;
+            var writeShard = this.queueShardMonitor.WriteShard;
 
             // Scale up if needed
-            if (utilizationPercentage > this.storageCapacityScaleOutThreshold)
+            if (writeShard.StorageUtilization > this.storageCapacityScaleOutThreshold)
                 await this.ScaleOut(writeShard).ConfigureAwait(false);
         }
 
@@ -113,13 +97,13 @@
         {
             // Add next shard!
             var nextShardIndex = currentWriteShard.ShardIndex + 1;
+            var nextShardName = currentWriteShard.PhysicalQueue.Name + nextShardIndex;
 
-            // Create a new shard!
-            var newWriteShard = await this.queueService.CreateQueue(currentWriteShard.ShardName + nextShardIndex)
+            await this.queueService.CreateQueue(nextShardName)
                 .ConfigureAwait(false);
 
             // Set the previous write shards new state.
-            await this.SetShardStates();
+            await this.SetShardStates().ConfigureAwait(false);
         }
 
         /// <summary>
