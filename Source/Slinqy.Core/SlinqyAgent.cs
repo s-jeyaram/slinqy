@@ -97,7 +97,7 @@
         {
             // Add next shard!
             var nextShardIndex = currentWriteShard.ShardIndex + 1;
-            var nextShardName = currentWriteShard.PhysicalQueue.Name + nextShardIndex;
+            var nextShardName = this.queueShardMonitor.QueueName + nextShardIndex;
 
             await this.queueService.CreateQueue(nextShardName)
                 .ConfigureAwait(false);

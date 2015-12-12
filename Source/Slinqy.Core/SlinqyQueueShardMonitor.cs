@@ -38,7 +38,7 @@
         /// <summary>
         /// Gets the name of the Slinqy Queue being monitored.
         /// </summary>
-        public string QueueName { get; }
+        public virtual string QueueName { get; }
 
         /// <summary>
         /// Gets a list of SlinqyQueueShards for each physical queue found.  This list refreshes periodically.

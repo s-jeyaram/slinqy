@@ -40,7 +40,7 @@
         /// Represents a valid value where one is needed for a physical queue name parameters.
         /// Should not be a special value other than it is guaranteed to be valid.
         /// </summary>
-        private static readonly string ValidShardPhysicalQueueName = string.Format(CultureInfo.InvariantCulture, "{0}-{1}", ValidSlinqyQueueName, ValidShardIndex);
+        private static readonly string ValidShardPhysicalQueueName = string.Format(CultureInfo.InvariantCulture, "{0}{1}", ValidSlinqyQueueName, ValidShardIndex);
 
         /// <summary>
         /// A fake queue service to be used for test purposes.
@@ -73,6 +73,8 @@
 
             // Configures the fake shard monitor to use the fake shards.
             var fakeQueueShardMonitor = A.Fake<SlinqyQueueShardMonitor>();
+
+            A.CallTo(() => fakeQueueShardMonitor.QueueName).Returns(ValidSlinqyQueueName);
             A.CallTo(() => fakeQueueShardMonitor.Shards).Returns(new List<SlinqyQueueShard> { this.fakeWritableShard });
 
             // Configure the agent that will be tested.
@@ -131,6 +133,30 @@
             A.CallTo(() =>
                 this.fakeQueueService.CreateQueue(A<string>.Ignored)
             ).MustNotHaveHappened();
+        }
+
+        /// <summary>
+        /// Verifies that the name of the new shard is correct.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        SlinqyAgent_AnotherShardAdded_ShardNameIsCorrect()
+        {
+            // Arrange
+            var scaleOutSizeMegabytes   = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
+            var scaleOutSizeBytes       = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
+
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
+
+            // Act
+            await this.slinqyAgent.Start();
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeQueueService.CreateQueue(ValidSlinqyQueueName + "1")
+            ).MustHaveHappened();
         }
     }
 }

@@ -12,6 +12,11 @@
     public class SlinqyQueueClient
     {
         /// <summary>
+        /// Defines the default value for a shard index on a new queue.
+        /// </summary>
+        private const int DefaultShardIndex = 0;
+
+        /// <summary>
         /// Maintains a list of references to SlinqyQueue's that have been instantiated since they are expensive to create.
         /// </summary>
         private readonly ConcurrentDictionary<string, SlinqyQueue> slinqyQueues = new ConcurrentDictionary<string, SlinqyQueue>();
@@ -56,9 +61,9 @@
 
             var queueShardName = string.Format(
                 CultureInfo.InvariantCulture,
-                "{0}-{1}",
+                "{0}{1}",
                 queueName,
-                0
+                DefaultShardIndex
             );
 
             // Call the function to create the first physical queue shard to establish the virtual queue.
