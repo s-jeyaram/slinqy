@@ -76,11 +76,13 @@
         EvaluateShards()
         {
             // Get the write queue shard.
-            var writeShard = this.queueShardMonitor.Shards.Single(q => q.Writable);
+            var writeShard = this.queueShardMonitor.WriteShard;
+
+            var physicalQueue = writeShard.PhysicalQueue;
 
             // Calculate it's storage utilization.
             // TODO: Move to property on SlinqyQueueShard...?
-            var utilizationPercentage = (((double)writeShard.CurrentSizeBytes / 1024) / 1024) / writeShard.MaxSizeMegabytes;
+            var utilizationPercentage = (((double)physicalQueue.CurrentSizeBytes / 1024) / 1024) / physicalQueue.MaxSizeMegabytes;
 
             // Scale up if needed
             if (utilizationPercentage > this.storageCapacityScaleOutThreshold)
@@ -102,9 +104,9 @@
         {
             // Add next shard!
             var nextShardIndex = currentWriteShard.ShardIndex + 1;
+            var nextShardName = currentWriteShard.PhysicalQueue.Name + nextShardIndex;
 
-            // Create a new shard!
-            var newWriteShard = await this.queueService.CreateQueue(currentWriteShard.ShardName + nextShardIndex)
+            await this.queueService.CreateQueue(nextShardName)
                 .ConfigureAwait(false);
 
             // Set the previous write shards new state.

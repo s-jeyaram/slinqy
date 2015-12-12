@@ -66,10 +66,10 @@
             // Configures one writable shard since that's the minimum valid state.
             this.fakeWritableShard = A.Fake<SlinqyQueueShard>();
 
-            A.CallTo(() => this.fakeWritableShard.Writable).Returns(true);
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.Writable).Returns(true);
             A.CallTo(() => this.fakeWritableShard.ShardIndex).Returns(ValidShardIndex);
-            A.CallTo(() => this.fakeWritableShard.ShardName).Returns(ValidShardPhysicalQueueName);
-            A.CallTo(() => this.fakeWritableShard.MaxSizeMegabytes).Returns(ValidMaxSizeMegabytes);
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.Name).Returns(ValidShardPhysicalQueueName);
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.MaxSizeMegabytes).Returns(ValidMaxSizeMegabytes);
 
             // Configures the fake shard monitor to use the fake shards.
             var fakeQueueShardMonitor = A.Fake<SlinqyQueueShardMonitor>();
@@ -97,7 +97,7 @@
             var scaleOutSizeMegabytes = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
             var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
 
-            A.CallTo(() => this.fakeWritableShard.CurrentSizeBytes).Returns(scaleOutSizeBytes);
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
 
             // Act
             await this.slinqyAgent.Start();
@@ -122,7 +122,7 @@
             var scaleOutSizeMegabytes = Math.Floor(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
             var sizeBytes             = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
 
-            A.CallTo(() => this.fakeWritableShard.CurrentSizeBytes).Returns(sizeBytes);
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.CurrentSizeBytes).Returns(sizeBytes);
 
             // Act
             await this.slinqyAgent.Start();

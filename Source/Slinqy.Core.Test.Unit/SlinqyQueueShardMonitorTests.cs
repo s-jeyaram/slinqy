@@ -72,7 +72,7 @@
             // Assert
             Assert.Equal(
                 physicalQueues.First().MaxSizeMegabytes,
-                slinqyQueueShards.First().MaxSizeMegabytes
+                slinqyQueueShards.First().PhysicalQueue.MaxSizeMegabytes
             );
         }
 
@@ -110,7 +110,7 @@
             // Assert
             Assert.Equal(
                 fakeReadWritePhysicalQueue.Name,
-                this.monitor.WriteShard.ShardName
+                this.monitor.WriteShard.PhysicalQueue.Name
             );
         }
 
@@ -147,7 +147,7 @@
             // Assert
             Assert.Equal(
                 fakeWritePhysicalQueue.Name,
-                this.monitor.WriteShard.ShardName
+                this.monitor.WriteShard.PhysicalQueue.Name
             );
         }
 
@@ -193,7 +193,7 @@
             // Assert
             Assert.Equal(
                 fakeWritePhysicalQueue.Name,
-                this.monitor.WriteShard.ShardName
+                this.monitor.WriteShard.PhysicalQueue.Name
             );
         }
 
@@ -240,7 +240,7 @@
             // Assert
             Assert.Equal(
                 fakeNewWritePhysicalQueue.Name,
-                this.monitor.WriteShard.ShardName
+                this.monitor.WriteShard.PhysicalQueue.Name
             );
         }
     }

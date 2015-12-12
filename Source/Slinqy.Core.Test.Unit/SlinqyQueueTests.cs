@@ -34,8 +34,8 @@
             this.fakeReadShard  = A.Fake<SlinqyQueueShard>();
             this.fakeWriteShard = A.Fake<SlinqyQueueShard>();
 
-            A.CallTo(() => this.fakeReadShard.Writable).Returns(false);
-            A.CallTo(() => this.fakeWriteShard.Writable).Returns(true);
+            A.CallTo(() => this.fakeReadShard.PhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => this.fakeWriteShard.PhysicalQueue.Writable).Returns(true);
 
             var shards = new List<SlinqyQueueShard> {
                 this.fakeReadShard,
@@ -54,8 +54,8 @@
         MaxQueueSizeMegabytes_Always_ReturnsSumOfAllShardSizes()
         {
             // Arrange
-            A.CallTo(() => this.fakeReadShard.MaxSizeMegabytes).Returns(1024);
-            A.CallTo(() => this.fakeWriteShard.MaxSizeMegabytes).Returns(1024);
+            A.CallTo(() => this.fakeReadShard.PhysicalQueue.MaxSizeMegabytes).Returns(1024);
+            A.CallTo(() => this.fakeWriteShard.PhysicalQueue.MaxSizeMegabytes).Returns(1024);
 
             var slinqyQueue = new SlinqyQueue(
                 this.fakeQueueShardMonitor
@@ -77,8 +77,8 @@
         CurrentQueueSizeBytes_Always_ReturnsSumOfAllShardSizes()
         {
             // Arrange
-            A.CallTo(() => this.fakeReadShard.CurrentSizeBytes).Returns(1);
-            A.CallTo(() => this.fakeWriteShard.CurrentSizeBytes).Returns(2);
+            A.CallTo(() => this.fakeReadShard.PhysicalQueue.CurrentSizeBytes).Returns(1);
+            A.CallTo(() => this.fakeWriteShard.PhysicalQueue.CurrentSizeBytes).Returns(2);
 
             var slinqyQueue = new SlinqyQueue(
                 this.fakeQueueShardMonitor
