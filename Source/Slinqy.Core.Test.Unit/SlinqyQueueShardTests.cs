@@ -69,7 +69,9 @@
         /// Verifies that the ShardIndex property returns the shards index based on the physical shards name.
         /// </summary>
         [Fact]
-        public void ShardIndex_Always_ReturnsIndexFromName()
+        public
+        void
+        ShardIndex_Always_ReturnsIndexFromName()
         {
             // Arrange
             A.CallTo(() =>
