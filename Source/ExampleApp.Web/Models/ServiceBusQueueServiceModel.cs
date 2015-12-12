@@ -67,7 +67,7 @@
         ListQueues(
             string namePrefix)
         {
-            var getFilter = "startswith(path, '" + namePrefix + "-') eq true";
+            var getFilter = "startswith(path, '" + namePrefix + "') eq true";
 
             var queues = (await this.serviceBusNamespaceManager.GetQueuesAsync(getFilter)
                 .ConfigureAwait(false))

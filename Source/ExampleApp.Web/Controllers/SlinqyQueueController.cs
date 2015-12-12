@@ -82,8 +82,6 @@
                 PhysicalQueueService
             );
 
-            await monitor.Start();
-
             slinqyAgent = new SlinqyAgent(
                 PhysicalQueueService,
                 monitor,
