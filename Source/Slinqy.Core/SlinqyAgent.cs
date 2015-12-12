@@ -99,7 +99,7 @@
             var nextShardIndex = currentWriteShard.ShardIndex + 1;
             var nextShardName = this.queueShardMonitor.QueueName + nextShardIndex;
 
-            await this.queueService.CreateQueue(nextShardName)
+            await this.queueService.CreateSendOnlyQueue(nextShardName)
                 .ConfigureAwait(false);
 
             // Set the previous write shards new state.

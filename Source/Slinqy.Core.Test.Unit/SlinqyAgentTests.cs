@@ -93,7 +93,7 @@
         [Fact]
         public
         async Task
-        SlinqyAgent_WriteQueueShardExceedsCapacityThreshold_AnotherShardIsAdded()
+        SlinqyAgent_WriteQueueShardExceedsCapacityThreshold_ASendOnlyShardIsAdded()
         {
             // Arrange
             var scaleOutSizeMegabytes = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
@@ -106,7 +106,7 @@
 
             // Assert
             A.CallTo(() =>
-                this.fakeQueueService.CreateQueue(A<string>.Ignored)
+                this.fakeQueueService.CreateSendOnlyQueue(A<string>.Ignored)
             ).MustHaveHappened();
         }
 
@@ -155,7 +155,7 @@
 
             // Assert
             A.CallTo(() =>
-                this.fakeQueueService.CreateQueue(ValidSlinqyQueueName + "1")
+                this.fakeQueueService.CreateSendOnlyQueue(ValidSlinqyQueueName + "1")
             ).MustHaveHappened();
         }
     }

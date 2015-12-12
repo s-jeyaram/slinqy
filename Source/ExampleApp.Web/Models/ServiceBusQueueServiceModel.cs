@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.ServiceBus;
+    using Microsoft.ServiceBus.Messaging;
     using Slinqy.Core;
 
     /// <summary>
@@ -40,21 +41,30 @@
         /// Creates the specified physical Service Bus queue.
         /// </summary>
         /// <param name="name">Specifies the queue path.</param>
-        /// <returns>Returns the created queue as a SlinqyQueueShard.</returns>
+        /// <returns>Returns the created queue as a IPhysicalQueue.</returns>
         public
         async Task<IPhysicalQueue>
         CreateQueue(
             string name)
         {
-            var queueDescription = await this.serviceBusNamespaceManager.CreateQueueAsync(path: name)
-                .ConfigureAwait(false);
+            return await this.CreateQueueInternal(new QueueDescription(name));
+        }
 
-            var physicalQueue = new ServiceBusQueueModel(
-                this.serviceBusConnectionString,
-                queueDescription
-            );
+        /// <summary>
+        /// Creates a new Service Bus queue in the ReceiveDisabled state.
+        /// </summary>
+        /// <param name="name">Specifies the queue path.</param>
+        /// <returns>Returns the created queue as an IPhysicalQueue.</returns>
+        public
+        async Task<IPhysicalQueue>
+        CreateSendOnlyQueue(
+            string name)
+        {
+            var queueDescription = new QueueDescription(name) {
+                Status = EntityStatus.ReceiveDisabled
+            };
 
-            return physicalQueue;
+            return await this.CreateQueueInternal(queueDescription);
         }
 
         /// <summary>
@@ -75,6 +85,27 @@
                 .ToArray();
 
             return queues;
+        }
+
+        /// <summary>
+        /// Creates the specified physical Service Bus queue using the specified description.
+        /// </summary>
+        /// <param name="queueDescription">Specifies the details of the queue to create.</param>
+        /// <returns>Returns the created queue as a IPhysicalQueue.</returns>
+        private
+        async Task<IPhysicalQueue>
+        CreateQueueInternal(
+            QueueDescription queueDescription)
+        {
+            await this.serviceBusNamespaceManager.CreateQueueAsync(queueDescription)
+                .ConfigureAwait(false);
+
+            var physicalQueue = new ServiceBusQueueModel(
+                this.serviceBusConnectionString,
+                queueDescription
+            );
+
+            return physicalQueue;
         }
     }
 }

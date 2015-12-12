@@ -12,13 +12,22 @@
     public interface IPhysicalQueueService
     {
         /// <summary>
-        /// Creates a physical queue in the service with the specified name.
+        /// Creates a physical queue in the service with the specified name
+        /// that is enabled for both sending and receiving of queue messages.
         /// </summary>
         /// <param name="name">
         /// Specifies the name of the queue to create.
         /// </param>
         /// <returns>Returns the queue that was created.</returns>
         Task<IPhysicalQueue> CreateQueue(string name);
+
+        /// <summary>
+        /// Creates a physical queue in the service with the specified name
+        /// that is only enabled for sending of queue messages to the queue.
+        /// </summary>
+        /// <param name="name">The name of the queue to create.</param>
+        /// <returns>Returns the queue that was created.</returns>
+        Task<IPhysicalQueue> CreateSendOnlyQueue(string name);
 
         /// <summary>
         /// Lists the physical queues whose names matches the specified prefix.
