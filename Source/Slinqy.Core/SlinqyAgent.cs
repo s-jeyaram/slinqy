@@ -1,7 +1,6 @@
 ﻿namespace Slinqy.Core
 {
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -104,7 +103,7 @@
                 .ConfigureAwait(false);
 
             // Set the previous write shards new state.
-            await this.SetShardStates();
+            await this.SetShardStates().ConfigureAwait(false);
         }
 
         /// <summary>

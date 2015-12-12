@@ -59,7 +59,7 @@
         Start()
         {
             // Perform a manual poll now to validate that it works before returning.
-            await this.UpdateShards();
+            await this.UpdateShards().ConfigureAwait(false);
 
             // Start polling
             this.pollQueuesTask = this.PollQueues();
