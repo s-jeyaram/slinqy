@@ -78,14 +78,8 @@
             // Get the write queue shard.
             var writeShard = this.queueShardMonitor.WriteShard;
 
-            var physicalQueue = writeShard.PhysicalQueue;
-
-            // Calculate it's storage utilization.
-            // TODO: Move to property on SlinqyQueueShard...?
-            var utilizationPercentage = (((double)physicalQueue.CurrentSizeBytes / 1024) / 1024) / physicalQueue.MaxSizeMegabytes;
-
             // Scale up if needed
-            if (utilizationPercentage > this.storageCapacityScaleOutThreshold)
+            if (writeShard.StorageUtilization > this.storageCapacityScaleOutThreshold)
                 await this.ScaleOut(writeShard).ConfigureAwait(false);
         }
 

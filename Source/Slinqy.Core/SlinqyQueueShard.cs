@@ -55,6 +55,11 @@
         public virtual int ShardIndex => ParseQueueNameForIndex(this.PhysicalQueue.Name);
 
         /// <summary>
+        /// Gets the current storage utilization percentage of this shard.
+        /// </summary>
+        public double StorageUtilization => (((double)this.PhysicalQueue.CurrentSizeBytes / 1024) / 1024) / this.PhysicalQueue.MaxSizeMegabytes;
+
+        /// <summary>
         /// Sends the batch of messages to the physical queue shard.
         /// </summary>
         /// <param name="batch">

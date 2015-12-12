@@ -23,12 +23,19 @@
         private readonly IPhysicalQueue fakePhysicalQueue = A.Fake<IPhysicalQueue>();
 
         /// <summary>
+        /// The SlinqyQueueShard instance under test.
+        /// </summary>
+        private readonly SlinqyQueueShard slinqyQueueShard;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueShardTests"/> class.
         /// </summary>
         public
         SlinqyQueueShardTests()
         {
             A.CallTo(() => this.fakePhysicalQueue.Name).Returns(ValidSlinqyShardName);
+
+            this.slinqyQueueShard = new SlinqyQueueShard(this.fakePhysicalQueue);
         }
 
         /// <summary>
@@ -53,11 +60,10 @@
         SendBatch_BatchIsValid_BatchSentToPhysicalQueue()
         {
             // Arrange
-            var queueShard        = new SlinqyQueueShard(this.fakePhysicalQueue);
-            var validBatch        = new List<string> { "message 1", "message 2" };
+            var validBatch = new List<string> { "message 1", "message 2" };
 
             // Act
-            await queueShard.SendBatch(validBatch);
+            await this.slinqyQueueShard.SendBatch(validBatch);
 
             // Assert
             A.CallTo(() =>
@@ -78,13 +84,31 @@
                 this.fakePhysicalQueue.Name
             ).Returns("queue-100");
 
-            var shard = new SlinqyQueueShard(this.fakePhysicalQueue);
-
             // Act
-            var actualShardIndex = shard.ShardIndex;
+            var actualShardIndex = this.slinqyQueueShard.ShardIndex;
 
             // Assert
             Assert.Equal(100, actualShardIndex);
+        }
+
+        /// <summary>
+        /// Verifies that the StorageUtilization property correctly returns the
+        /// storage utilization percentage based on the underlying physical queue.
+        /// </summary>
+        [Fact]
+        public
+        void
+        StorageUtilization_PhysicalQueuePartiallyFull_ReturnsPercentage()
+        {
+            // Arrange
+            A.CallTo(() => this.fakePhysicalQueue.MaxSizeMegabytes).Returns(1);
+            A.CallTo(() => this.fakePhysicalQueue.CurrentSizeBytes).Returns(524288);
+
+            // Act
+            var actualPercentage = this.slinqyQueueShard.StorageUtilization;
+
+            // Assert
+            Assert.Equal(0.5, actualPercentage);
         }
     }
 }
