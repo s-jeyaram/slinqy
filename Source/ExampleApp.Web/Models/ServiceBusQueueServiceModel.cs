@@ -88,6 +88,23 @@
         }
 
         /// <summary>
+        /// Sets the specified Service Bus queue in to a Receive-Only mode.
+        /// </summary>
+        /// <param name="name">Specifies the queue path.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public
+        async Task
+        SetQueueReceiveOnly(
+            string name)
+        {
+            var queue = await this.serviceBusNamespaceManager.GetQueueAsync(name);
+
+            queue.Status = EntityStatus.SendDisabled;
+
+            await this.serviceBusNamespaceManager.UpdateQueueAsync(queue);
+        }
+
+        /// <summary>
         /// Creates the specified physical Service Bus queue using the specified description.
         /// </summary>
         /// <param name="queueDescription">Specifies the details of the queue to create.</param>

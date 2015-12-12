@@ -103,6 +103,7 @@
                 .ConfigureAwait(false);
 
             // Set the previous write shards new state.
+            await this.queueService.SetQueueReceiveOnly(currentWriteShard.PhysicalQueue.Name);
             await this.SetShardStates().ConfigureAwait(false);
         }
 

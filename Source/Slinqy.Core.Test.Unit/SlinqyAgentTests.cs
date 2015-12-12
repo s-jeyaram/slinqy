@@ -158,5 +158,29 @@
                 this.fakeQueueService.CreateSendOnlyQueue(ValidSlinqyQueueName + "1")
             ).MustHaveHappened();
         }
+
+        /// <summary>
+        /// Verifies that the previous shard is set to be receive only after a new write shard is added.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        SlinqyAgent_AnotherShardAdded_PreviousShardIsReceiveOnly()
+        {
+            // Arrange
+            var scaleOutSizeMegabytes = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
+            var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
+
+            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
+
+            // Act
+            await this.slinqyAgent.Start();
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeQueueService.SetQueueReceiveOnly(this.fakeWritableShard.PhysicalQueue.Name)
+            ).MustHaveHappened();
+        }
     }
 }

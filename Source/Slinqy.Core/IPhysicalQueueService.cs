@@ -40,5 +40,12 @@
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule wasn't designed for async Tasks.")]
         Task<IEnumerable<IPhysicalQueue>> ListQueues(string namePrefix);
+
+        /// <summary>
+        /// Modifies the status of the specified queue to where clients can only receive from the queue, sending is disabled.
+        /// </summary>
+        /// <param name="name">Specifies the name of the queue to update.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        Task SetQueueReceiveOnly(string name);
     }
 }
