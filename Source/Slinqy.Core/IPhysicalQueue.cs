@@ -35,7 +35,7 @@
         /// <summary>
         /// Gets a value indicating whether the queue supports both reading and writing (true), or not (false).
         /// </summary>
-        bool ReadWritable { get; }
+        bool ReadWritable { get; } // TODO: Consider repurposing to Receivable
 
         /// <summary>
         /// Gets a value indicating whether the queue is disabled for both reading and writing (true), or not (false).
