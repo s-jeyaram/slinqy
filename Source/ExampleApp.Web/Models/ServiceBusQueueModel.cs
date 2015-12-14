@@ -38,7 +38,7 @@
             this.Name               = queueDescription.Path;
             this.MaxSizeMegabytes   = queueDescription.MaxSizeInMegabytes;
             this.CurrentSizeBytes   = queueDescription.SizeInBytes;
-            this.Writable           = new[] {
+            this.IsSendEnabled      = new[] {
                                         EntityStatus.Active,
                                         EntityStatus.ReceiveDisabled
                                     }.Any(s => s == queueDescription.Status);
@@ -64,7 +64,7 @@
         /// <summary>
         /// Gets a value indicating whether the queue is writable (true) or not (false).
         /// </summary>
-        public bool Writable { get; }
+        public bool IsSendEnabled { get; }
 
         /// <summary>
         /// Gets a value indicating whether the queue supports both reading and writing (true) or not (false).

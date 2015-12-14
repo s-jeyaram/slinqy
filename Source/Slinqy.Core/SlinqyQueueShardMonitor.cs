@@ -46,9 +46,9 @@
         public virtual IEnumerable<SlinqyQueueShard> Shards { get; private set; }
 
         /// <summary>
-        /// Gets the current write shard.
+        /// Gets the current shard for sending new queue messages.
         /// </summary>
-        public SlinqyQueueShard WriteShard => this.Shards.Last(s => s.PhysicalQueue.Writable);
+        public SlinqyQueueShard SendShard => this.Shards.Last(s => s.PhysicalQueue.IsSendEnabled);
 
         /// <summary>
         /// Starts polling the physical resources to update the Shards property values.

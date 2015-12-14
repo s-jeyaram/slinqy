@@ -34,8 +34,8 @@
             this.fakeReadShard  = A.Fake<SlinqyQueueShard>();
             this.fakeWriteShard = A.Fake<SlinqyQueueShard>();
 
-            A.CallTo(() => this.fakeReadShard.PhysicalQueue.Writable).Returns(false);
-            A.CallTo(() => this.fakeWriteShard.PhysicalQueue.Writable).Returns(true);
+            A.CallTo(() => this.fakeReadShard.PhysicalQueue.IsSendEnabled).Returns(false);
+            A.CallTo(() => this.fakeWriteShard.PhysicalQueue.IsSendEnabled).Returns(true);
 
             var shards = new List<SlinqyQueueShard> {
                 this.fakeReadShard,

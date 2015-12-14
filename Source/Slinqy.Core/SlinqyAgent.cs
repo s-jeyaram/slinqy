@@ -75,32 +75,32 @@
         async Task
         EvaluateShards()
         {
-            // Get the write queue shard.
-            var writeShard = this.queueShardMonitor.WriteShard;
+            // Get the send queue shard.
+            var sendShard = this.queueShardMonitor.SendShard;
 
             // Scale if needed.
-            if (writeShard.StorageUtilization > this.storageCapacityScaleOutThreshold)
-                await this.ScaleOut(writeShard).ConfigureAwait(false);
+            if (sendShard.StorageUtilization > this.storageCapacityScaleOutThreshold)
+                await this.ScaleOut(sendShard).ConfigureAwait(false);
 
             // Make sure shard states are set properly.
             await this.SetShardStates();
         }
 
         /// <summary>
-        /// Scales out the Slinqy queue by adding a new write shard.
+        /// Scales out the Slinqy queue by adding a new send shard.
         /// </summary>
-        /// <param name="currentWriteShard">
-        /// Specifies the current write shard.
-        /// A new shard will be added after it, and it then writing will be disabled on it.
+        /// <param name="currentSendShard">
+        /// Specifies the current send shard.
+        /// A new shard will be added after it, and it then sending will be disabled on it.
         /// </param>
         /// <returns>Returns the async Task for the work.</returns>
         private
         async Task
         ScaleOut(
-            SlinqyQueueShard currentWriteShard)
+            SlinqyQueueShard currentSendShard)
         {
             // Add next shard!
-            var nextShardIndex = currentWriteShard.ShardIndex + 1;
+            var nextShardIndex = currentSendShard.ShardIndex + 1;
             var nextShardName  = this.queueShardMonitor.QueueName + nextShardIndex;
 
             await this.queueService.CreateSendOnlyQueue(nextShardName)
@@ -122,14 +122,14 @@
             var queues = this.queueShardMonitor.Shards.ToArray();
 
             // Determine what the readable and writable shards should be.
-            var lastWritableShard  = queues.Last();
-            var firstReadableShard = queues.FirstOrDefault(q => q.PhysicalQueue.CurrentSizeBytes > 0) ?? lastWritableShard;
+            var lastSendableShard  = queues.Last();
+            var firstReadableShard = queues.FirstOrDefault(q => q.PhysicalQueue.CurrentSizeBytes > 0) ?? lastSendableShard;
 
-            var lastWritableQueue  = lastWritableShard.PhysicalQueue;
+            var lastSendableQueue  = lastSendableShard.PhysicalQueue;
             var firstReadableQueue = firstReadableShard.PhysicalQueue;
 
             // If the first and last queue are the same, make sure it's fully enabled.
-            if (firstReadableQueue == lastWritableQueue && !firstReadableQueue.ReadWritable)
+            if (firstReadableQueue == lastSendableQueue && !firstReadableQueue.ReadWritable)
             {
                 // Set the shard to its proper state.
                 await this.queueService.SetQueueEnabled(firstReadableQueue.Name);
@@ -139,13 +139,13 @@
             }
 
             // If the first read queue is not the same as the last, then make sure sending to it is disabled.
-            if (firstReadableQueue != lastWritableQueue && firstReadableQueue.Writable)
+            if (firstReadableQueue != lastSendableQueue && firstReadableQueue.IsSendEnabled)
                 await this.queueService.SetQueueReceiveOnly(firstReadableQueue.Name);
 
             // Make sure all shards in between are disabled.
             var inBetweenShards = queues.Where(s =>
                 s.PhysicalQueue != firstReadableQueue ||
-                s.PhysicalQueue != lastWritableQueue
+                s.PhysicalQueue != lastSendableQueue
             );
 
             foreach (var shard in inBetweenShards)

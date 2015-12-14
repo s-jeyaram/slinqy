@@ -93,7 +93,7 @@
             ).Returns(ValidSlinqyQueueName + "0");
 
             A.CallTo(() =>
-                fakeReadWritePhysicalQueue.Writable
+                fakeReadWritePhysicalQueue.IsSendEnabled
             ).Returns(true);
 
             var physicalQueues = new List<IPhysicalQueue> {
@@ -110,7 +110,7 @@
             // Assert
             Assert.Equal(
                 fakeReadWritePhysicalQueue.Name,
-                this.monitor.WriteShard.PhysicalQueue.Name
+                this.monitor.SendShard.PhysicalQueue.Name
             );
         }
 
@@ -128,9 +128,9 @@
             var fakeWritePhysicalQueue = A.Fake<IPhysicalQueue>();
 
             A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard0");
-            A.CallTo(() => fakeReadPhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => fakeReadPhysicalQueue.IsSendEnabled).Returns(false);
             A.CallTo(() => fakeWritePhysicalQueue.Name).Returns("shard1");
-            A.CallTo(() => fakeWritePhysicalQueue.Writable).Returns(true);
+            A.CallTo(() => fakeWritePhysicalQueue.IsSendEnabled).Returns(true);
 
             var physicalQueues = new List<IPhysicalQueue> {
                 fakeReadPhysicalQueue,
@@ -147,7 +147,7 @@
             // Assert
             Assert.Equal(
                 fakeWritePhysicalQueue.Name,
-                this.monitor.WriteShard.PhysicalQueue.Name
+                this.monitor.SendShard.PhysicalQueue.Name
             );
         }
 
@@ -167,15 +167,15 @@
             var fakeDisabled3PhysicalQueue = A.Fake<IPhysicalQueue>();
             var fakeWritePhysicalQueue     = A.Fake<IPhysicalQueue>();
 
-            A.CallTo(() => fakeReadPhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => fakeReadPhysicalQueue.IsSendEnabled).Returns(false);
             A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard0");
-            A.CallTo(() => fakeDisabled1PhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => fakeDisabled1PhysicalQueue.IsSendEnabled).Returns(false);
             A.CallTo(() => fakeDisabled1PhysicalQueue.Name).Returns("shard1");
-            A.CallTo(() => fakeDisabled2PhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => fakeDisabled2PhysicalQueue.IsSendEnabled).Returns(false);
             A.CallTo(() => fakeDisabled2PhysicalQueue.Name).Returns("shard2");
-            A.CallTo(() => fakeDisabled3PhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => fakeDisabled3PhysicalQueue.IsSendEnabled).Returns(false);
             A.CallTo(() => fakeDisabled3PhysicalQueue.Name).Returns("shard3");
-            A.CallTo(() => fakeWritePhysicalQueue.Writable).Returns(true);
+            A.CallTo(() => fakeWritePhysicalQueue.IsSendEnabled).Returns(true);
             A.CallTo(() => fakeWritePhysicalQueue.Name).Returns("shard4");
 
             var physicalQueues = new List<IPhysicalQueue> {
@@ -193,7 +193,7 @@
             // Assert
             Assert.Equal(
                 fakeWritePhysicalQueue.Name,
-                this.monitor.WriteShard.PhysicalQueue.Name
+                this.monitor.SendShard.PhysicalQueue.Name
             );
         }
 
@@ -217,11 +217,11 @@
             var fakeOldWritePhysicalQueue = A.Fake<IPhysicalQueue>();
             var fakeNewWritePhysicalQueue = A.Fake<IPhysicalQueue>();
 
-            A.CallTo(() => fakeReadPhysicalQueue.Writable).Returns(false);
+            A.CallTo(() => fakeReadPhysicalQueue.IsSendEnabled).Returns(false);
             A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard0");
-            A.CallTo(() => fakeOldWritePhysicalQueue.Writable).Returns(true);
+            A.CallTo(() => fakeOldWritePhysicalQueue.IsSendEnabled).Returns(true);
             A.CallTo(() => fakeOldWritePhysicalQueue.Name).Returns("shard1");
-            A.CallTo(() => fakeNewWritePhysicalQueue.Writable).Returns(true);
+            A.CallTo(() => fakeNewWritePhysicalQueue.IsSendEnabled).Returns(true);
             A.CallTo(() => fakeNewWritePhysicalQueue.Name).Returns("shard2");
 
             var physicalQueues = new List<IPhysicalQueue> {
@@ -240,7 +240,7 @@
             // Assert
             Assert.Equal(
                 fakeNewWritePhysicalQueue.Name,
-                this.monitor.WriteShard.PhysicalQueue.Name
+                this.monitor.SendShard.PhysicalQueue.Name
             );
         }
     }

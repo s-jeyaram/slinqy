@@ -55,7 +55,7 @@
         SendBatch(
             IEnumerable<object> batch)
         {
-            return this.queueShardMonitor.WriteShard.SendBatch(batch);
+            return this.queueShardMonitor.SendShard.SendBatch(batch);
         }
     }
 }
