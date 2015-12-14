@@ -122,27 +122,30 @@
             var queues = this.queueShardMonitor.Shards.ToArray();
 
             // Determine what the readable and writable shards should be.
-            var lastWritableShard  = queues.Last().PhysicalQueue;
-            var firstReadableShard = queues.FirstOrDefault(q => q.PhysicalQueue.CurrentSizeBytes > 0).PhysicalQueue ?? lastWritableShard;
+            var lastWritableShard  = queues.Last();
+            var firstReadableShard = queues.FirstOrDefault(q => q.PhysicalQueue.CurrentSizeBytes > 0) ?? lastWritableShard;
+
+            var lastWritableQueue  = lastWritableShard.PhysicalQueue;
+            var firstReadableQueue = firstReadableShard.PhysicalQueue;
 
             // If the first and last queue are the same, make sure it's fully enabled.
-            if (firstReadableShard == lastWritableShard && !firstReadableShard.ReadWritable)
+            if (firstReadableQueue == lastWritableQueue && !firstReadableQueue.ReadWritable)
             {
                 // Set the shard to its proper state.
-                await this.queueService.SetQueueEnabled(firstReadableShard.Name);
+                await this.queueService.SetQueueEnabled(firstReadableQueue.Name);
 
                 // Return now since there's only one shard and it's been set.
                 return;
             }
 
             // If the first read queue is not the same as the last, then make sure sending to it is disabled.
-            if (firstReadableShard != lastWritableShard && firstReadableShard.Writable)
-                await this.queueService.SetQueueReceiveOnly(firstReadableShard.Name);
+            if (firstReadableQueue != lastWritableQueue && firstReadableQueue.Writable)
+                await this.queueService.SetQueueReceiveOnly(firstReadableQueue.Name);
 
             // Make sure all shards in between are disabled.
             var inBetweenShards = queues.Where(s =>
-                s.PhysicalQueue != firstReadableShard ||
-                s.PhysicalQueue != lastWritableShard
+                s.PhysicalQueue != firstReadableQueue ||
+                s.PhysicalQueue != lastWritableQueue
             );
 
             foreach (var shard in inBetweenShards)
