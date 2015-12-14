@@ -39,12 +39,6 @@
         private const double ValidStorageCapacityScaleOutThreshold = 0.80;
 
         /// <summary>
-        /// Represents a valid value where one is needed for a physical queue name parameters.
-        /// Should not be a special value other than it is guaranteed to be valid.
-        /// </summary>
-        private static readonly string ValidShardPhysicalQueueName = string.Format(CultureInfo.InvariantCulture, "{0}{1}", ValidSlinqyQueueName, ValidShardIndex);
-
-        /// <summary>
         /// A fake queue service to be used for test purposes.
         /// </summary>
         private readonly IPhysicalQueueService fakeQueueService = A.Fake<IPhysicalQueueService>();
@@ -67,7 +61,12 @@
         /// <summary>
         /// The list of fake shards that the fakeQueueShardMonitor works from.
         /// </summary>
-        private List<SlinqyQueueShard> fakeShards;
+        private readonly List<SlinqyQueueShard> fakeShards;
+
+        /// <summary>
+        /// Maintains a count of the number of shards that have been created to simplify generating of shard indexes and names.
+        /// </summary>
+        private int shardIndexCounter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyAgentTests"/> class with default/common behaviors and values.
@@ -75,13 +74,8 @@
         public
         SlinqyAgentTests()
         {
-            // Configures one writable shard since that's the minimum valid state.
-            this.fakeWritableShard = A.Fake<SlinqyQueueShard>();
-
-            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.Writable).Returns(true);
-            A.CallTo(() => this.fakeWritableShard.ShardIndex).Returns(ValidShardIndex);
-            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.Name).Returns(ValidShardPhysicalQueueName);
-            A.CallTo(() => this.fakeWritableShard.PhysicalQueue.MaxSizeMegabytes).Returns(ValidMaxSizeMegabytes);
+            // Configures one read/writable shard since that's the minimum valid state.
+            this.fakeWritableShard = this.CreateFakeSendReceiveQueue();
 
             // Configures the fake shard monitor to use the fake shards.
             this.fakeQueueShardMonitor = A.Fake<SlinqyQueueShardMonitor>();
@@ -185,11 +179,15 @@
             var scaleOutSizeMegabytes = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
             var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
 
+            // Configure the write shards size to trigger scaling.
             A.CallTo(() => this.fakeWritableShard.PhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
 
+            // Configure the new shard that will be added as a result of the scaling.
+            var fakeAdditionalShard = this.CreateFakeSendOnlyQueue();
+
             A.CallTo(() => this.fakeQueueService.CreateSendOnlyQueue(A<string>.Ignored))
-                .Invokes(this.AddFakeSendOnlyQueue)
-                .Returns(this.fakeShards.Last().PhysicalQueue);
+                .Invokes(() => this.fakeShards.Add(fakeAdditionalShard))
+                .Returns(fakeAdditionalShard.PhysicalQueue);
 
             // Act
             await this.slinqyAgent.Start();
@@ -254,24 +252,66 @@
         }
 
         /// <summary>
-        /// Adds a new send-only fake queue to the monitors list of shards.
+        /// Creates a new instance of SlinqyQueueShard as a fake that is configured to simulate a send/receive queue.
         /// </summary>
-        /// <param name="fakeObjectCall">
-        /// Specifies parameters of the call to create the queue.
-        /// </param>
+        /// <returns>Returns a fake that simulates a send/receive queue.</returns>
         private
-        void
-        AddFakeSendOnlyQueue(
-            IFakeObjectCall fakeObjectCall)
+        SlinqyQueueShard
+        CreateFakeSendReceiveQueue()
         {
-            var fakeSendOnlyQueue = A.Fake<SlinqyQueueShard>();
+            return this.CreateFakeShard(sendable: true, sendReceiveable: true);
+        }
 
-            A.CallTo(() => fakeSendOnlyQueue.PhysicalQueue.Name).Returns(fakeObjectCall.GetArgument<string>(argumentName: "name"));
-            A.CallTo(() => fakeSendOnlyQueue.PhysicalQueue.Writable).Returns(true);
-            A.CallTo(() => fakeSendOnlyQueue.PhysicalQueue.ReadWritable).Returns(false);
-            A.CallTo(() => fakeSendOnlyQueue.PhysicalQueue.MaxSizeMegabytes).Returns(ValidMaxSizeMegabytes);
+        /// <summary>
+        /// Creates a new instance of SlinqyQueueShard as a fake that is configured to simulate a send-only queue.
+        /// </summary>
+        /// <returns>
+        /// Returns a fake that simulates a new queue shard.
+        /// </returns>
+        private
+        SlinqyQueueShard
+        CreateFakeSendOnlyQueue()
+        {
+            return this.CreateFakeShard(sendable: true, sendReceiveable: false);
+        }
 
-            this.fakeShards.Add(fakeSendOnlyQueue);
+        /// <summary>
+        /// Creates a new instance of SlinqyQueueShard as a fake that is configured to simulate a send-only queue.
+        /// </summary>
+        /// <returns>
+        /// Returns a fake that simulates a new queue shard.
+        /// </returns>
+        private
+        SlinqyQueueShard
+        CreateFakeReceiveOnlyQueue()
+        {
+            return this.CreateFakeShard(sendable: false, sendReceiveable: false);
+        }
+
+        /// <summary>
+        /// Creates a new fake SlinqyQueueShard.
+        /// </summary>
+        /// <param name="sendable">Specifies if the fake shard can be sent to.</param>
+        /// <param name="sendReceiveable">Specifies if the fake shard can be received from.</param>
+        /// <param name="maxSizeMegabytes">Specifies the max size of the fake shard.</param>
+        /// <returns>Returns the fake shard.</returns>
+        private
+        SlinqyQueueShard
+        CreateFakeShard(
+            bool sendable           = true,
+            bool sendReceiveable    = true,
+            long maxSizeMegabytes   = ValidMaxSizeMegabytes)
+        {
+            var fakeShard           = A.Fake<SlinqyQueueShard>();
+            var fakePhysicalQueue   = fakeShard.PhysicalQueue;
+
+            A.CallTo(() => fakeShard.ShardIndex                 ).Returns(this.shardIndexCounter++);
+            A.CallTo(() => fakePhysicalQueue.Name               ).Returns(ValidSlinqyQueueName + fakeShard.ShardIndex);
+            A.CallTo(() => fakePhysicalQueue.Writable           ).Returns(sendable);
+            A.CallTo(() => fakePhysicalQueue.ReadWritable       ).Returns(sendReceiveable);
+            A.CallTo(() => fakePhysicalQueue.MaxSizeMegabytes   ).Returns(maxSizeMegabytes);
+
+            return fakeShard;
         }
     }
 }
