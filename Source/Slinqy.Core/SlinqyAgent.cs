@@ -1,6 +1,7 @@
 ﻿namespace Slinqy.Core
 {
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -77,9 +78,12 @@
             // Get the write queue shard.
             var writeShard = this.queueShardMonitor.WriteShard;
 
-            // Scale up if needed
+            // Scale if needed.
             if (writeShard.StorageUtilization > this.storageCapacityScaleOutThreshold)
                 await this.ScaleOut(writeShard).ConfigureAwait(false);
+
+            // Make sure shard states are set properly.
+            await this.SetShardStates();
         }
 
         /// <summary>
@@ -97,14 +101,13 @@
         {
             // Add next shard!
             var nextShardIndex = currentWriteShard.ShardIndex + 1;
-            var nextShardName = this.queueShardMonitor.QueueName + nextShardIndex;
+            var nextShardName  = this.queueShardMonitor.QueueName + nextShardIndex;
 
             await this.queueService.CreateSendOnlyQueue(nextShardName)
                 .ConfigureAwait(false);
 
-            // Set the previous write shards new state.
-            await this.queueService.SetQueueReceiveOnly(currentWriteShard.PhysicalQueue.Name);
-            await this.SetShardStates().ConfigureAwait(false);
+            // Proactively tell the monitor to refresh so it sees the new shard immediately.
+            await this.queueShardMonitor.Refresh();
         }
 
         /// <summary>
@@ -112,11 +115,45 @@
         /// </summary>
         /// <returns>Returns the async Task for the work.</returns>
         private
-        Task
+        async Task
         SetShardStates()
         {
-            this.ToString();
-            return Task.Run(() => { });
+            // Get latest info
+            var queues = this.queueShardMonitor.Shards.ToArray();
+
+            // Determine what the readable and writable shards should be.
+            var lastWritableShard  = queues.Last().PhysicalQueue;
+            var firstReadableShard = queues.FirstOrDefault(q => q.PhysicalQueue.CurrentSizeBytes > 0).PhysicalQueue ?? lastWritableShard;
+
+            // If the first and last queue are the same, make sure it's fully enabled.
+            if (firstReadableShard == lastWritableShard && !firstReadableShard.ReadWritable)
+            {
+                // Set the shard to its proper state.
+                await this.queueService.SetQueueEnabled(firstReadableShard.Name);
+
+                // Return now since there's only one shard and it's been set.
+                return;
+            }
+
+            // If the first read queue is not the same as the last, then make sure sending to it is disabled.
+            if (firstReadableShard != lastWritableShard && firstReadableShard.Writable)
+                await this.queueService.SetQueueReceiveOnly(firstReadableShard.Name);
+
+            // Make sure all shards in between are disabled.
+            var inBetweenShards = queues.Where(s =>
+                s.PhysicalQueue != firstReadableShard ||
+                s.PhysicalQueue != lastWritableShard
+            );
+
+            foreach (var shard in inBetweenShards)
+            {
+                // Ignore shards that are already disabled.
+                if (shard.PhysicalQueue.Disabled)
+                    continue;
+
+                // Disable it!
+                await this.queueService.SetQueueDisabled(shard.PhysicalQueue.Name);
+            }
         }
 
         /// <summary>

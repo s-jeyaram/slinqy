@@ -105,6 +105,40 @@
         }
 
         /// <summary>
+        /// Sets the specified Service Bus queue in to a Disabled mode.
+        /// </summary>
+        /// <param name="name">Specifies the queue path.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public
+        async Task
+        SetQueueDisabled(
+            string name)
+        {
+            var queue = await this.serviceBusNamespaceManager.GetQueueAsync(name);
+
+            queue.Status = EntityStatus.Disabled;
+
+            await this.serviceBusNamespaceManager.UpdateQueueAsync(queue);
+        }
+
+        /// <summary>
+        /// Sets the specified Service Bus queue in to a Enabled mode for both reading and writing.
+        /// </summary>
+        /// <param name="name">Specifies the queue path.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public
+        async Task
+        SetQueueEnabled(
+            string name)
+        {
+            var queue = await this.serviceBusNamespaceManager.GetQueueAsync(name);
+
+            queue.Status = EntityStatus.Active;
+
+            await this.serviceBusNamespaceManager.UpdateQueueAsync(queue);
+        }
+
+        /// <summary>
         /// Creates the specified physical Service Bus queue using the specified description.
         /// </summary>
         /// <param name="queueDescription">Specifies the details of the queue to create.</param>

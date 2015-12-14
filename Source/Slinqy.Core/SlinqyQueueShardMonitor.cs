@@ -59,7 +59,7 @@
         Start()
         {
             // Perform a manual poll now to validate that it works before returning.
-            await this.UpdateShards().ConfigureAwait(false);
+            await this.Refresh().ConfigureAwait(false);
 
             // Start polling
             this.pollQueuesTask = this.PollQueues();
@@ -70,9 +70,9 @@
         /// Updates the instances Shards collection based on the latest data from the physical queue service.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        private
+        public
         async Task
-        UpdateShards()
+        Refresh()
         {
             var physicalShards = await this.queueService.ListQueues(this.QueueName)
                 .ConfigureAwait(false);
@@ -90,7 +90,7 @@
         {
             while (true)
             {
-                await this.UpdateShards().ConfigureAwait(false);
+                await this.Refresh().ConfigureAwait(false);
                 await Task.Delay(1000).ConfigureAwait(false);
             }
         }

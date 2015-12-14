@@ -47,5 +47,19 @@
         /// <param name="name">Specifies the name of the queue to update.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         Task SetQueueReceiveOnly(string name);
+
+        /// <summary>
+        /// Modifies the status of the specified queue to where clients cannot send or receive from the queue.
+        /// </summary>
+        /// <param name="name">Specifies the name of the queue to update.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        Task SetQueueDisabled(string name);
+
+        /// <summary>
+        /// Modifies the status of the specified queue to where clients can both send or receive from the queue.
+        /// </summary>
+        /// <param name="name">Specifies the name of the queue to update.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        Task SetQueueEnabled(string name);
     }
 }
