@@ -60,6 +60,11 @@
         public double StorageUtilization => (((double)this.PhysicalQueue.CurrentSizeBytes / 1024) / 1024) / this.PhysicalQueue.MaxSizeMegabytes;
 
         /// <summary>
+        /// Gets a value indicating whether both sending and receiving are disabled on this queue.
+        /// </summary>
+        public virtual bool IsDisabled => !this.PhysicalQueue.IsReceiveEnabled && !this.PhysicalQueue.IsSendEnabled;
+
+        /// <summary>
         /// Sends the batch of messages to the physical queue shard.
         /// </summary>
         /// <param name="batch">

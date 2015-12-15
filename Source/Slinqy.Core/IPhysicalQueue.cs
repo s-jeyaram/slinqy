@@ -28,9 +28,14 @@
         long CurrentSizeBytes { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the queue is writable (true) or not (false).
+        /// Gets a value indicating whether sending (enqueuing) new messages to the queue is currently enabled (true), or not (false).
         /// </summary>
-        bool Writable { get; }
+        bool IsSendEnabled { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether receiving (dequeuing) messages from the queue is currently enabled (true), or not (false).
+        /// </summary>
+        bool IsReceiveEnabled { get; }
 
         /// <summary>
         /// Sends a batch of messages to the queue.

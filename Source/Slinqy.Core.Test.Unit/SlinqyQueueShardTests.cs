@@ -15,7 +15,7 @@
         /// Represents a valid value where one is needed for a Slinqy shard name parameters.
         /// Should not be a special value other than it is guaranteed to be valid.
         /// </summary>
-        private const string ValidSlinqyShardName = "queue-name-0";
+        private const string ValidSlinqyShardName = "queue-name0";
 
         /// <summary>
         /// The fake that simulates a physical queue.
@@ -82,7 +82,7 @@
             // Arrange
             A.CallTo(() =>
                 this.fakePhysicalQueue.Name
-            ).Returns("queue-100");
+            ).Returns("queue100");
 
             // Act
             var actualShardIndex = this.slinqyQueueShard.ShardIndex;
@@ -109,6 +109,26 @@
 
             // Assert
             Assert.Equal(0.5, actualPercentage);
+        }
+
+        /// <summary>
+        /// Verifies that the IsDisabled property returns true when both sending
+        /// and receiving is disabled on the underlying physical queue.
+        /// </summary>
+        [Fact]
+        public
+        void
+        IsDisabled_SendDisabledReceiveDisabled_ReturnsTrue()
+        {
+            // Arrange
+            A.CallTo(() => this.fakePhysicalQueue.IsSendEnabled).Returns(false);
+            A.CallTo(() => this.fakePhysicalQueue.IsReceiveEnabled).Returns(false);
+
+            // Act
+            var actualValue = this.slinqyQueueShard.IsDisabled;
+
+            // Assert
+            Assert.True(actualValue);
         }
     }
 }

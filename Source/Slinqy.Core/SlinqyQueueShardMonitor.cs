@@ -38,7 +38,7 @@
         /// <summary>
         /// Gets the name of the Slinqy Queue being monitored.
         /// </summary>
-        public string QueueName { get; }
+        public virtual string QueueName { get; }
 
         /// <summary>
         /// Gets a list of SlinqyQueueShards for each physical queue found.  This list refreshes periodically.
@@ -46,9 +46,9 @@
         public virtual IEnumerable<SlinqyQueueShard> Shards { get; private set; }
 
         /// <summary>
-        /// Gets the current write shard.
+        /// Gets the current shard for sending new queue messages.
         /// </summary>
-        public SlinqyQueueShard WriteShard => this.Shards.Last(s => s.PhysicalQueue.Writable);
+        public SlinqyQueueShard SendShard => this.Shards.Last(s => s.PhysicalQueue.IsSendEnabled);
 
         /// <summary>
         /// Starts polling the physical resources to update the Shards property values.
@@ -59,7 +59,7 @@
         Start()
         {
             // Perform a manual poll now to validate that it works before returning.
-            await this.UpdateShards().ConfigureAwait(false);
+            await this.Refresh().ConfigureAwait(false);
 
             // Start polling
             this.pollQueuesTask = this.PollQueues();
@@ -72,7 +72,7 @@
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         private
         async Task
-        UpdateShards()
+        Refresh()
         {
             var physicalShards = await this.queueService.ListQueues(this.QueueName)
                 .ConfigureAwait(false);
@@ -90,7 +90,7 @@
         {
             while (true)
             {
-                await this.UpdateShards().ConfigureAwait(false);
+                await this.Refresh().ConfigureAwait(false);
                 await Task.Delay(1000).ConfigureAwait(false);
             }
         }
