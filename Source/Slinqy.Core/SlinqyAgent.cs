@@ -105,9 +105,6 @@
 
             await this.queueService.CreateSendOnlyQueue(nextShardName)
                 .ConfigureAwait(false);
-
-            // Proactively tell the monitor to refresh so it sees the new shard immediately.
-            await this.queueShardMonitor.Refresh();
         }
 
         /// <summary>
@@ -144,7 +141,7 @@
 
             // Make sure all shards in between are disabled.
             var inBetweenShards = queues.Where(s =>
-                s.PhysicalQueue != receivableQueue ||
+                s.PhysicalQueue != receivableQueue &&
                 s.PhysicalQueue != sendableQueue
             );
 

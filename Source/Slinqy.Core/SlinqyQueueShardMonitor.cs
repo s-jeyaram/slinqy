@@ -70,7 +70,7 @@
         /// Updates the instances Shards collection based on the latest data from the physical queue service.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public
+        private
         async Task
         Refresh()
         {
