@@ -110,5 +110,25 @@
             // Assert
             Assert.Equal(0.5, actualPercentage);
         }
+
+        /// <summary>
+        /// Verifies that the IsDisabled property returns true when both sending
+        /// and receiving is disabled on the underlying physical queue.
+        /// </summary>
+        [Fact]
+        public
+        void
+        IsDisabled_SendDisabledReceiveDisabled_ReturnsTrue()
+        {
+            // Arrange
+            A.CallTo(() => this.fakePhysicalQueue.IsSendEnabled).Returns(false);
+            A.CallTo(() => this.fakePhysicalQueue.IsReceiveEnabled).Returns(false);
+
+            // Act
+            var actualValue = this.slinqyQueueShard.IsDisabled;
+
+            // Assert
+            Assert.True(actualValue);
+        }
     }
 }

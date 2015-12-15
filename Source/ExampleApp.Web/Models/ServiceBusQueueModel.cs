@@ -42,8 +42,10 @@
                                         EntityStatus.Active,
                                         EntityStatus.ReceiveDisabled
                                     }.Any(s => s == queueDescription.Status);
-            this.IsReceiveEnabled   = queueDescription.Status == EntityStatus.Active;
-            this.Disabled           = queueDescription.Status == EntityStatus.Disabled;
+            this.IsReceiveEnabled   = new[] {
+                                        EntityStatus.Active,
+                                        EntityStatus.SendDisabled
+                                    }.Any(s => s == queueDescription.Status);
         }
 
         /// <summary>
@@ -70,11 +72,6 @@
         /// Gets a value indicating whether the queue supports both reading and writing (true) or not (false).
         /// </summary>
         public bool IsReceiveEnabled { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the queue is disabled for both reading and writing (true), or not (false).
-        /// </summary>
-        public bool Disabled { get; }
 
         /// <summary>
         /// Sends a batch of messages to the queue in a single transaction.

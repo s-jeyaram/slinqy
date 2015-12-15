@@ -227,6 +227,36 @@
         }
 
         /// <summary>
+        /// Verifies that once a shard has been disabled the agent doesn't continually try to disable it.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [Fact]
+        public
+        async Task
+        SlinqyAgent_ShardsAlreadyDisabled_DoesNotDisableAgain()
+        {
+            // Arrange
+            // Configure the initial default shard to be receive-only.
+            A.CallTo(() => this.fakeShard.PhysicalQueue.CurrentSizeBytes).Returns(1);
+            A.CallTo(() => this.fakeShard.PhysicalQueue.IsSendEnabled).Returns(false);
+            A.CallTo(() => this.fakeShard.PhysicalQueue.IsReceiveEnabled).Returns(true);
+
+            var fakeDisabledMiddleShard = this.CreateFakeDisabledQueue();
+            var fakeSendOnlyShard       = this.CreateFakeSendOnlyQueue();
+
+            this.fakeShards.Add(fakeDisabledMiddleShard);
+            this.fakeShards.Add(fakeSendOnlyShard);
+
+            // Act
+            await this.slinqyAgent.Start();
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeQueueService.SetQueueDisabled(A<string>.Ignored)
+            ).MustNotHaveHappened();
+        }
+
+        /// <summary>
         /// Creates a new instance of SlinqyQueueShard as a fake that is configured to simulate a send/receive queue.
         /// </summary>
         /// <returns>Returns a fake that simulates a send/receive queue.</returns>
@@ -257,14 +287,14 @@
         }
 
         /// <summary>
-        /// Creates a new instance of SlinqyQueueShard as a fake that is configured to simulate a send-only queue.
+        /// Creates a new instance of SlinqyQueueShard as a fake that is configured to simulate a disabled queue.
         /// </summary>
         /// <returns>
         /// Returns a fake that simulates a new queue shard.
         /// </returns>
         private
         SlinqyQueueShard
-        CreateFakeReceiveOnlyQueue()
+        CreateFakeDisabledQueue()
         {
             return this.CreateFakeShard(sendable: false, receivable: false);
         }
@@ -289,6 +319,7 @@
             var fakePhysicalQueue   = fakeShard.PhysicalQueue;
 
             A.CallTo(() => fakeShard.ShardIndex                 ).Returns(this.shardIndexCounter++);
+            A.CallTo(() => fakeShard.IsDisabled                 ).Returns(!sendable && !receivable);
             A.CallTo(() => fakePhysicalQueue.Name               ).Returns(ValidSlinqyQueueName + fakeShard.ShardIndex);
             A.CallTo(() => fakePhysicalQueue.IsSendEnabled      ).Returns(sendable);
             A.CallTo(() => fakePhysicalQueue.IsReceiveEnabled   ).Returns(receivable);

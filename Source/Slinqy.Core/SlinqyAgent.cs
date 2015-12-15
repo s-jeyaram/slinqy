@@ -119,36 +119,26 @@
             var queues = this.queueShardMonitor.Shards.ToArray();
 
             // Determine what the receivable and sendable shards *should* be.
-            var sendableShard   = queues.Last();
-            var receivableShard = queues.FirstOrDefault(q => q.PhysicalQueue.CurrentSizeBytes > 0) ?? sendableShard;
+            var sendShard    = queues.Last();
+            var receiveShard = queues.FirstOrDefault(q => q.PhysicalQueue.CurrentSizeBytes > 0) ?? sendShard;
 
-            var sendableQueue   = sendableShard.PhysicalQueue;
-            var receivableQueue = receivableShard.PhysicalQueue;
-
-            // If the send and receive queue are the same, make sure it's fully enabled if not already.
-            if (receivableQueue == sendableQueue && !receivableQueue.IsReceiveEnabled)
-            {
-                // Set the shard to its proper state.
-                await this.queueService.SetQueueEnabled(receivableQueue.Name);
-
-                // Return now since there's only one shard and it's been set.
-                return;
-            }
+            var sendQueue    = sendShard.PhysicalQueue;
+            var receiveQueue = receiveShard.PhysicalQueue;
 
             // If the send and receive queues are not the same, then make sure sending to it is disabled.
-            if (receivableQueue != sendableQueue && receivableQueue.IsSendEnabled)
-                await this.queueService.SetQueueReceiveOnly(receivableQueue.Name);
+            if (receiveQueue != sendQueue && receiveQueue.IsSendEnabled)
+                await this.queueService.SetQueueReceiveOnly(receiveQueue.Name);
 
             // Make sure all shards in between are disabled.
             var inBetweenShards = queues.Where(s =>
-                s.PhysicalQueue != receivableQueue &&
-                s.PhysicalQueue != sendableQueue
+                s.PhysicalQueue != receiveQueue &&
+                s.PhysicalQueue != sendQueue
             );
 
             foreach (var shard in inBetweenShards)
             {
                 // Ignore shards that are already disabled.
-                if (shard.PhysicalQueue.Disabled)
+                if (shard.IsDisabled)
                     continue;
 
                 // Disable it!

@@ -38,11 +38,6 @@
         bool IsReceiveEnabled { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the queue is disabled for both reading and writing (true), or not (false).
-        /// </summary>
-        bool Disabled { get; }
-
-        /// <summary>
         /// Sends a batch of messages to the queue.
         /// </summary>
         /// <param name="batch">Specifies the batch to send.</param>
