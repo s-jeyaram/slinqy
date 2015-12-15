@@ -28,14 +28,14 @@
         long CurrentSizeBytes { get; }
 
         /// <summary>
-        /// Gets a value indicating whether sending new messages to the queue is enabled (true), or not (false).
+        /// Gets a value indicating whether sending (enqueuing) new messages to the queue is currently enabled (true), or not (false).
         /// </summary>
         bool IsSendEnabled { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the queue supports both reading and writing (true), or not (false).
+        /// Gets a value indicating whether receiving (dequeuing) messages from the queue is currently enabled (true), or not (false).
         /// </summary>
-        bool ReadWritable { get; } // TODO: Consider repurposing to Receivable
+        bool IsReceiveEnabled { get; }
 
         /// <summary>
         /// Gets a value indicating whether the queue is disabled for both reading and writing (true), or not (false).

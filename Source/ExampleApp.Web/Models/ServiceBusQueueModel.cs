@@ -42,7 +42,7 @@
                                         EntityStatus.Active,
                                         EntityStatus.ReceiveDisabled
                                     }.Any(s => s == queueDescription.Status);
-            this.ReadWritable       = queueDescription.Status == EntityStatus.Active;
+            this.IsReceiveEnabled   = queueDescription.Status == EntityStatus.Active;
             this.Disabled           = queueDescription.Status == EntityStatus.Disabled;
         }
 
@@ -69,7 +69,7 @@
         /// <summary>
         /// Gets a value indicating whether the queue supports both reading and writing (true) or not (false).
         /// </summary>
-        public bool ReadWritable { get; }
+        public bool IsReceiveEnabled { get; }
 
         /// <summary>
         /// Gets a value indicating whether the queue is disabled for both reading and writing (true), or not (false).

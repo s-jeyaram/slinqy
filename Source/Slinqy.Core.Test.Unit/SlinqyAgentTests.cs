@@ -259,7 +259,7 @@
         SlinqyQueueShard
         CreateFakeSendReceiveQueue()
         {
-            return this.CreateFakeShard(sendable: true, sendReceiveable: true);
+            return this.CreateFakeShard(sendable: true, receivable: true);
         }
 
         /// <summary>
@@ -272,7 +272,7 @@
         SlinqyQueueShard
         CreateFakeSendOnlyQueue()
         {
-            return this.CreateFakeShard(sendable: true, sendReceiveable: false);
+            return this.CreateFakeShard(sendable: true, receivable: false);
         }
 
         /// <summary>
@@ -285,21 +285,21 @@
         SlinqyQueueShard
         CreateFakeReceiveOnlyQueue()
         {
-            return this.CreateFakeShard(sendable: false, sendReceiveable: false);
+            return this.CreateFakeShard(sendable: false, receivable: false);
         }
 
         /// <summary>
         /// Creates a new fake SlinqyQueueShard.
         /// </summary>
         /// <param name="sendable">Specifies if the fake shard can be sent to.</param>
-        /// <param name="sendReceiveable">Specifies if the fake shard can be received from.</param>
+        /// <param name="receivable">Specifies if the fake shard can be received from.</param>
         /// <param name="maxSizeMegabytes">Specifies the max size of the fake shard.</param>
         /// <returns>Returns the fake shard.</returns>
         private
         SlinqyQueueShard
         CreateFakeShard(
             bool sendable           = true,
-            bool sendReceiveable    = true,
+            bool receivable         = true,
             long maxSizeMegabytes   = ValidMaxSizeMegabytes)
         {
             var fakeShard           = A.Fake<SlinqyQueueShard>();
@@ -308,7 +308,7 @@
             A.CallTo(() => fakeShard.ShardIndex                 ).Returns(this.shardIndexCounter++);
             A.CallTo(() => fakePhysicalQueue.Name               ).Returns(ValidSlinqyQueueName + fakeShard.ShardIndex);
             A.CallTo(() => fakePhysicalQueue.IsSendEnabled      ).Returns(sendable);
-            A.CallTo(() => fakePhysicalQueue.ReadWritable       ).Returns(sendReceiveable);
+            A.CallTo(() => fakePhysicalQueue.IsReceiveEnabled   ).Returns(receivable);
             A.CallTo(() => fakePhysicalQueue.MaxSizeMegabytes   ).Returns(maxSizeMegabytes);
 
             return fakeShard;
