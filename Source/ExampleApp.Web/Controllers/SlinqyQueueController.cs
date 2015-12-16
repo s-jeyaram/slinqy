@@ -2,6 +2,7 @@
 {
     using System;
     using System.Configuration;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
@@ -144,8 +145,18 @@
                     return randomData;
                 });
 
-                // Send the batch of random data.
-                await queue.SendBatch(batch).ConfigureAwait(false);
+                try
+                {
+                    // Send the batch of random data.
+                    await queue.SendBatch(batch)
+                        .ConfigureAwait(false);
+                }
+                catch (Exception exception)
+                {
+                    Trace.TraceWarning(
+                        "Exception while sending batch (will retry):\r\n" + exception
+                    );
+                }
             }
         }
     }
