@@ -1,5 +1,6 @@
 ﻿namespace Slinqy.Core
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
@@ -60,11 +61,8 @@
             // Start the monitor.
             await this.queueShardMonitor.Start().ConfigureAwait(false);
 
-            // Perform a manual first check before returning.
-            await this.EvaluateShards().ConfigureAwait(false);
-
             // Start checking the monitor periodically to respond if need be.
-            var task = this.PollShardState().ConfigureAwait(false);
+            var task = this.PollShardState();
         }
 
         /// <summary>
@@ -156,10 +154,16 @@
         {
             while (true)
             {
-                // TODO: Add try/catch block and log exceptions so that exceptions don't stop the agent from polling.
-
-                // Evaluate the current state.
-                await this.EvaluateShards().ConfigureAwait(false);
+                try
+                {
+                    // Evaluate the current state.
+                    await this.EvaluateShards().ConfigureAwait(false);
+                }
+                catch
+                {
+                    // Do nothing.
+                    // TODO: Log exception
+                }
 
                 // Wait before checking again.
                 // TODO: Make duration more configurable.

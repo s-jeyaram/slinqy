@@ -257,6 +257,32 @@
         }
 
         /// <summary>
+        /// Verifies that the agent will retry a scale out operation after encountering unhandled exceptions.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [Fact]
+        public
+        async Task
+        SlinqyAgent_ExceptionOccursDuringScaleOut_Retries()
+        {
+            // Arrange
+            var scaleOutSizeMegabytes = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
+            var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
+
+            // Configure the write shards size to trigger scaling.
+            A.CallTo(() => this.fakeShard.PhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
+            A.CallTo(() => this.fakeQueueService.CreateSendOnlyQueue(A<string>.Ignored)).Throws<Exception>().Once();
+
+            // Act
+            await this.slinqyAgent.Start();
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeQueueService.CreateSendOnlyQueue(A<string>.Ignored)
+            ).MustHaveHappened();
+        }
+
+        /// <summary>
         /// Creates a new instance of SlinqyQueueShard as a fake that is configured to simulate a send/receive queue.
         /// </summary>
         /// <returns>Returns a fake that simulates a send/receive queue.</returns>
