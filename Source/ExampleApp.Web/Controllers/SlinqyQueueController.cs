@@ -88,7 +88,7 @@
                 0.01
             );
 
-            await slinqyAgent.Start();
+            slinqyAgent.Start();
 
             return new QueueInformationViewModel(
                 queue.Name,

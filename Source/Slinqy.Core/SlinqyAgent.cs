@@ -53,16 +53,16 @@
         /// <summary>
         /// Starts the agent to begin monitoring the queue shards and taking action if needed.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public
-        async Task
+        void
         Start()
         {
             // Start the monitor.
-            await this.queueShardMonitor.Start().ConfigureAwait(false);
+            this.queueShardMonitor.Start();
 
             // Start checking the monitor periodically to respond if need be.
-            var task = this.PollShardState();
+            this.PollShardState()
+                .ConfigureAwait(false);
         }
 
         /// <summary>

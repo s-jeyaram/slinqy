@@ -53,17 +53,13 @@
         /// <summary>
         /// Starts polling the physical resources to update the Shards property values.
         /// </summary>
-        /// <returns>Returns the async Task for the work.</returns>
         public
-        async Task
+        void
         Start()
         {
-            // Perform a manual poll now to validate that it works before returning.
-            await this.Refresh().ConfigureAwait(false);
-
             // Start polling
             this.pollQueuesTask = this.PollQueues();
-            var awaitResult = this.pollQueuesTask.ConfigureAwait(false);
+            this.pollQueuesTask.ConfigureAwait(false);
         }
 
         /// <summary>
@@ -90,7 +86,16 @@
         {
             while (true)
             {
-                await this.Refresh().ConfigureAwait(false);
+                try
+                {
+                    await this.Refresh().ConfigureAwait(false);
+                }
+                catch
+                {
+                    // TODO: Log the exception as a warning.
+                }
+
+                // TODO: Make the delay more configurable.
                 await Task.Delay(1000).ConfigureAwait(false);
             }
         }
