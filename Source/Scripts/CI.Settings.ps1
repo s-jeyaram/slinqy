@@ -15,20 +15,18 @@ function Get-EnvironmentSettings {
 		Write-Host "Loading settings from $settingsFilePath..." -NoNewline
 
 		# Load the specified settings
-		$SettingsFileContent = Get-Content `
+		$params = Get-Content `
 			-Path $settingsFilePath `
 			-Raw | 
 				ConvertFrom-Json
-
-		$params = $SettingsFileContent.parameters
 	} else {
 		Write-Host "Loading settings from environment variables..." -NoNewline
 		$params = New-Object PSCustomObject
 	}
 
 	# Build the hash values from a combination of sources.
-	$hash.EnvironmentName     = if ($params.environmentName)     { $params.environmentName.value }     else { Get-Setting "EnvironmentName" }
-	$hash.EnvironmentLocation = if ($params.environmentLocation) { $params.environmentLocation.value } else { Get-Setting "EnvironmentLocation" }
+	$hash.EnvironmentName     = if ($params.EnvironmentName)     { $params.EnvironmentName     } else { Get-Setting "EnvironmentName" }
+	$hash.EnvironmentLocation = if ($params.EnvironmentLocation) { $params.EnvironmentLocation } else { Get-Setting "EnvironmentLocation" }
 
 	# Autogenerate some setting values.
 	$hash.ResourceGroupName	  = $hash.EnvironmentName + '-' + $ProductName
