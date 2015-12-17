@@ -1,6 +1,5 @@
 ﻿namespace Slinqy.Core
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
@@ -26,6 +25,11 @@
         private readonly SlinqyQueueShardMonitor queueShardMonitor;
 
         /// <summary>
+        /// Gets a value indicating whether monitoring is active (true) or not (false).
+        /// </summary>
+        private bool monitoring;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyAgent"/> class.
         /// </summary>
         /// <param name="queueService">
@@ -45,6 +49,7 @@
             SlinqyQueueShardMonitor slinqyQueueShardMonitor,
             double                  storageCapacityScaleOutThreshold)
         {
+            this.monitoring                         = false;
             this.queueService                       = queueService;
             this.queueShardMonitor                  = slinqyQueueShardMonitor;
             this.storageCapacityScaleOutThreshold   = storageCapacityScaleOutThreshold;
@@ -59,10 +64,20 @@
         {
             // Start the monitor.
             this.queueShardMonitor.Start();
+            this.monitoring = true;
 
             // Start checking the monitor periodically to respond if need be.
-            this.PollShardState()
-                .ConfigureAwait(false);
+            this.PollShardState().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Stops the agent from monitoring or taking any actions.
+        /// </summary>
+        public
+        void
+        Stop()
+        {
+            this.monitoring = false;
         }
 
         /// <summary>
@@ -152,7 +167,7 @@
         async Task
         PollShardState()
         {
-            while (true)
+            while (this.monitoring)
             {
                 try
                 {

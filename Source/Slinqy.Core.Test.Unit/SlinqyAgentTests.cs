@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
+    using System.Threading;
     using FakeItEasy;
     using Xunit;
 
@@ -72,6 +72,7 @@
             this.fakeQueueShardMonitor = A.Fake<SlinqyQueueShardMonitor>();
             this.fakeShards = new List<SlinqyQueueShard> { this.fakeShard };
 
+            A.CallTo(() => this.fakeQueueShardMonitor.SendShard).Returns(this.fakeShard);
             A.CallTo(() => this.fakeQueueShardMonitor.QueueName).Returns(ValidSlinqyQueueName);
             A.CallTo(() => this.fakeQueueShardMonitor.Shards).Returns(this.fakeShards);
 
@@ -273,6 +274,27 @@
             A.CallTo(() =>
                 this.fakeQueueService.CreateSendOnlyQueue(A<string>.Ignored)
             ).MustHaveHappened();
+        }
+
+        /// <summary>
+        /// Verifies that the agent stops polling the SlinqyQueueMonitor after Stop is called.
+        /// </summary>
+        [Fact]
+        public
+        void
+        Stop_IsRunning_StopsPollingTheMonitor()
+        {
+            // Arrange
+            this.slinqyAgent.Start();
+
+            // Act
+            this.slinqyAgent.Stop();
+            Thread.Sleep(2000); // TODO: Reduce when monitor delay is configurable.
+
+            // Assert
+            A.CallTo(
+                () => this.fakeQueueShardMonitor.Shards
+            ).MustHaveHappened(Repeated.Exactly.Once);
         }
 
         /// <summary>

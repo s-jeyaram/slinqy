@@ -48,12 +48,13 @@
         /// <summary>
         /// Gets the current shard for sending new queue messages.
         /// </summary>
-        public SlinqyQueueShard SendShard => this.Shards.Last(s => s.PhysicalQueue.IsSendEnabled);
+        public virtual SlinqyQueueShard SendShard => this.Shards.Last(s => s.PhysicalQueue.IsSendEnabled);
 
         /// <summary>
         /// Starts polling the physical resources to update the Shards property values.
         /// </summary>
         public
+        virtual
         void
         Start()
         {
