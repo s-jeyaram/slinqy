@@ -139,20 +139,21 @@
             var queue = SlinqyQueueClient.Get(queueName);
 
             // Prepare to generate some random data.
-            var randomData       = new byte[1024];
-            var ranGen           = new Random(DateTime.UtcNow.Millisecond);
-            var sizeKilobytes    = sizeMegabytes * 1024;
-            var messagesPerBatch = 100;
-            var batches          = sizeKilobytes / messagesPerBatch;
+            var messagesPerBatch        = 250;
+            var randomMessagePayload    = new byte[1024 * 5];
+            var ranGen                  = new Random(DateTime.UtcNow.Millisecond);
+            var sizeKilobytes           = sizeMegabytes * 1024;
+            var kilobytesPerBatch       = messagesPerBatch * (randomMessagePayload.Length / 1024);
+            var batches                 = sizeKilobytes / kilobytesPerBatch;
 
             for (var i = 0; i < batches; i++)
             {
                 // Generate random data for each item in the batch.
                 var batch = Enumerable.Range(0, messagesPerBatch).Select(index => {
                     // Generate random data.
-                    ranGen.NextBytes(randomData);
+                    ranGen.NextBytes(randomMessagePayload);
 
-                    return randomData;
+                    return randomMessagePayload;
                 });
 
                 try
