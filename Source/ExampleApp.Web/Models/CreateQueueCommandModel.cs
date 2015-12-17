@@ -20,5 +20,13 @@
         [Required]
         [Display(Name = "Max Size (megabytes)")]
         public long MaxQueueSizeMegabytes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the percentage at which the agent will scale out the virtual SlinqyQueue.
+        /// </summary>
+        [Required]
+        [Range(1, 100)]
+        [Display(Name = "Storage Capacity ScaleOut Threshold")]
+        public int StorageCapacityScaleOutThresholdPercentage { get; set; }
     }
 }

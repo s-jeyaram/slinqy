@@ -76,7 +76,7 @@
             if (createQueueModel == null)
                 throw new ArgumentNullException(nameof(createQueueModel));
 
-            var queue = await SlinqyQueueClient.CreateAsync(createQueueModel.QueueName);
+            var queue = await SlinqyQueueClient.CreateQueueAsync(createQueueModel.QueueName);
 
             var monitor = new SlinqyQueueShardMonitor(
                 createQueueModel.QueueName,
@@ -86,7 +86,7 @@
             slinqyAgent = new SlinqyAgent(
                 PhysicalQueueService,
                 monitor,
-                0.01
+                createQueueModel.StorageCapacityScaleOutThresholdPercentage / 100D
             );
 
             slinqyAgent.Start();
@@ -101,16 +101,21 @@
         /// <summary>
         /// Handles the HTTP POST /api/slinqy-queue/{queueName}/ by submitting randomly generated messages.
         /// </summary>
-        /// <param name="queueName">Specifies the name of the Slinqy queue to fill.</param>
+        /// <param name="queueName">Specifies the name of the queue.</param>
+        /// <param name="fillQueueCommand">Specifies the amount of data, in megabytes, to submit to the queue.</param>
         [HttpPost]
         [Route("api/slinqy-queue/{queueName}/fill-request", Name = "FillQueue")]
         public
         void
         StartFillQueue(
-            string queueName)
+            string                queueName,
+            FillQueueCommandModel fillQueueCommand)
         {
+            if (fillQueueCommand == null)
+                throw new ArgumentNullException(nameof(fillQueueCommand));
+
             // Start the async task.
-            this.FillQueue(queueName)
+            this.FillQueue(queueName, fillQueueCommand.SizeMegabytes)
                 .ConfigureAwait(false);
 
             // Return while the task continues to run in the background.
@@ -122,23 +127,28 @@
         /// <param name="queueName">
         /// Specifies the name of the Slinqy queue to fill.
         /// </param>
+        /// <param name="sizeMegabytes">Specifies the amount of data, in megabytes, to submit to the queue.</param>
         /// <returns>Returns an async Task for the work.</returns>
         private
         async Task
         FillQueue(
-            string queueName)
+            string  queueName,
+            int     sizeMegabytes)
         {
             // Get the queue.
             var queue = SlinqyQueueClient.Get(queueName);
 
             // Prepare to generate some random data.
-            var randomData = new byte[1024];
-            var ranGen = new Random(DateTime.UtcNow.Millisecond);
+            var randomData       = new byte[1024];
+            var ranGen           = new Random(DateTime.UtcNow.Millisecond);
+            var sizeKilobytes    = sizeMegabytes * 1024;
+            var messagesPerBatch = 100;
+            var batches          = sizeKilobytes / messagesPerBatch;
 
-            while (true)
+            for (var i = 0; i < batches; i++)
             {
                 // Generate random data for each item in the batch.
-                var batch = Enumerable.Range(0, 100).Select(i => {
+                var batch = Enumerable.Range(0, messagesPerBatch).Select(index => {
                     // Generate random data.
                     ranGen.NextBytes(randomData);
 

@@ -57,7 +57,7 @@
         CreateAsync_QueueNameValid_CreateDelegateInvoked()
         {
             // Act
-            await this.client.CreateAsync(ValidSlinqyQueueName);
+            await this.client.CreateQueueAsync(ValidSlinqyQueueName);
 
             // Assert
             A.CallTo(() =>
@@ -78,7 +78,7 @@
             string queueName = null;
 
             // Act
-            Func<Task<SlinqyQueue>> action = async () => await this.client.CreateAsync(queueName);
+            Func<Task<SlinqyQueue>> action = async () => await this.client.CreateQueueAsync(queueName);
 
             // Assert
             await Assert.ThrowsAsync<ArgumentNullException>(action);

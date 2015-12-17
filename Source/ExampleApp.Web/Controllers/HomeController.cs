@@ -26,7 +26,8 @@
             this.ViewBag.ServiceBusNamespace    = serviceBusNamespaceManager.Address.ToString();
 
             var defaultValues = new CreateQueueCommandModel {
-                MaxQueueSizeMegabytes = 1024
+                MaxQueueSizeMegabytes                      = 1024,
+                StorageCapacityScaleOutThresholdPercentage = 1
             };
 
             return this.View(defaultValues);

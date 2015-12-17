@@ -53,7 +53,7 @@
         /// <returns>Returns the resulting SlinqyQueue that was created.</returns>
         public
         async Task<SlinqyQueue>
-        CreateAsync(
+        CreateQueueAsync(
             string queueName)
         {
             if (string.IsNullOrWhiteSpace(queueName))

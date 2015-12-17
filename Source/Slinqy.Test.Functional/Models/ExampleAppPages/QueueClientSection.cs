@@ -12,7 +12,7 @@
         /// A proxy reference to the element in the web browser.
         /// </summary>
         /// <remarks>This field is automatically populated by SpecFlow.</remarks>
-        [FindsBy(How = How.Id, Using = "FillQueueButton")]
+        [FindsBy(How = How.Id, Using = "StartFillingQueueButton")]
         private IWebElement fillQueueButton = null;
 
         /// <summary>

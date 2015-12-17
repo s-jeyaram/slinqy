@@ -1,0 +1,49 @@
+﻿@model ExampleApp.Web.Models.FillQueueCommandModel
+
+<form id="FillQueueForm">
+    @Html.EditorForModel()
+    <button id="StartFillingQueueButton" type="button">Start</button>
+</form>
+
+<script type="text/javascript">
+    function FillQueue() {
+        var fillQueueUrl = '@Url.HttpRouteUrl("FillQueue", new { queueName = ViewBag.QueueName })';
+        var payload = $('#FillQueueForm').serialize();
+        $.post(fillQueueUrl, payload)
+            .done(StartFillQueueSucceeded)
+            .fail(StartFillQueueFailed)
+            .always(StartFillQueueCompleted);
+
+        StartFillQueueStarted();
+    }
+
+    // Called when the user initiates a fill queue AJAX request.
+    function StartFillQueueStarted() {
+        // Disable the button so it cannot be double clicked, or more.
+        $('#StartFillingQueueButton')
+            .text('Filling...')
+            .prop('disabled', true);
+
+        $('#AjaxStatus').text('STARTED');
+        $('#AjaxStatusMessage').text('Request submitting, awaiting a response from the server.');
+    }
+
+    function StartFillQueueSucceeded() {
+        $('#AjaxResult').text('SUCCEEDED');
+        $('#AjaxStatusMessage').text('Request accepted by server, the queue is now being filled...');
+    }
+
+    function StartFillQueueFailed(response) {
+        $('#AjaxResult').text('FAILED');
+        $('#AjaxStatusMessage').text(response.responseText);
+    }
+
+    function StartFillQueueCompleted() {
+        $('#AjaxStatus').text('COMPLETED');
+    }
+
+    $(function () {
+        // Tie the button to the function.
+        $('#StartFillingQueueButton').click(FillQueue);
+    });
+</script>
