@@ -20,6 +20,11 @@
         private Task pollQueuesTask;
 
         /// <summary>
+        /// Gets a value indicating whether monitoring is active (true) or not (false).
+        /// </summary>
+        private bool monitoring;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueShardMonitor"/> class.
         /// </summary>
         /// <param name="queueName">Specifies the name of the virtual queue to monitor.</param>
@@ -29,6 +34,7 @@
             string                  queueName,
             IPhysicalQueueService   queueService)
         {
+            this.monitoring   = false;
             this.QueueName    = queueName;
             this.queueService = queueService;
 
@@ -59,8 +65,20 @@
         Start()
         {
             // Start polling
+            this.monitoring = true;
             this.pollQueuesTask = this.PollQueues();
             this.pollQueuesTask.ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Stops monitoring.
+        /// </summary>
+        public
+        virtual
+        void
+        StopMonitoring()
+        {
+            this.monitoring = false;
         }
 
         /// <summary>
@@ -85,7 +103,7 @@
         async Task
         PollQueues()
         {
-            while (true)
+            while (this.monitoring)
             {
                 try
                 {

@@ -77,6 +77,7 @@
         void
         Stop()
         {
+            this.queueShardMonitor.StopMonitoring();
             this.monitoring = false;
         }
 

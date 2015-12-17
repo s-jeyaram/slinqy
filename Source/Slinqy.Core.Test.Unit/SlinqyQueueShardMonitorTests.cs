@@ -263,5 +263,26 @@
                 this.fakeQueueService.ListQueues(A<string>.Ignored)
             ).MustHaveHappened(Repeated.AtLeast.Twice);
         }
+
+        /// <summary>
+        /// Verifies that the SlinqyQueueMonitor stops polling the queuing service after Stop is called.
+        /// </summary>
+        [Fact]
+        public
+        void
+        StopMonitoring_IsRunning_StopsPollingTheQueuingService()
+        {
+            // Arrange
+            this.monitor.Start();
+
+            // Act
+            this.monitor.StopMonitoring();
+            Thread.Sleep(2000); // TODO: Reduce when monitor delay is configurable.
+
+            // Assert
+            A.CallTo(
+                () => this.fakeQueueService.ListQueues(A<string>.Ignored)
+            ).MustHaveHappened(Repeated.Exactly.Once);
+        }
     }
 }

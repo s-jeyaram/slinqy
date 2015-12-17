@@ -298,6 +298,26 @@
         }
 
         /// <summary>
+        /// Verifies that the agent stops the monitor when Stop is called.
+        /// </summary>
+        [Fact]
+        public
+        void
+        Stop_IsRunning_StopsTheMonitor()
+        {
+            // Arrange
+            this.slinqyAgent.Start();
+
+            // Act
+            this.slinqyAgent.Stop();
+
+            // Assert
+            A.CallTo(
+                () => this.fakeQueueShardMonitor.StopMonitoring()
+            ).MustHaveHappened();
+        }
+
+        /// <summary>
         /// Creates a new instance of SlinqyQueueShard as a fake that is configured to simulate a send/receive queue.
         /// </summary>
         /// <returns>Returns a fake that simulates a send/receive queue.</returns>
