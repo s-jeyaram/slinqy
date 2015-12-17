@@ -90,7 +90,7 @@ Task Build -depends Clean -description "Compiles all source code." {
         -PackagesPath  $PackagesPath `
         -ArtifactsPath $ArtifactsPath `
         -TestDlls      $TestDlls `
-        -ReportCodeCoverage
+        -CodeCoveragePercentageRequired 100
 
     Write-Host "done!"
     Write-Host
