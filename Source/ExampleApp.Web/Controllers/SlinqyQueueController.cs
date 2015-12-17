@@ -86,7 +86,7 @@
             slinqyAgent = new SlinqyAgent(
                 PhysicalQueueService,
                 monitor,
-                0.01
+                createQueueModel.StorageCapacityScaleOutThresholdPercentage / 100D
             );
 
             slinqyAgent.Start();
