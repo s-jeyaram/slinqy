@@ -25,6 +25,11 @@
         private readonly SlinqyQueueShardMonitor queueShardMonitor;
 
         /// <summary>
+        /// Gets a value indicating whether monitoring is active (true) or not (false).
+        /// </summary>
+        private bool monitoring;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyAgent"/> class.
         /// </summary>
         /// <param name="queueService">
@@ -44,6 +49,7 @@
             SlinqyQueueShardMonitor slinqyQueueShardMonitor,
             double                  storageCapacityScaleOutThreshold)
         {
+            this.monitoring                         = false;
             this.queueService                       = queueService;
             this.queueShardMonitor                  = slinqyQueueShardMonitor;
             this.storageCapacityScaleOutThreshold   = storageCapacityScaleOutThreshold;
@@ -52,19 +58,27 @@
         /// <summary>
         /// Starts the agent to begin monitoring the queue shards and taking action if needed.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public
-        async Task
+        void
         Start()
         {
             // Start the monitor.
-            await this.queueShardMonitor.Start().ConfigureAwait(false);
-
-            // Perform a manual first check before returning.
-            await this.EvaluateShards().ConfigureAwait(false);
+            this.queueShardMonitor.Start();
+            this.monitoring = true;
 
             // Start checking the monitor periodically to respond if need be.
-            var task = this.PollShardState().ConfigureAwait(false);
+            this.PollShardState().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Stops the agent from monitoring or taking any actions.
+        /// </summary>
+        public
+        void
+        Stop()
+        {
+            this.queueShardMonitor.StopMonitoring();
+            this.monitoring = false;
         }
 
         /// <summary>
@@ -154,12 +168,18 @@
         async Task
         PollShardState()
         {
-            while (true)
+            while (this.monitoring)
             {
-                // TODO: Add try/catch block and log exceptions so that exceptions don't stop the agent from polling.
-
-                // Evaluate the current state.
-                await this.EvaluateShards().ConfigureAwait(false);
+                try
+                {
+                    // Evaluate the current state.
+                    await this.EvaluateShards().ConfigureAwait(false);
+                }
+                catch
+                {
+                    // Do nothing.
+                    // TODO: Log exception
+                }
 
                 // Wait before checking again.
                 // TODO: Make duration more configurable.

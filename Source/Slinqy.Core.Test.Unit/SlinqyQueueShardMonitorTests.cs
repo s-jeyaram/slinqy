@@ -1,7 +1,9 @@
 ﻿namespace Slinqy.Core.Test.Unit
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using FakeItEasy;
     using Xunit;
@@ -42,10 +44,9 @@
         /// <summary>
         /// Verifies that physical queue shards are correctly represented as SlinqyQueueShards.
         /// </summary>
-        /// <returns>Returns the async Task for the test.</returns>
         [Fact]
         public
-        async Task
+        void
         SlinqyQueueShardMonitor_PhysicalQueueShardsExists_MatchingSlinqyQueueShardsExist()
         {
             // Arrange
@@ -65,7 +66,7 @@
             ).Returns(physicalQueues);
 
             // Act
-            await this.monitor.Start();                  // Start monitoring for shards.
+            this.monitor.Start();                  // Start monitoring for shards.
 
             var slinqyQueueShards = this.monitor.Shards; // Retrieve shards that were detected.
 
@@ -79,10 +80,9 @@
         /// <summary>
         /// Verifies that the WriteShard property reflects the current write shard.
         /// </summary>
-        /// <returns>Returns the async Task for the test.</returns>
         [Fact]
         public
-        async Task
+        void
         WriteShard_OneReadWriteShardExists_SlinqyQueueWriteShardIsReturned()
         {
             // Arrange
@@ -105,7 +105,7 @@
             ).Returns(physicalQueues);
 
             // Act
-            await this.monitor.Start();
+            this.monitor.Start();
 
             // Assert
             Assert.Equal(
@@ -117,10 +117,9 @@
         /// <summary>
         /// Verifies that the WriteShard property reflects the current write shard.
         /// </summary>
-        /// <returns>Returns the async Task for the test.</returns>
         [Fact]
         public
-        async Task
+        void
         WriteShard_OneReadOneWriteShardExists_SlinqyQueueWriteShardIsReturned()
         {
             // Arrange
@@ -142,7 +141,7 @@
             ).Returns(physicalQueues);
 
             // Act
-            await this.monitor.Start();
+            this.monitor.Start();
 
             // Assert
             Assert.Equal(
@@ -154,10 +153,9 @@
         /// <summary>
         /// Verifies that the WriteShard property reflects the current write shard.
         /// </summary>
-        /// <returns>Returns the async Task for the test.</returns>
         [Fact]
         public
-        async Task
+        void
         WriteShard_OneReadManyDisabledOneWriteShardExists_SlinqyQueueWriteShardIsReturned()
         {
             // Arrange
@@ -188,7 +186,7 @@
             ).Returns(physicalQueues);
 
             // Act
-            await this.monitor.Start();
+            this.monitor.Start();
 
             // Assert
             Assert.Equal(
@@ -206,10 +204,9 @@
         /// write shards exist simultaneously since these operations cannot be
         /// completed as a single atomic operation.
         /// </summary>
-        /// <returns>Returns the async Task for the test.</returns>
         [Fact]
         public
-        async Task
+        void
         WriteShard_MultipleWriteShardsExists_LastSlinqyQueueWriteShardIsReturned()
         {
             // Arrange
@@ -235,13 +232,57 @@
             ).Returns(physicalQueues);
 
             // Act
-            await this.monitor.Start();
+            this.monitor.Start();
 
             // Assert
             Assert.Equal(
                 fakeNewWritePhysicalQueue.Name,
                 this.monitor.SendShard.PhysicalQueue.Name
             );
+        }
+
+        /// <summary>
+        /// Verifies that the SlinqyQueueShardMonitor does not end if an unhandled exception occurs
+        /// while monitoring the physical queues, but instead retries the operation.
+        /// </summary>
+        [Fact]
+        public
+        void
+        SlinqyQueueShardMonitor_ExceptionOccursDuringRefresh_Retries()
+        {
+            // Arrange
+            A.CallTo(() => this.fakeQueueService.ListQueues(A<string>.Ignored)).Throws<Exception>().Once();
+
+            // Act
+            this.monitor.Start();
+
+            Thread.Sleep(2000); // TODO: Reduce when monitor poll delay is configurable.
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeQueueService.ListQueues(A<string>.Ignored)
+            ).MustHaveHappened(Repeated.AtLeast.Twice);
+        }
+
+        /// <summary>
+        /// Verifies that the SlinqyQueueMonitor stops polling the queuing service after Stop is called.
+        /// </summary>
+        [Fact]
+        public
+        void
+        StopMonitoring_IsRunning_StopsPollingTheQueuingService()
+        {
+            // Arrange
+            this.monitor.Start();
+
+            // Act
+            this.monitor.StopMonitoring();
+            Thread.Sleep(2000); // TODO: Reduce when monitor delay is configurable.
+
+            // Assert
+            A.CallTo(
+                () => this.fakeQueueService.ListQueues(A<string>.Ignored)
+            ).MustHaveHappened(Repeated.Exactly.Once);
         }
     }
 }

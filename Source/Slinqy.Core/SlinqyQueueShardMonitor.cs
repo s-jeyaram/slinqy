@@ -20,6 +20,11 @@
         private Task pollQueuesTask;
 
         /// <summary>
+        /// Gets a value indicating whether monitoring is active (true) or not (false).
+        /// </summary>
+        private bool monitoring;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueShardMonitor"/> class.
         /// </summary>
         /// <param name="queueName">Specifies the name of the virtual queue to monitor.</param>
@@ -29,6 +34,7 @@
             string                  queueName,
             IPhysicalQueueService   queueService)
         {
+            this.monitoring   = false;
             this.QueueName    = queueName;
             this.queueService = queueService;
 
@@ -48,22 +54,31 @@
         /// <summary>
         /// Gets the current shard for sending new queue messages.
         /// </summary>
-        public SlinqyQueueShard SendShard => this.Shards.Last(s => s.PhysicalQueue.IsSendEnabled);
+        public virtual SlinqyQueueShard SendShard => this.Shards.Last(s => s.PhysicalQueue.IsSendEnabled);
 
         /// <summary>
         /// Starts polling the physical resources to update the Shards property values.
         /// </summary>
-        /// <returns>Returns the async Task for the work.</returns>
         public
-        async Task
+        virtual
+        void
         Start()
         {
-            // Perform a manual poll now to validate that it works before returning.
-            await this.Refresh().ConfigureAwait(false);
-
             // Start polling
+            this.monitoring = true;
             this.pollQueuesTask = this.PollQueues();
-            var awaitResult = this.pollQueuesTask.ConfigureAwait(false);
+            this.pollQueuesTask.ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Stops monitoring.
+        /// </summary>
+        public
+        virtual
+        void
+        StopMonitoring()
+        {
+            this.monitoring = false;
         }
 
         /// <summary>
@@ -88,9 +103,18 @@
         async Task
         PollQueues()
         {
-            while (true)
+            while (this.monitoring)
             {
-                await this.Refresh().ConfigureAwait(false);
+                try
+                {
+                    await this.Refresh().ConfigureAwait(false);
+                }
+                catch
+                {
+                    // TODO: Log the exception as a warning.
+                }
+
+                // TODO: Make the delay more configurable.
                 await Task.Delay(1000).ConfigureAwait(false);
             }
         }

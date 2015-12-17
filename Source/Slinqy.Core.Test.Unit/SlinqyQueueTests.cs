@@ -26,6 +26,11 @@
         private readonly SlinqyQueueShard fakeWriteShard;
 
         /// <summary>
+        /// The instance under test.
+        /// </summary>
+        private readonly SlinqyQueue slinqyQueue;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueTests"/> class.
         /// </summary>
         public
@@ -43,6 +48,11 @@
             };
 
             A.CallTo(() => this.fakeQueueShardMonitor.Shards).Returns(shards);
+            A.CallTo(() => this.fakeQueueShardMonitor.SendShard).Returns(this.fakeWriteShard);
+
+            this.slinqyQueue = new SlinqyQueue(
+                this.fakeQueueShardMonitor
+            );
         }
 
         /// <summary>
@@ -57,12 +67,8 @@
             A.CallTo(() => this.fakeReadShard.PhysicalQueue.MaxSizeMegabytes).Returns(1024);
             A.CallTo(() => this.fakeWriteShard.PhysicalQueue.MaxSizeMegabytes).Returns(1024);
 
-            var slinqyQueue = new SlinqyQueue(
-                this.fakeQueueShardMonitor
-            );
-
             // Act
-            var actual = slinqyQueue.MaxQueueSizeMegabytes;
+            var actual = this.slinqyQueue.MaxQueueSizeMegabytes;
 
             // Assert
             Assert.Equal(2048, actual);
@@ -80,12 +86,8 @@
             A.CallTo(() => this.fakeReadShard.PhysicalQueue.CurrentSizeBytes).Returns(1);
             A.CallTo(() => this.fakeWriteShard.PhysicalQueue.CurrentSizeBytes).Returns(2);
 
-            var slinqyQueue = new SlinqyQueue(
-                this.fakeQueueShardMonitor
-            );
-
             // Act
-            var actual = slinqyQueue.CurrentQueueSizeBytes;
+            var actual = this.slinqyQueue.CurrentQueueSizeBytes;
 
             // Assert
             Assert.Equal(3, actual);
@@ -101,14 +103,10 @@
         SendBatch_BatchIsValid_BatchSentToWriteShard()
         {
             // Arrange
-            var slinqyQueue = new SlinqyQueue(
-                this.fakeQueueShardMonitor
-            );
-
             var validBatch = new List<string> { "message 1", "message 2" };
 
             // Act
-            await slinqyQueue.SendBatch(validBatch);
+            await this.slinqyQueue.SendBatch(validBatch);
 
             // Assert
             A.CallTo(() =>
