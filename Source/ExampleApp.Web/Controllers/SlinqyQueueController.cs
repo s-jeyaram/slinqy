@@ -1,6 +1,7 @@
 ﻿namespace ExampleApp.Web.Controllers
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Configuration;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -31,6 +32,11 @@
         private static readonly SlinqyQueueClient SlinqyQueueClient = new SlinqyQueueClient(
             PhysicalQueueService
         );
+
+        /// <summary>
+        /// Maintains a list of queue fill operations.
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, FillQueueStatusViewModel> FillOperations = new ConcurrentDictionary<string, FillQueueStatusViewModel>();
 
         /// <summary>
         /// Tracks the last created queue.
@@ -99,7 +105,7 @@
         }
 
         /// <summary>
-        /// Handles the HTTP POST /api/slinqy-queue/{queueName}/ by submitting randomly generated messages.
+        /// Handles the HTTP POST /api/slinqy-queue/{queueName}/fill-request by submitting randomly generated messages.
         /// </summary>
         /// <param name="queueName">Specifies the name of the queue.</param>
         /// <param name="fillQueueCommand">Specifies the amount of data, in megabytes, to submit to the queue.</param>
@@ -118,7 +124,35 @@
             this.FillQueue(queueName, fillQueueCommand.SizeMegabytes)
                 .ConfigureAwait(false);
 
+            FillOperations.AddOrUpdate(
+                key:                queueName,
+                addValueFactory:    name => new FillQueueStatusViewModel { Status = FillQueueStatus.Running },
+                updateValueFactory: (name, fillOperation) => {
+                    if (fillOperation.Status != FillQueueStatus.Finished)
+                        throw new InvalidOperationException("A previous fill operation is still in progress.");
+
+                    return new FillQueueStatusViewModel { Status = FillQueueStatus.Running };
+                }
+
+            );
+
             // Return while the task continues to run in the background.
+        }
+
+        /// <summary>
+        /// Handles the HTTP GET /api/slinqy-queue/{queueName}/fill-request by returning the current status.
+        /// </summary>
+        /// <param name="queueName">Specifies the name of the queue to get the fill request status for.</param>
+        /// <returns>Returns information about the fill status.</returns>
+        [HttpGet]
+        [Route("api/slinqy-queue/{queueName}/fill-request", Name = "GetFillQueueStatus")]
+        public
+        FillQueueStatusViewModel
+        GetFillQueueStatus(
+            string queueName)
+        {
+            this.ToString();
+            return FillOperations[queueName];
         }
 
         /// <summary>
@@ -169,6 +203,8 @@
                     );
                 }
             }
+
+            FillOperations[queueName].Status = FillQueueStatus.Finished;
         }
     }
 }

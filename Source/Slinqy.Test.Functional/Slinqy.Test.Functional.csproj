@@ -98,6 +98,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Versioning.feature</DependentUpon>
     </Compile>
+    <Compile Include="Features\ReceiveQueueMessages.feature.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReceiveQueueMessages.feature</DependentUpon>
+    </Compile>
     <Compile Include="Models\ExampleAppPages\CreateQueueForm.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
@@ -130,6 +135,10 @@
     <None Include="Features\Infrastructure\Versioning.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>Versioning.feature.cs</LastGenOutput>
+    </None>
+    <None Include="Features\ReceiveQueueMessages.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>ReceiveQueueMessages.feature.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
   </ItemGroup>

@@ -20,17 +20,18 @@
     // Called when the user initiates a fill queue AJAX request.
     function StartFillQueueStarted() {
         // Disable the button so it cannot be double clicked, or more.
-        $('#StartFillingQueueButton')
-            .text('Filling...')
-            .prop('disabled', true);
+        $('#StartFillingQueueButton').prop('disabled', true);
 
         $('#AjaxStatus').text('STARTED');
-        $('#AjaxStatusMessage').text('Request submitting, awaiting a response from the server.');
+        $('#AjaxStatusMessage').text('Request submitted, awaiting a response from the server.');
     }
 
     function StartFillQueueSucceeded() {
         $('#AjaxResult').text('SUCCEEDED');
         $('#AjaxStatusMessage').text('Request accepted by server, the queue is now being filled...');
+
+        // Start polling for completion...
+        setTimeout(PollFillStatus, 500);
     }
 
     function StartFillQueueFailed(response) {
@@ -39,6 +40,58 @@
     }
 
     function StartFillQueueCompleted() {
+        $('#AjaxStatus').text('COMPLETED');
+    }
+
+    function PollFillStatus() {
+        var fillStatusUrl = '@Url.HttpRouteUrl("GetFillQueueStatus", new { queueName = ViewBag.QueueName })';
+
+        $.getJSON(fillStatusUrl)
+            .done(UpdateFillStatus)
+            .fail(UpdateFillStatusFailed)
+            .always(UpdateFillStatusCompleted);
+
+        GetFillQueueStatusStarted();
+    }
+
+    function GetFillQueueStatusStarted() {
+        $('#AjaxStatus').text('STARTED');
+        $('#AjaxStatusMessage').text('Request submitted, awaiting a response from the server.');
+    }
+
+    function UpdateFillStatus(fillOperation) {
+        switch (fillOperation.Status) {
+            case 1: // Running
+                $('#StartFillingQueueButton').text('Filling...');
+
+                // Check again later...
+                setTimeout(PollFillStatus, 500);
+
+                break;
+            case 2: // Finished
+                // Re-enable the fill button.
+                $('#StartFillingQueueButton')
+                    .text('Start')
+                    .prop('disabled', false);
+
+                break;
+            default:
+                alert(
+                    'Invalid fill operation status: ' + fillOperation.Status
+                );
+
+                break;
+        }
+    }
+
+    function UpdateFillStatusFailed(response) {
+        $('#AjaxResult').text('FAILED');
+        $('#AjaxStatusMessage').text(response.responseText);
+
+        alert(response.responseText);
+    }
+
+    function UpdateFillStatusCompleted() {
         $('#AjaxStatus').text('COMPLETED');
     }
 

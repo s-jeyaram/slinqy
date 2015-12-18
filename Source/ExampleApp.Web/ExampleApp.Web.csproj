@@ -179,6 +179,8 @@
     </Compile>
     <Compile Include="Models\CreateQueueCommandModel.cs" />
     <Compile Include="Models\FillQueueCommandModel.cs" />
+    <Compile Include="Models\FillQueueStatus.cs" />
+    <Compile Include="Models\FillQueueStatusViewModel.cs" />
     <Compile Include="Models\ManageQueueViewModel.cs" />
     <Compile Include="Models\QueueInformationViewModel.cs" />
     <Compile Include="Models\QueueSettingsViewModel.cs" />
