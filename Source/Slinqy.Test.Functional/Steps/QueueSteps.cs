@@ -118,9 +118,11 @@
             var megabytesToScale = (int)(initialQueueStorageCapacityMegabytes * (scaleUpThresholdPercentage / 100D)) * targetNumberOfShards;
 
             // Submit data
-            QueueSteps.ContextGet<ManageQueueSection>()
+            var sentCount = QueueSteps.ContextGet<ManageQueueSection>()
                 .QueueClient
                 .FillQueue(sizeMegabytes: megabytesToScale);
+
+            QueueSteps.ContextSet(sentCount, nameof(sentCount));
         }
 
         /// <summary>
@@ -132,6 +134,12 @@
         WhenTheQueueReceiverIsRestored()
         {
             this.ToString();
+
+            var receivedCount = QueueSteps.ContextGet<ManageQueueSection>()
+                .QueueClient
+                .ReadQueue();
+
+            QueueSteps.ContextSet(receivedCount, nameof(receivedCount));
         }
 
         /// <summary>
@@ -143,6 +151,11 @@
         ThenTheAllTheMessagesCanBeReceived()
         {
             this.ToString();
+
+            var sentCount     = ContextGet<int>("sentCount");
+            var receivedCount = ContextGet<int>("receivedCount");
+
+            Assert.Equals(sentCount, receivedCount);
         }
     }
 }

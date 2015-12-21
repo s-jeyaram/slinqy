@@ -3,6 +3,7 @@
 <form id="FillQueueForm">
     @Html.EditorForModel()
     <button id="StartFillingQueueButton" type="button">Start</button>
+    <div id="FillQueueMessagesSent">0</div> sent
 </form>
 
 <script type="text/javascript">
@@ -82,6 +83,9 @@
 
                 break;
         }
+
+        $('#FillQueueMessagesSent')
+            .text(fillOperation.SentCount);
     }
 
     function UpdateFillStatusFailed(response) {

@@ -188,13 +188,16 @@
                     ranGen.NextBytes(randomMessagePayload);
 
                     return randomMessagePayload;
-                });
+                }).ToArray();
 
                 try
                 {
                     // Send the batch of random data.
                     await queue.SendBatch(batch)
                         .ConfigureAwait(false);
+
+                    FillOperations[queueName]
+                        .SentCount += batch.Count();
                 }
                 catch (Exception exception)
                 {
