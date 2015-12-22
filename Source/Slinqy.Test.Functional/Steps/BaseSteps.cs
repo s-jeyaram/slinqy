@@ -35,6 +35,22 @@
         /// Saves the specified value in the scenario context for subsequent steps to use.
         /// </summary>
         /// <param name="value">Specifies the value to save.</param>
+        /// <param name="key">Specifies a key to associate with the value.</param>
+        /// <typeparam name="T">Specifies the type of the value.</typeparam>
+        protected
+        static
+        void
+        ContextSet<T>(
+            T       value,
+            string  key)
+        {
+            ScenarioContext.Current.Set(value, key);
+        }
+
+        /// <summary>
+        /// Saves the specified value in the scenario context for subsequent steps to use.
+        /// </summary>
+        /// <param name="value">Specifies the value to save.</param>
         /// <typeparam name="T">Specifies the type of the value.</typeparam>
         protected
         static
@@ -43,6 +59,21 @@
             T value)
         {
             ScenarioContext.Current.Set(value);
+        }
+
+        /// <summary>
+        /// Retrieves a value that was saved by a previous step.
+        /// </summary>
+        /// <param name="key">Specifies the key of the value to get.</param>
+        /// <typeparam name="T">Specifies the type of the value.</typeparam>
+        /// <returns>Returns the requested value.</returns>
+        protected
+        static
+        T
+        ContextGet<T>(
+            string key)
+        {
+            return ScenarioContext.Current.Get<T>(key);
         }
 
         /// <summary>

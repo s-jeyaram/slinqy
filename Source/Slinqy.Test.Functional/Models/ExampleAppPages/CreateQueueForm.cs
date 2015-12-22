@@ -24,6 +24,12 @@
         private IWebElement maxQueueSizeMegabytes = null;
 
         /// <summary>
+        /// The proxy reference to the scale out threshold input on the web page.
+        /// </summary>
+        [FindsBy(How = How.Id, Using = "StorageCapacityScaleOutThresholdPercentage")]
+        private IWebElement storageCapacityScaleOutThresholdPercentage = null;
+
+        /// <summary>
         /// The proxy reference to the submit button on the create queue form.
         /// </summary>
         [FindsBy(How = How.Id, Using = "CreateQueueButton")]
@@ -72,15 +78,19 @@
                 throw new ArgumentNullException(nameof(createQueueParameters));
 
             // Enter parameters in to form.
+            this.queueName.Clear();
             this.queueName.SendKeys(createQueueParameters.QueueName);
+            this.maxQueueSizeMegabytes.Clear();
             this.maxQueueSizeMegabytes.SendKeys(createQueueParameters.StorageCapacityMegabytes.ToString(CultureInfo.InvariantCulture));
+            this.storageCapacityScaleOutThresholdPercentage.Clear();
+            this.storageCapacityScaleOutThresholdPercentage.SendKeys(createQueueParameters.ScaleUpThresholdPercentage.ToString(CultureInfo.InvariantCulture));
 
             // Submit
             this.createQueueButton.Click();
 
             // Wait for it to finish
             while (this.ajaxStatus.Text != "COMPLETED")
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
 
             // Check the result
             if (this.ajaxResult.Text == "FAILED")

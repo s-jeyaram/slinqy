@@ -14,7 +14,7 @@
         public CreateQueueParameters(
             string  queueName,
             int     storageCapacityMegabytes,
-            double  scaleUpThresholdPercentage)
+            int     scaleUpThresholdPercentage)
         {
             this.QueueName                  = queueName;
             this.StorageCapacityMegabytes   = storageCapacityMegabytes;
@@ -34,6 +34,6 @@
         /// <summary>
         /// Gets the scale up threshold setting.
         /// </summary>
-        public double   ScaleUpThresholdPercentage  { get; private set; }
+        public int      ScaleUpThresholdPercentage  { get; private set; }
     }
 }

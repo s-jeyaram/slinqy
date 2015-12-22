@@ -94,10 +94,7 @@
         SlinqyAgent_WriteQueueShardExceedsCapacityThreshold_ASendOnlyShardIsAdded()
         {
             // Arrange
-            var scaleOutSizeMegabytes = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
-            var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
-
-            A.CallTo(() => this.fakeShard.PhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
+            A.CallTo(() => this.fakeShard.StorageUtilization).Returns(ValidStorageCapacityScaleOutThreshold + 0.01);
 
             // Act
             this.slinqyAgent.Start();
@@ -141,10 +138,7 @@
         SlinqyAgent_AnotherShardAdded_ShardNameIsCorrect()
         {
             // Arrange
-            var scaleOutSizeMegabytes   = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
-            var scaleOutSizeBytes       = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
-
-            A.CallTo(() => this.fakeShard.PhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
+            A.CallTo(() => this.fakeShard.StorageUtilization).Returns(ValidStorageCapacityScaleOutThreshold + 0.01);
 
             // Act
             this.slinqyAgent.Start();
@@ -161,14 +155,11 @@
         [Fact]
         public
         void
-        SlinqyAgent_AnotherShardAdded_PreviousShardIsSetToReceiveOnly()
+        SlinqyAgent_SecondShardAdded_FirstShardIsSetToReceiveOnly()
         {
             // Arrange
-            var scaleOutSizeMegabytes = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
-            var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
-
             // Configure the write shards size to trigger scaling.
-            A.CallTo(() => this.fakeShard.PhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
+            A.CallTo(() => this.fakeShard.StorageUtilization).Returns(ValidStorageCapacityScaleOutThreshold + 0.01);
 
             // Configure the new shard that will be added as a result of the scaling.
             var fakeAdditionalShard = this.CreateFakeSendOnlyQueue();
@@ -187,24 +178,30 @@
         }
 
         /// <summary>
-        /// Verifies that shards existing in between the read and write shard are disabled.
+        /// Verifies that shards existing in between the send and receive shard are disabled.
         /// </summary>
         [Fact]
         public
         void
-        SlinqyAgent_AnotherShardAddedWithMiddleShards_MiddleShardsAreDisabled()
+        SlinqyAgent_ThirdShardIsAdded_MiddleShardIsDisabled()
         {
             // Arrange
             var scaleOutSizeMegabytes = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
             var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
 
-            // Configure the initial default shard to be receive-only.
-            A.CallTo(() => this.fakeShard.PhysicalQueue.IsSendEnabled).Returns(false);
+            // Configure the first shard to be receive-only.
+            var fakeReceiveOnlyShard = this.CreateFakeReceiveOnlyQueue();
 
             // Create a new send-only shard that has exceeded the scale out threshold,
             // this will become the middle shard after scaling occurs.
-            var sendOnlyShard = this.CreateFakeSendOnlyQueue(currentSizeBytes: scaleOutSizeBytes);
-            this.fakeShards.Add(sendOnlyShard);
+            var fakeSendOnlyShard = this.CreateFakeSendOnlyQueue(currentSizeBytes: scaleOutSizeBytes);
+
+            A.CallTo(() => this.fakeQueueShardMonitor.SendShard).Returns(fakeSendOnlyShard);
+            A.CallTo(() => this.fakeQueueShardMonitor.ReceiveShard).Returns(fakeReceiveOnlyShard);
+
+            this.fakeShards.Clear();
+            this.fakeShards.Add(fakeReceiveOnlyShard);
+            this.fakeShards.Add(fakeSendOnlyShard);
 
             // Configure the new shard that will be added as a result of the scaling.
             var newSendOnlyShard = this.CreateFakeSendOnlyQueue();
@@ -218,7 +215,7 @@
 
             // Assert
             A.CallTo(() =>
-                this.fakeQueueService.SetQueueDisabled(this.fakeShard.PhysicalQueue.Name)
+                this.fakeQueueService.SetQueueDisabled(fakeSendOnlyShard.PhysicalQueue.Name)
             ).MustHaveHappened();
         }
 
@@ -231,14 +228,13 @@
         SlinqyAgent_ShardsAlreadyDisabled_DoesNotDisableAgain()
         {
             // Arrange
-            // Configure the initial default shard to be receive-only.
-            A.CallTo(() => this.fakeShard.PhysicalQueue.CurrentSizeBytes).Returns(1);
-            A.CallTo(() => this.fakeShard.PhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => this.fakeShard.PhysicalQueue.IsReceiveEnabled).Returns(true);
-
+            // Configure the first shard to be receive-only.
+            var fakeReceiveOnlyShard    = this.CreateFakeReceiveOnlyQueue();
             var fakeDisabledMiddleShard = this.CreateFakeDisabledQueue();
             var fakeSendOnlyShard       = this.CreateFakeSendOnlyQueue();
 
+            this.fakeShards.Clear();
+            this.fakeShards.Add(fakeReceiveOnlyShard);
             this.fakeShards.Add(fakeDisabledMiddleShard);
             this.fakeShards.Add(fakeSendOnlyShard);
 
@@ -252,6 +248,26 @@
         }
 
         /// <summary>
+        /// Verifies that if a send-able/receivable shard is found to be send only, it will be set to active.
+        /// </summary>
+        [Fact]
+        public
+        void
+        SlinqyAgent_SendReceivableShardIsSendOnly_IsSetToEnabled()
+        {
+            // Arrange
+            A.CallTo(() => this.fakeShard.IsReceiveOnly).Returns(false);
+
+            // Act
+            this.slinqyAgent.Start();
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeQueueService.SetQueueEnabled(A<string>.Ignored)
+            ).MustHaveHappened();
+        }
+
+        /// <summary>
         /// Verifies that the agent will retry a scale out operation after encountering unhandled exceptions.
         /// </summary>
         [Fact]
@@ -260,11 +276,8 @@
         SlinqyAgent_ExceptionOccursDuringScaleOut_Retries()
         {
             // Arrange
-            var scaleOutSizeMegabytes = Math.Ceiling(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
-            var scaleOutSizeBytes     = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
-
             // Configure the write shards size to trigger scaling.
-            A.CallTo(() => this.fakeShard.PhysicalQueue.CurrentSizeBytes).Returns(scaleOutSizeBytes);
+            A.CallTo(() => this.fakeShard.StorageUtilization).Returns(ValidStorageCapacityScaleOutThreshold + 0.01);
             A.CallTo(() => this.fakeQueueService.CreateSendOnlyQueue(A<string>.Ignored)).Throws<Exception>().Once();
 
             // Act
@@ -348,6 +361,25 @@
         }
 
         /// <summary>
+        /// Creates a new instance of SlinqyQueueShard as a fake that is configured to simulate a receive-only queue.
+        /// </summary>
+        /// <param name="currentSizeBytes">Specifies the current size of the fake shard.</param>
+        /// <returns>
+        /// Returns a fake that simulates a new queue shard.
+        /// </returns>
+        private
+        SlinqyQueueShard
+        CreateFakeReceiveOnlyQueue(
+            long currentSizeBytes = 1)
+        {
+            return this.CreateFakeShard(
+                sendable:           false,
+                receivable:         true,
+                currentSizeBytes:   currentSizeBytes
+            );
+        }
+
+        /// <summary>
         /// Creates a new instance of SlinqyQueueShard as a fake that is configured to simulate a disabled queue.
         /// </summary>
         /// <returns>
@@ -381,6 +413,8 @@
 
             A.CallTo(() => fakeShard.ShardIndex                 ).Returns(this.shardIndexCounter++);
             A.CallTo(() => fakeShard.IsDisabled                 ).Returns(!sendable && !receivable);
+            A.CallTo(() => fakeShard.IsReceiveOnly              ).Returns(!sendable && receivable);
+            A.CallTo(() => fakeShard.StorageUtilization         ).Returns(currentSizeBytes == 0 ? 0 : 1);
             A.CallTo(() => fakePhysicalQueue.Name               ).Returns(ValidSlinqyQueueName + fakeShard.ShardIndex);
             A.CallTo(() => fakePhysicalQueue.IsSendEnabled      ).Returns(sendable);
             A.CallTo(() => fakePhysicalQueue.IsReceiveEnabled   ).Returns(receivable);

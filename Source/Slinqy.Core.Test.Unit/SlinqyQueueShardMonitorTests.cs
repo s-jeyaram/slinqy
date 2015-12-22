@@ -242,6 +242,38 @@
         }
 
         /// <summary>
+        /// Verifies that the ReceiveShard property reflects the current receive shard.
+        /// </summary>
+        [Fact]
+        public
+        void
+        ReceiveShard_OneReadWriteShardExists_SlinqyQueueReceiveShardIsReturned()
+        {
+            // Arrange
+            var fakeReadWritePhysicalQueue = A.Fake<IPhysicalQueue>();
+
+            A.CallTo(() => fakeReadWritePhysicalQueue.Name).Returns(ValidSlinqyQueueName + "0");
+            A.CallTo(() => fakeReadWritePhysicalQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeReadWritePhysicalQueue.IsReceiveEnabled).Returns(true);
+
+            var physicalQueues = new List<IPhysicalQueue> {
+                fakeReadWritePhysicalQueue
+            };
+
+            A.CallTo(() =>
+                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
+            ).Returns(physicalQueues);
+
+            this.monitor.Start();
+
+            // Act
+            var actualQueueShard = this.monitor.ReceiveShard;
+
+            // Assert
+            Assert.Equal(fakeReadWritePhysicalQueue, actualQueueShard.PhysicalQueue);
+        }
+
+        /// <summary>
         /// Verifies that the SlinqyQueueShardMonitor does not end if an unhandled exception occurs
         /// while monitoring the physical queues, but instead retries the operation.
         /// </summary>

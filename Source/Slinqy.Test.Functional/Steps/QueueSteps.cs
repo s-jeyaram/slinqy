@@ -78,7 +78,7 @@
             var createQueueParams = new CreateQueueParameters(
                 "test-queue",
                 storageCapacityMegabytes:   1024,
-                scaleUpThresholdPercentage: 0.05
+                scaleUpThresholdPercentage: 1
             );
 
             var manageQueueSection = homepage
@@ -87,6 +87,75 @@
 
             QueueSteps.ContextSet(createQueueParams);
             QueueSteps.ContextSet(manageQueueSection);
+        }
+
+        /// <summary>
+        /// Creates a Queue and fills it until it has scaled out twice, resulting in three shards with data at the end.
+        /// </summary>
+        [Given]
+        public
+        void
+        GivenAQueueWhoseStorageHasScaledOut()
+        {
+            var targetNumberOfShards                 = 3;
+            var scaleUpThresholdPercentage           = 1;
+            var initialQueueStorageCapacityMegabytes = 1024; // 1 GB
+            var homepage                             = this.WebBrowser.NavigateTo<Homepage>();
+
+            // Configure so it doesn't take much to hit the threshold.
+            var createQueueParams = new CreateQueueParameters(
+                queueName:                  "scaled-test-queue",
+                storageCapacityMegabytes:   initialQueueStorageCapacityMegabytes,
+                scaleUpThresholdPercentage: scaleUpThresholdPercentage
+            );
+
+            // Create it!
+            QueueSteps.ContextSet(homepage
+                .CreateQueueForm
+                .CreateQueue(createQueueParams));
+
+            // Calculate amount of data needed to generate to fill 3 shards.
+            var megabytesToScale = (int)(initialQueueStorageCapacityMegabytes * (scaleUpThresholdPercentage / 100D)) * targetNumberOfShards;
+
+            // Submit data
+            var sentCount = QueueSteps.ContextGet<ManageQueueSection>()
+                .QueueClient
+                .FillQueue(sizeMegabytes: megabytesToScale);
+
+            QueueSteps.ContextSet(sentCount, nameof(sentCount));
+        }
+
+        /// <summary>
+        /// Starts receiving messages from the queue.
+        /// </summary>
+        [When]
+        public
+        void
+        WhenTheQueueReceiverIsRestored()
+        {
+            this.ToString();
+
+            var receivedCount = QueueSteps.ContextGet<ManageQueueSection>()
+                .QueueClient
+                .ReadQueue();
+
+            QueueSteps.ContextSet(receivedCount, nameof(receivedCount));
+        }
+
+        /// <summary>
+        /// Verifies that all the queue messages can be received.
+        /// </summary>
+        [Then]
+        public
+        void
+        ThenTheAllTheMessagesCanBeReceived()
+        {
+            this.ToString();
+
+            var sentCount     = ContextGet<int>("sentCount");
+            var receivedCount = ContextGet<int>("receivedCount");
+
+            Assert.AreEqual(sentCount, receivedCount);
         }
     }
 }

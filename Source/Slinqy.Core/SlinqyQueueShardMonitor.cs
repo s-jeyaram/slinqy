@@ -57,6 +57,11 @@
         public virtual SlinqyQueueShard SendShard => this.Shards.Last(s => s.PhysicalQueue.IsSendEnabled);
 
         /// <summary>
+        /// Gets the current shard for receiving queue messages for processing.
+        /// </summary>
+        public virtual SlinqyQueueShard ReceiveShard => this.Shards.First(s => s.PhysicalQueue.IsReceiveEnabled);
+
+        /// <summary>
         /// Starts polling the physical resources to update the Shards property values.
         /// </summary>
         public
