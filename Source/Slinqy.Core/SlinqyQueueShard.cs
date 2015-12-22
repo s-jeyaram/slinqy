@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
@@ -57,12 +58,22 @@
         /// <summary>
         /// Gets the current storage utilization percentage of this shard.
         /// </summary>
-        public double StorageUtilization => (((double)this.PhysicalQueue.CurrentSizeBytes / 1024) / 1024) / this.PhysicalQueue.MaxSizeMegabytes;
+        public virtual double StorageUtilization => (((double)this.PhysicalQueue.CurrentSizeBytes / 1024) / 1024) / this.PhysicalQueue.MaxSizeMegabytes;
 
         /// <summary>
         /// Gets a value indicating whether both sending and receiving are disabled on this queue.
         /// </summary>
         public virtual bool IsDisabled => !this.PhysicalQueue.IsReceiveEnabled && !this.PhysicalQueue.IsSendEnabled;
+
+        /// <summary>
+        /// Gets a value indicating whether receiving is the only operation enabled (true), or not (false).
+        /// </summary>
+        public virtual bool IsReceiveOnly => this.PhysicalQueue.IsReceiveEnabled && !this.PhysicalQueue.IsSendEnabled;
+
+        /// <summary>
+        /// Gets a value indicating whether this shard is enabled for both sending and receiving (true), or not (false).
+        /// </summary>
+        public virtual bool IsSendReceiveEnabled => this.PhysicalQueue.IsReceiveEnabled && this.PhysicalQueue.IsSendEnabled;
 
         /// <summary>
         /// Sends the batch of messages to the physical queue shard.
@@ -78,6 +89,23 @@
             IEnumerable<object> batch)
         {
             return this.PhysicalQueue.SendBatch(batch);
+        }
+
+        /// <summary>
+        /// Receives a batch of messages from the queue.
+        /// </summary>
+        /// <param name="maxWaitTime">Specifies the maximum amount of time to wait for messages before returning.</param>
+        /// <returns>Returns an enumeration of messages that were received.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule wasn't designed for async Tasks.")]
+        public
+        virtual
+        async Task<IEnumerable<object>>
+        ReceiveBatch(
+            TimeSpan maxWaitTime)
+        {
+            return await this.PhysicalQueue
+                .ReceiveBatch(maxWaitTime)
+                .ConfigureAwait(false);
         }
 
         /// <summary>

@@ -155,7 +155,7 @@
             var sentCount     = ContextGet<int>("sentCount");
             var receivedCount = ContextGet<int>("receivedCount");
 
-            Assert.Equals(sentCount, receivedCount);
+            Assert.AreEqual(sentCount, receivedCount);
         }
     }
 }

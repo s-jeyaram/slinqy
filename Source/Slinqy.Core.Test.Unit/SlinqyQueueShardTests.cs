@@ -18,6 +18,12 @@
         private const string ValidSlinqyShardName = "queue-name0";
 
         /// <summary>
+        /// Represents a valid value where one is needed for max wait timespan parameters.
+        /// Should not be a special value other than it is guaranteed to be valid.
+        /// </summary>
+        private readonly TimeSpan validMaxWaitTimeSpan = TimeSpan.FromSeconds(1);
+
+        /// <summary>
         /// The fake that simulates a physical queue.
         /// </summary>
         private readonly IPhysicalQueue fakePhysicalQueue = A.Fake<IPhysicalQueue>();
@@ -129,6 +135,185 @@
 
             // Assert
             Assert.True(actualValue);
+        }
+
+        /// <summary>
+        /// Verifies that ReceiveBatch correctly calls the underlying IPhysicalQueue method.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        ReceiveBatch_Always_CallsReceiveBatchOnPhysicalQueue()
+        {
+            // Arrange
+            // Act
+            await this.slinqyQueueShard.ReceiveBatch(this.validMaxWaitTimeSpan);
+
+            // Assert
+            A.CallTo(() =>
+                this.fakePhysicalQueue.ReceiveBatch(A<TimeSpan>.Ignored)
+            ).MustHaveHappened();
+        }
+
+        /// <summary>
+        /// Verifies that the IsReceiveOnly property returns False when
+        /// both send and receive are disabled on the underlying physical queue.
+        /// </summary>
+        [Fact]
+        public
+        void
+        IsReceiveOnly_SendAndReceiveDisabledOnPhysicalQueue_ReturnsFalse()
+        {
+            // Arrange
+            A.CallTo(() => this.fakePhysicalQueue.IsReceiveEnabled).Returns(false);
+            A.CallTo(() => this.fakePhysicalQueue.IsSendEnabled).Returns(false);
+
+            // Act
+            var actualValue = this.slinqyQueueShard.IsReceiveOnly;
+
+            // Assert
+            Assert.False(actualValue);
+        }
+
+        /// <summary>
+        /// Verifies that the IsReceiveOnly property returns True when
+        /// send is disabled and receive is enabled on the underlying physical queue.
+        /// </summary>
+        [Fact]
+        public
+        void
+        IsReceiveOnly_SendDisabledReceiveEnabledOnPhysicalQueue_ReturnsTrue()
+        {
+            // Arrange
+            A.CallTo(() => this.fakePhysicalQueue.IsReceiveEnabled).Returns(true);
+            A.CallTo(() => this.fakePhysicalQueue.IsSendEnabled).Returns(false);
+
+            // Act
+            var actualValue = this.slinqyQueueShard.IsReceiveOnly;
+
+            // Assert
+            Assert.True(actualValue);
+        }
+
+        /// <summary>
+        /// Verifies that the IsReceiveOnly property returns False when
+        /// send is enabled and receive is enabled on the underlying physical queue.
+        /// </summary>
+        [Fact]
+        public
+        void
+        IsReceiveOnly_SendEnabledReceiveEnabledOnPhysicalQueue_ReturnsFalse()
+        {
+            // Arrange
+            A.CallTo(() => this.fakePhysicalQueue.IsReceiveEnabled).Returns(true);
+            A.CallTo(() => this.fakePhysicalQueue.IsSendEnabled).Returns(true);
+
+            // Act
+            var actualValue = this.slinqyQueueShard.IsReceiveOnly;
+
+            // Assert
+            Assert.False(actualValue);
+        }
+
+        /// <summary>
+        /// Verifies that the IsReceiveOnly property returns False when
+        /// send is enabled and receive is disabled on the underlying physical queue.
+        /// </summary>
+        [Fact]
+        public
+        void
+        IsReceiveOnly_SendEnabledReceiveDisabledOnPhysicalQueue_ReturnsFalse()
+        {
+            // Arrange
+            A.CallTo(() => this.fakePhysicalQueue.IsReceiveEnabled).Returns(false);
+            A.CallTo(() => this.fakePhysicalQueue.IsSendEnabled).Returns(true);
+
+            // Act
+            var actualValue = this.slinqyQueueShard.IsReceiveOnly;
+
+            // Assert
+            Assert.False(actualValue);
+        }
+
+        /// <summary>
+        /// Verifies that the IsSendReceiveEnabled property returns False when
+        /// send is enabled and receive is disabled on the underlying physical queue.
+        /// </summary>
+        [Fact]
+        public
+        void
+        IsSendReceiveEnabled_SendEnabledReceiveDisabledOnPhysicalQueue_ReturnsFalse()
+        {
+            // Arrange
+            A.CallTo(() => this.fakePhysicalQueue.IsReceiveEnabled).Returns(false);
+            A.CallTo(() => this.fakePhysicalQueue.IsSendEnabled).Returns(true);
+
+            // Act
+            var actualValue = this.slinqyQueueShard.IsSendReceiveEnabled;
+
+            // Assert
+            Assert.False(actualValue);
+        }
+
+        /// <summary>
+        /// Verifies that the IsSendReceiveEnabled property returns True when
+        /// send is enabled and receive is enabled on the underlying physical queue.
+        /// </summary>
+        [Fact]
+        public
+        void
+        IsSendReceiveEnabled_SendEnabledReceiveEnabledOnPhysicalQueue_ReturnsTrue()
+        {
+            // Arrange
+            A.CallTo(() => this.fakePhysicalQueue.IsReceiveEnabled).Returns(true);
+            A.CallTo(() => this.fakePhysicalQueue.IsSendEnabled).Returns(true);
+
+            // Act
+            var actualValue = this.slinqyQueueShard.IsSendReceiveEnabled;
+
+            // Assert
+            Assert.True(actualValue);
+        }
+
+        /// <summary>
+        /// Verifies that the IsSendReceiveEnabled property returns False when
+        /// send is disabled and receive is enabled on the underlying physical queue.
+        /// </summary>
+        [Fact]
+        public
+        void
+        IsSendReceiveEnabled_SendDisabledReceiveEnabledOnPhysicalQueue_ReturnsFalse()
+        {
+            // Arrange
+            A.CallTo(() => this.fakePhysicalQueue.IsReceiveEnabled).Returns(true);
+            A.CallTo(() => this.fakePhysicalQueue.IsSendEnabled).Returns(false);
+
+            // Act
+            var actualValue = this.slinqyQueueShard.IsSendReceiveEnabled;
+
+            // Assert
+            Assert.False(actualValue);
+        }
+
+        /// <summary>
+        /// Verifies that the IsSendReceiveEnabled property returns false when both sending
+        /// and receiving is disabled on the underlying physical queue.
+        /// </summary>
+        [Fact]
+        public
+        void
+        IsSendReceiveEnabled_SendDisabledReceiveDisabled_ReturnsFalse()
+        {
+            // Arrange
+            A.CallTo(() => this.fakePhysicalQueue.IsSendEnabled).Returns(false);
+            A.CallTo(() => this.fakePhysicalQueue.IsReceiveEnabled).Returns(false);
+
+            // Act
+            var actualValue = this.slinqyQueueShard.IsSendReceiveEnabled;
+
+            // Assert
+            Assert.False(actualValue);
         }
     }
 }

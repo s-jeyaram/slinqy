@@ -1,5 +1,6 @@
 ﻿namespace Slinqy.Core.Test.Unit
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using FakeItEasy;
@@ -10,6 +11,12 @@
     /// </summary>
     public class SlinqyQueueTests
     {
+        /// <summary>
+        /// Represents a valid value where one is needed for max wait timespan parameters.
+        /// Should not be a special value other than it is guaranteed to be valid.
+        /// </summary>
+        private readonly TimeSpan validMaxWaitTimeSpan = TimeSpan.FromSeconds(1);
+
         /// <summary>
         /// The fake that simulates a queue shard monitor.
         /// </summary>
@@ -111,6 +118,29 @@
             // Assert
             A.CallTo(() =>
                 this.fakeWriteShard.SendBatch(A<IEnumerable<object>>.Ignored)
+            ).MustHaveHappened();
+        }
+
+        /// <summary>
+        /// Verifies that the SlinqyQueue uses the ReceiveShard to perform receive operations.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        ReceiveBatch_Always_CallsReceiveBatchOnReceiveShard()
+        {
+            // Arrange
+            A.CallTo(() =>
+                this.fakeQueueShardMonitor.ReceiveShard
+            ).Returns(this.fakeReadShard);
+
+            // Act
+            await this.slinqyQueue.ReceiveBatch(this.validMaxWaitTimeSpan);
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeReadShard.ReceiveBatch(A<TimeSpan>.Ignored)
             ).MustHaveHappened();
         }
     }

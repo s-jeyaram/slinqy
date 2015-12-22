@@ -1,5 +1,6 @@
 ﻿namespace Slinqy.Core
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
@@ -56,6 +57,22 @@
             IEnumerable<object> batch)
         {
             return this.queueShardMonitor.SendShard.SendBatch(batch);
+        }
+
+        /// <summary>
+        /// Retrieves the next batch of messages from the queue.
+        /// </summary>
+        /// <param name="maxWaitTime">Specifies the maximum amount of time to wait for messages before returning.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule wasn't designed for async Tasks.")]
+        public
+        async Task<IEnumerable<object>>
+        ReceiveBatch(TimeSpan maxWaitTime)
+        {
+            return await this.queueShardMonitor
+                .ReceiveShard
+                .ReceiveBatch(maxWaitTime)
+                .ConfigureAwait(false);
         }
     }
 }

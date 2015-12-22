@@ -1,5 +1,6 @@
 ﻿namespace ExampleApp.Web.Models
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -32,7 +33,8 @@
         {
             this.queueClient = QueueClient.CreateFromConnectionString(
                 serviceBusConnectionString,
-                queueDescription.Path
+                queueDescription.Path,
+                ReceiveMode.ReceiveAndDelete
             );
 
             this.Name               = queueDescription.Path;
@@ -88,6 +90,23 @@
             return this.queueClient.SendBatchAsync(
                 batch.Select(o => new BrokeredMessage(o))
             );
+        }
+
+        /// <summary>
+        /// Receives a batch of messages from the queue in a single transaction.
+        /// </summary>
+        /// <param name="maxWaitTime">Specifies the maximum amount of time to wait for messages before returning.</param>
+        /// <returns>Returns an enumeration of the messages that were received.</returns>
+        public
+        async Task<IEnumerable<object>>
+        ReceiveBatch(
+            TimeSpan maxWaitTime)
+        {
+            var batch = await this.queueClient
+                .ReceiveBatchAsync(messageCount: 100, serverWaitTime: maxWaitTime)
+                .ConfigureAwait(false);
+
+            return batch.Select(message => (object)message);
         }
     }
 }

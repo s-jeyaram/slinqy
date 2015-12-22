@@ -39,6 +39,11 @@
         private static readonly ConcurrentDictionary<string, FillQueueStatusViewModel> FillOperations = new ConcurrentDictionary<string, FillQueueStatusViewModel>();
 
         /// <summary>
+        /// Maintains a list of queue read operations.
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, ReadQueueStatusViewModel> ReadOperations = new ConcurrentDictionary<string, ReadQueueStatusViewModel>();
+
+        /// <summary>
         /// Tracks the last created queue.
         /// This currently does not support running multiple instances of the website.
         /// </summary>
@@ -156,6 +161,54 @@
         }
 
         /// <summary>
+        /// Handles the HTTP POST /api/slinqy-queue/{queueName}/read-request by reading all the messages in the specified queue.
+        /// </summary>
+        /// <param name="queueName">
+        /// Specifies the name of the Slinqy queue to read.
+        /// </param>
+        [HttpPost]
+        [Route("api/slinqy-queue/{queueName}/read-request", Name = "ReadQueue")]
+        public
+        void
+        StartReadQueue(
+            string queueName)
+        {
+            // Start the async task.
+            this.ReadQueue(queueName)
+                .ConfigureAwait(false);
+
+            ReadOperations.AddOrUpdate(
+                key: queueName,
+                addValueFactory: name => new ReadQueueStatusViewModel { Status = ReadQueueStatus.Running },
+                updateValueFactory: (name, readOperation) => {
+                    if (readOperation.Status != ReadQueueStatus.Finished)
+                        throw new InvalidOperationException("A previous read operation is still in progress.");
+
+                    return new ReadQueueStatusViewModel { Status = ReadQueueStatus.Running };
+                }
+
+            );
+
+            // Return while the task continues to run in the background.
+        }
+
+        /// <summary>
+        /// Handles the HTTP GET /api/slinqy-queue/{queueName}/read-request by returning the current status.
+        /// </summary>
+        /// <param name="queueName">Specifies the name of the queue to get the read request status for.</param>
+        /// <returns>Returns information about the read status.</returns>
+        [HttpGet]
+        [Route("api/slinqy-queue/{queueName}/read-request", Name = "GetReadQueueStatus")]
+        public
+        ReadQueueStatusViewModel
+        GetReadQueueStatus(
+            string queueName)
+        {
+            this.ToString();
+            return ReadOperations[queueName];
+        }
+
+        /// <summary>
         /// Attempts to fill the specified Slinqy queue with random data.
         /// </summary>
         /// <param name="queueName">
@@ -208,6 +261,44 @@
             }
 
             FillOperations[queueName].Status = FillQueueStatus.Finished;
+        }
+
+        /// <summary>
+        /// Attempts to read the specified Slinqy queue until it's empty.
+        /// </summary>
+        /// <param name="queueName">
+        /// Specifies the name of the Slinqy queue to read.
+        /// </param>
+        /// <returns>Returns an async Task for the work.</returns>
+        private
+        async Task
+        ReadQueue(
+            string queueName)
+        {
+            // Get the queue.
+            var queue = SlinqyQueueClient.Get(queueName);
+
+            while (queue.CurrentQueueSizeBytes > 0)
+            {
+                try
+                {
+                    // Receive the batch of messages.
+                    var maxWaitTimeSpan = TimeSpan.FromSeconds(1);
+                    var receivedBatch = await queue.ReceiveBatch(maxWaitTimeSpan)
+                        .ConfigureAwait(false);
+
+                    ReadOperations[queueName]
+                        .ReceivedCount += receivedBatch.Count();
+                }
+                catch (Exception exception)
+                {
+                    Trace.TraceWarning(
+                        "Exception while receiving batch (will retry):\r\n" + exception
+                    );
+                }
+            }
+
+            ReadOperations[queueName].Status = ReadQueueStatus.Finished;
         }
     }
 }
