@@ -53,7 +53,22 @@
         /// <summary>
         /// Gets the index of this shard within the SlinqyQueue.
         /// </summary>
-        public virtual int ShardIndex => ParseQueueNameForIndex(this.PhysicalQueue.Name);
+        public virtual int ShardIndex
+        {
+            get
+            {
+                var index   = 0;
+                var padding = 0;
+
+                ParseQueueName(
+                    this.PhysicalQueue.Name,
+                    out index,
+                    out padding
+                );
+
+                return index;
+            }
+        }
 
         /// <summary>
         /// Gets the current storage utilization percentage of this shard.
@@ -74,6 +89,39 @@
         /// Gets a value indicating whether this shard is enabled for both sending and receiving (true), or not (false).
         /// </summary>
         public virtual bool IsSendReceiveEnabled => this.PhysicalQueue.IsReceiveEnabled && this.PhysicalQueue.IsSendEnabled;
+
+        /// <summary>
+        /// Parses the specified shard name and generates the next one based on it.
+        /// </summary>
+        /// <param name="shardName">
+        /// Specifies the name of a shard to parse.  Any zero padding will be maintained.
+        /// </param>
+        /// <returns>Returns the next shard name based on the specified shard name.</returns>
+        public
+        static
+        string
+        GenerateNextShardName(
+            string shardName)
+        {
+            var index   = 0;
+            var padding = 0;
+
+            var slinqyQueueName = ParseQueueName(
+                shardName,
+                out index,
+                out padding
+            );
+
+            var nextIndex            = index + 1;
+            var nextIndexWithPadding = nextIndex.ToString("D" + padding, CultureInfo.InvariantCulture);
+
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}{1}",
+                slinqyQueueName,
+                nextIndexWithPadding
+            );
+        }
 
         /// <summary>
         /// Sends the batch of messages to the physical queue shard.
@@ -109,25 +157,42 @@
         }
 
         /// <summary>
-        /// Parses the specified name and returns the shard index that is included in the name.
+        /// Parses the specified name and returns the Slinqy Queue name.
         /// </summary>
         /// <param name="name">
         /// Specifies the name of the physical queue.
+        /// </param>
+        /// <param name="index">
+        /// Returns the numerical index of the shard based on the name.
+        /// </param>
+        /// <param name="padding">
+        /// Returns the amount of padding that was included in the name.
         /// </param>
         /// <returns>
         /// Returns the shard index that was parsed from the name.
         /// </returns>
         private
         static
-        int
-        ParseQueueNameForIndex(
-            string name)
+        string
+        ParseQueueName(
+            string  name,
+            out int index,
+            out int padding)
         {
+            // Parse the name to extract the index using a regular expression.
             var match = ShardIndexRegEx.Match(name);
 
-            var index = match.Groups[0].Value;
+            // Get the full index string, including any zero padding.
+            var indexString = match.Groups[0].Value;
 
-            return int.Parse(index, CultureInfo.InvariantCulture);
+            // Parse out just the name of the queue, minus any index information.
+            var parsedName  = name.Substring(0, name.Length - indexString.Length);
+
+            // Parse the index to an actual integer.
+            index   = int.Parse(indexString, CultureInfo.InvariantCulture);
+            padding = indexString.Length;
+
+            return parsedName;
         }
     }
 }

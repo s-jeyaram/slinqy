@@ -12,10 +12,16 @@
     public class SlinqyQueueShardTests
     {
         /// <summary>
+        /// Represents a valid value where one is needed for a Slinqy queue name parameters.
+        /// Should not be a special value other than it is guaranteed to be valid.
+        /// </summary>
+        private const string ValidSlinqyQueueName = "queue-name";
+
+        /// <summary>
         /// Represents a valid value where one is needed for a Slinqy shard name parameters.
         /// Should not be a special value other than it is guaranteed to be valid.
         /// </summary>
-        private const string ValidSlinqyShardName = "queue-name0";
+        private const string ValidSlinqyShardName = ValidSlinqyQueueName + "0";
 
         /// <summary>
         /// Represents a valid value where one is needed for max wait timespan parameters.
@@ -314,6 +320,25 @@
 
             // Assert
             Assert.False(actualValue);
+        }
+
+        /// <summary>
+        /// Verifies that GenerateNextShardName properly handles zero padding in shard names from existing shard names.
+        /// </summary>
+        [Fact]
+        public
+        void
+        GenerateNextShardName_ZeroPaddedShardName_ReturnsIncrementedShardNameWithMatchingPadding()
+        {
+            // Arrange
+            this.ToString();
+            const string ExistingShardName = ValidSlinqyQueueName + "0001";
+
+            // Act
+            var actual = SlinqyQueueShard.GenerateNextShardName(ExistingShardName);
+
+            // Assert
+            Assert.Equal(ValidSlinqyQueueName + "0002", actual);
         }
     }
 }
