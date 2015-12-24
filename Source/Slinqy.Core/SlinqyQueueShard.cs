@@ -91,6 +91,28 @@
         public virtual bool IsSendReceiveEnabled => this.PhysicalQueue.IsReceiveEnabled && this.PhysicalQueue.IsSendEnabled;
 
         /// <summary>
+        /// Generates the name of the first physical queue shard for a Slinqy queue.
+        /// </summary>
+        /// <param name="slinqyQueueName">
+        /// Specifies the name of the Slinqy queue.
+        /// </param>
+        /// <param name="shardIndexPadding">
+        /// Specifies how many digits the shard index can occupy in the physical queue name.
+        /// </param>
+        /// <returns>
+        /// Returns the name of what the first physical queue shard should be.
+        /// </returns>
+        public
+        static
+        string
+        GenerateFirstShardName(
+            string  slinqyQueueName,
+            int     shardIndexPadding)
+        {
+            return slinqyQueueName + 0.ToString("D" + shardIndexPadding, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
         /// Parses the specified shard name and generates the next one based on it.
         /// </summary>
         /// <param name="shardName">

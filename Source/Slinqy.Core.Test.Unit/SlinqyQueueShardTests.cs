@@ -51,6 +51,45 @@
         }
 
         /// <summary>
+        /// Verifies that the GenerateFirstShardName returns the correct
+        /// shard name when index padding is specified.
+        /// </summary>
+        [Fact]
+        public
+        static
+        void
+        GenerateFirstShardName_MultipleShardIndexPaddingIsSpecified_ReturnsCorrectName()
+        {
+            // Arrange
+            const int ShardIndexPadding = 2;
+
+            // Act
+            var actual = SlinqyQueueShard.GenerateFirstShardName(ValidSlinqyQueueName, ShardIndexPadding);
+
+            // Assert
+            Assert.Equal(ValidSlinqyQueueName + "00", actual);
+        }
+
+        /// <summary>
+        /// Verifies that GenerateNextShardName properly handles zero padding in shard names from existing shard names.
+        /// </summary>
+        [Fact]
+        public
+        static
+        void
+        GenerateNextShardName_ZeroPaddedShardName_ReturnsIncrementedShardNameWithMatchingPadding()
+        {
+            // Arrange
+            const string ExistingShardName = ValidSlinqyQueueName + "0001";
+
+            // Act
+            var actual = SlinqyQueueShard.GenerateNextShardName(ExistingShardName);
+
+            // Assert
+            Assert.Equal(ValidSlinqyQueueName + "0002", actual);
+        }
+
+        /// <summary>
         /// Verifies that the constructor checks the physicalQueue parameter.
         /// </summary>
         [Fact]
@@ -320,25 +359,6 @@
 
             // Assert
             Assert.False(actualValue);
-        }
-
-        /// <summary>
-        /// Verifies that GenerateNextShardName properly handles zero padding in shard names from existing shard names.
-        /// </summary>
-        [Fact]
-        public
-        void
-        GenerateNextShardName_ZeroPaddedShardName_ReturnsIncrementedShardNameWithMatchingPadding()
-        {
-            // Arrange
-            this.ToString();
-            const string ExistingShardName = ValidSlinqyQueueName + "0001";
-
-            // Act
-            var actual = SlinqyQueueShard.GenerateNextShardName(ExistingShardName);
-
-            // Assert
-            Assert.Equal(ValidSlinqyQueueName + "0002", actual);
         }
     }
 }

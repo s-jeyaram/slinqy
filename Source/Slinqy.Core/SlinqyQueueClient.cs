@@ -50,20 +50,25 @@
         /// <param name="queueName">
         /// Specifies the name of the queue.
         /// </param>
+        /// <param name="shardIndexPadding">
+        /// Specifies how many digits should be used for the index part of the queue shard name.
+        /// For example:
+        /// CreateQueueAsync("my-queue", 1) will generate the following: "my-queue0", "my-queue1", "my-queue2", etc.
+        /// CreateQueueAsync("my-queue", 2) will generate the following: "my-queue00", "my-queue01", "my-queue02", etc.
+        /// </param>
         /// <returns>Returns the resulting SlinqyQueue that was created.</returns>
         public
         async Task<SlinqyQueue>
         CreateQueueAsync(
-            string queueName)
+            string  queueName,
+            int     shardIndexPadding)
         {
             if (string.IsNullOrWhiteSpace(queueName))
                 throw new ArgumentNullException(nameof(queueName));
 
-            var queueShardName = string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}{1}",
-                queueName,
-                DefaultShardIndex
+            var queueShardName = SlinqyQueueShard.GenerateFirstShardName(
+                slinqyQueueName:    queueName,
+                shardIndexPadding:  shardIndexPadding
             );
 
             // Call the function to create the first physical queue shard to establish the virtual queue.
@@ -86,6 +91,23 @@
             this.slinqyQueues.TryAdd(queueName, queue);
 
             return queue;
+        }
+
+        /// <summary>
+        /// Creates a new queue with a default shardIndexPadding of 1,
+        /// which allows for a maximum of 10 (0 - 9).
+        /// </summary>
+        /// <param name="queueName">
+        /// Specifies the name of the queue.
+        /// </param>
+        /// <returns>Returns the resulting SlinqyQueue that was created.</returns>
+        public
+        async Task<SlinqyQueue>
+        CreateQueueAsync(
+            string  queueName)
+        {
+            return await this.CreateQueueAsync(queueName, 1)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
