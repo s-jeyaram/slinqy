@@ -114,8 +114,7 @@
             SlinqyQueueShard currentSendShard)
         {
             // Add next shard!
-            var nextShardIndex = currentSendShard.ShardIndex + 1;
-            var nextShardName  = this.queueShardMonitor.QueueName + nextShardIndex;
+            var nextShardName = SlinqyQueueShard.GenerateNextShardName(currentSendShard.PhysicalQueue.Name);
 
             await this.queueService.CreateSendOnlyQueue(nextShardName)
                 .ConfigureAwait(false);

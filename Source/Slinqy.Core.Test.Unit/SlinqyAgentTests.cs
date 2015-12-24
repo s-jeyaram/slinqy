@@ -130,26 +130,6 @@
         }
 
         /// <summary>
-        /// Verifies that the name of the new shard is correct.
-        /// </summary>
-        [Fact]
-        public
-        void
-        SlinqyAgent_AnotherShardAdded_ShardNameIsCorrect()
-        {
-            // Arrange
-            A.CallTo(() => this.fakeShard.StorageUtilization).Returns(ValidStorageCapacityScaleOutThreshold + 0.01);
-
-            // Act
-            this.slinqyAgent.Start();
-
-            // Assert
-            A.CallTo(() =>
-                this.fakeQueueService.CreateSendOnlyQueue(ValidSlinqyQueueName + "1")
-            ).MustHaveHappened();
-        }
-
-        /// <summary>
         /// Verifies that the previous shard is set to be receive only after a new write shard is added.
         /// </summary>
         [Fact]

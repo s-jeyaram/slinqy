@@ -87,7 +87,10 @@
             if (createQueueModel == null)
                 throw new ArgumentNullException(nameof(createQueueModel));
 
-            var queue = await SlinqyQueueClient.CreateQueueAsync(createQueueModel.QueueName);
+            var queue = await SlinqyQueueClient.CreateQueueAsync(
+                queueName:          createQueueModel.QueueName,
+                shardIndexPadding:  4
+            );
 
             var monitor = new SlinqyQueueShardMonitor(
                 createQueueModel.QueueName,
