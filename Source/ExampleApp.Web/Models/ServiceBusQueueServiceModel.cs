@@ -122,7 +122,7 @@
         }
 
         /// <summary>
-        /// Sets the specified Service Bus queue in to a Enabled mode for both reading and writing.
+        /// Sets the specified Service Bus queue in to a Enabled mode for both sending and receiving.
         /// </summary>
         /// <param name="name">Specifies the queue path.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>

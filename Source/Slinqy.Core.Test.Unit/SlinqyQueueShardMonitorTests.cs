@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
-    using System.Threading.Tasks;
     using FakeItEasy;
     using Xunit;
 
@@ -78,26 +77,26 @@
         }
 
         /// <summary>
-        /// Verifies that the WriteShard property reflects the current write shard.
+        /// Verifies that the SendShard property reflects the current send shard.
         /// </summary>
         [Fact]
         public
         void
-        WriteShard_OneReadWriteShardExists_SlinqyQueueWriteShardIsReturned()
+        WriteShard_OneSendReceiveShardExists_SlinqyQueueSendShardIsReturned()
         {
             // Arrange
-            var fakeReadWritePhysicalQueue = A.Fake<IPhysicalQueue>();
+            var fakeSendReceivePhysicalQueue = A.Fake<IPhysicalQueue>();
 
             A.CallTo(() =>
-                fakeReadWritePhysicalQueue.Name
+                fakeSendReceivePhysicalQueue.Name
             ).Returns(ValidSlinqyQueueName + "0");
 
             A.CallTo(() =>
-                fakeReadWritePhysicalQueue.IsSendEnabled
+                fakeSendReceivePhysicalQueue.IsSendEnabled
             ).Returns(true);
 
             var physicalQueues = new List<IPhysicalQueue> {
-                fakeReadWritePhysicalQueue
+                fakeSendReceivePhysicalQueue
             };
 
             A.CallTo(() =>
@@ -109,7 +108,7 @@
 
             // Assert
             Assert.Equal(
-                fakeReadWritePhysicalQueue.Name,
+                fakeSendReceivePhysicalQueue.Name,
                 this.monitor.SendShard.PhysicalQueue.Name
             );
         }
@@ -120,20 +119,20 @@
         [Fact]
         public
         void
-        WriteShard_OneReadOneWriteShardExists_SlinqyQueueWriteShardIsReturned()
+        WriteShard_OneReceiveOneSendShardExists_SlinqyQueueSendShardIsReturned()
         {
             // Arrange
-            var fakeReadPhysicalQueue  = A.Fake<IPhysicalQueue>();
-            var fakeWritePhysicalQueue = A.Fake<IPhysicalQueue>();
+            var fakeReceivePhysicalQueue  = A.Fake<IPhysicalQueue>();
+            var fakeSendPhysicalQueue     = A.Fake<IPhysicalQueue>();
 
-            A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard0");
-            A.CallTo(() => fakeReadPhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => fakeWritePhysicalQueue.Name).Returns("shard1");
-            A.CallTo(() => fakeWritePhysicalQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeReceivePhysicalQueue.Name).Returns("shard0");
+            A.CallTo(() => fakeReceivePhysicalQueue.IsSendEnabled).Returns(false);
+            A.CallTo(() => fakeSendPhysicalQueue.Name).Returns("shard1");
+            A.CallTo(() => fakeSendPhysicalQueue.IsSendEnabled).Returns(true);
 
             var physicalQueues = new List<IPhysicalQueue> {
-                fakeReadPhysicalQueue,
-                fakeWritePhysicalQueue
+                fakeReceivePhysicalQueue,
+                fakeSendPhysicalQueue
             };
 
             A.CallTo(() =>
@@ -145,40 +144,40 @@
 
             // Assert
             Assert.Equal(
-                fakeWritePhysicalQueue.Name,
+                fakeSendPhysicalQueue.Name,
                 this.monitor.SendShard.PhysicalQueue.Name
             );
         }
 
         /// <summary>
-        /// Verifies that the WriteShard property reflects the current write shard.
+        /// Verifies that the SendShard property reflects the current send shard.
         /// </summary>
         [Fact]
         public
         void
-        WriteShard_OneReadManyDisabledOneWriteShardExists_SlinqyQueueWriteShardIsReturned()
+        SendShard_OneReceiveManyDisabledOneSendShardExists_SlinqyQueueSendShardIsReturned()
         {
             // Arrange
-            var fakeReadPhysicalQueue      = A.Fake<IPhysicalQueue>();
-            var fakeDisabled1PhysicalQueue = A.Fake<IPhysicalQueue>();
-            var fakeDisabled2PhysicalQueue = A.Fake<IPhysicalQueue>();
-            var fakeDisabled3PhysicalQueue = A.Fake<IPhysicalQueue>();
-            var fakeWritePhysicalQueue     = A.Fake<IPhysicalQueue>();
+            var fakeReceivePhysicalQueue    = A.Fake<IPhysicalQueue>();
+            var fakeDisabled1PhysicalQueue  = A.Fake<IPhysicalQueue>();
+            var fakeDisabled2PhysicalQueue  = A.Fake<IPhysicalQueue>();
+            var fakeDisabled3PhysicalQueue  = A.Fake<IPhysicalQueue>();
+            var fakeSendPhysicalQueue       = A.Fake<IPhysicalQueue>();
 
-            A.CallTo(() => fakeReadPhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard0");
+            A.CallTo(() => fakeReceivePhysicalQueue.IsSendEnabled).Returns(false);
+            A.CallTo(() => fakeReceivePhysicalQueue.Name).Returns("shard0");
             A.CallTo(() => fakeDisabled1PhysicalQueue.IsSendEnabled).Returns(false);
             A.CallTo(() => fakeDisabled1PhysicalQueue.Name).Returns("shard1");
             A.CallTo(() => fakeDisabled2PhysicalQueue.IsSendEnabled).Returns(false);
             A.CallTo(() => fakeDisabled2PhysicalQueue.Name).Returns("shard2");
             A.CallTo(() => fakeDisabled3PhysicalQueue.IsSendEnabled).Returns(false);
             A.CallTo(() => fakeDisabled3PhysicalQueue.Name).Returns("shard3");
-            A.CallTo(() => fakeWritePhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeWritePhysicalQueue.Name).Returns("shard4");
+            A.CallTo(() => fakeSendPhysicalQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeSendPhysicalQueue.Name).Returns("shard4");
 
             var physicalQueues = new List<IPhysicalQueue> {
-                fakeReadPhysicalQueue,
-                fakeWritePhysicalQueue
+                fakeReceivePhysicalQueue,
+                fakeSendPhysicalQueue
             };
 
             A.CallTo(() =>
@@ -190,41 +189,41 @@
 
             // Assert
             Assert.Equal(
-                fakeWritePhysicalQueue.Name,
+                fakeSendPhysicalQueue.Name,
                 this.monitor.SendShard.PhysicalQueue.Name
             );
         }
 
         /// <summary>
-        /// Verifies that the WriteShard property reflects the current write shard.
-        /// This scenario simulates the situation where the current write shard
-        /// just crosses the scale up threshold and a new write shard is added.
-        /// Once the new write shard is added, the old is disabled.
+        /// Verifies that the SendShard property reflects the current send shard.
+        /// This scenario simulates the situation where the current send shard
+        /// just crosses the scale up threshold and a new send shard is added.
+        /// Once the new send shard is added, the old is disabled.
         /// During this time there will be a short period where the old and new
-        /// write shards exist simultaneously since these operations cannot be
+        /// send shards exist simultaneously since these operations cannot be
         /// completed as a single atomic operation.
         /// </summary>
         [Fact]
         public
         void
-        WriteShard_MultipleWriteShardsExists_LastSlinqyQueueWriteShardIsReturned()
+        SendShard_MultipleSendShardsExists_LastSlinqyQueueSendShardIsReturned()
         {
             // Arrange
-            var fakeReadPhysicalQueue     = A.Fake<IPhysicalQueue>();
-            var fakeOldWritePhysicalQueue = A.Fake<IPhysicalQueue>();
-            var fakeNewWritePhysicalQueue = A.Fake<IPhysicalQueue>();
+            var fakeReceivePhysicalQueue    = A.Fake<IPhysicalQueue>();
+            var fakeOldSendPhysicalQueue    = A.Fake<IPhysicalQueue>();
+            var fakeNewSendPhysicalQueue    = A.Fake<IPhysicalQueue>();
 
-            A.CallTo(() => fakeReadPhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => fakeReadPhysicalQueue.Name).Returns("shard0");
-            A.CallTo(() => fakeOldWritePhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeOldWritePhysicalQueue.Name).Returns("shard1");
-            A.CallTo(() => fakeNewWritePhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeNewWritePhysicalQueue.Name).Returns("shard2");
+            A.CallTo(() => fakeReceivePhysicalQueue.IsSendEnabled).Returns(false);
+            A.CallTo(() => fakeReceivePhysicalQueue.Name).Returns("shard0");
+            A.CallTo(() => fakeOldSendPhysicalQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeOldSendPhysicalQueue.Name).Returns("shard1");
+            A.CallTo(() => fakeNewSendPhysicalQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeNewSendPhysicalQueue.Name).Returns("shard2");
 
             var physicalQueues = new List<IPhysicalQueue> {
-                fakeReadPhysicalQueue,
-                fakeOldWritePhysicalQueue,
-                fakeNewWritePhysicalQueue
+                fakeReceivePhysicalQueue,
+                fakeOldSendPhysicalQueue,
+                fakeNewSendPhysicalQueue
             };
 
             A.CallTo(() =>
@@ -236,7 +235,7 @@
 
             // Assert
             Assert.Equal(
-                fakeNewWritePhysicalQueue.Name,
+                fakeNewSendPhysicalQueue.Name,
                 this.monitor.SendShard.PhysicalQueue.Name
             );
         }
@@ -247,17 +246,17 @@
         [Fact]
         public
         void
-        ReceiveShard_OneReadWriteShardExists_SlinqyQueueReceiveShardIsReturned()
+        ReceiveShard_OneSendReceiveShardExists_SlinqyQueueReceiveShardIsReturned()
         {
             // Arrange
-            var fakeReadWritePhysicalQueue = A.Fake<IPhysicalQueue>();
+            var fakeSendReceivePhysicalQueue = A.Fake<IPhysicalQueue>();
 
-            A.CallTo(() => fakeReadWritePhysicalQueue.Name).Returns(ValidSlinqyQueueName + "0");
-            A.CallTo(() => fakeReadWritePhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeReadWritePhysicalQueue.IsReceiveEnabled).Returns(true);
+            A.CallTo(() => fakeSendReceivePhysicalQueue.Name).Returns(ValidSlinqyQueueName + "0");
+            A.CallTo(() => fakeSendReceivePhysicalQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeSendReceivePhysicalQueue.IsReceiveEnabled).Returns(true);
 
             var physicalQueues = new List<IPhysicalQueue> {
-                fakeReadWritePhysicalQueue
+                fakeSendReceivePhysicalQueue
             };
 
             A.CallTo(() =>
@@ -270,7 +269,7 @@
             var actualQueueShard = this.monitor.ReceiveShard;
 
             // Assert
-            Assert.Equal(fakeReadWritePhysicalQueue, actualQueueShard.PhysicalQueue);
+            Assert.Equal(fakeSendReceivePhysicalQueue, actualQueueShard.PhysicalQueue);
         }
 
         /// <summary>

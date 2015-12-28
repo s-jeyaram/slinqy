@@ -137,7 +137,7 @@
 
             var receivedCount = QueueSteps.ContextGet<ManageQueueSection>()
                 .QueueClient
-                .ReadQueue();
+                .ReceiveQueue();
 
             QueueSteps.ContextSet(receivedCount, nameof(receivedCount));
         }
