@@ -95,7 +95,7 @@
         /// <returns>Returns the count of received messages from the UI.</returns>
         public
         int
-        ReadQueue()
+        ReceiveQueue()
         {
             this.receiveQueueButton.Click();
 

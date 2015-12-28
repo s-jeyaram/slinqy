@@ -1,9 +1,9 @@
 ﻿namespace ExampleApp.Web.Models
 {
     /// <summary>
-    /// Defines the possible states of a read queue operation.
+    /// Defines the possible states of a receive queue operation.
     /// </summary>
-    public enum ReadQueueStatus
+    public enum ReceiveQueueStatus
     {
         /// <summary>
         /// Indicates the variable has not been initialized with a valid value.
@@ -11,12 +11,12 @@
         Uninitialized,
 
         /// <summary>
-        /// Indicates that the read queue operation is currently occurring.
+        /// Indicates that the receive queue operation is currently occurring.
         /// </summary>
         Running,
 
         /// <summary>
-        /// Indicates that the read queue operation has completed.
+        /// Indicates that the receive queue operation has completed.
         /// </summary>
         Finished
     }

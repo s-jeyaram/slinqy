@@ -34,8 +34,8 @@ namespace Slinqy.Test.Functional.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Receive Queue Messages", "As a Queue Receiver\nI want to be able to always receive messages from the queue\nS" +
-                    "o that I can process them", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Receive Queue Messages", "As a Queue Receiver\r\nI want to be able to always receive messages from the queue\r" +
+                    "\nSo that I can process them", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -75,10 +75,10 @@ namespace Slinqy.Test.Functional.Features
         
         [Xunit.FactAttribute()]
         [Xunit.TraitAttribute("FeatureTitle", "Receive Queue Messages")]
-        [Xunit.TraitAttribute("Description", "All queued messages can be read from a scaled out queue")]
-        public virtual void AllQueuedMessagesCanBeReadFromAScaledOutQueue()
+        [Xunit.TraitAttribute("Description", "All queued messages can be receive from a scaled out queue")]
+        public virtual void AllQueuedMessagesCanBeReceiveFromAScaledOutQueue()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("All queued messages can be read from a scaled out queue", ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("All queued messages can be receive from a scaled out queue", ((string[])(null)));
 #line 6
 this.ScenarioSetup(scenarioInfo);
 #line 7

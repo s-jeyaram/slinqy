@@ -39,9 +39,9 @@
         private static readonly ConcurrentDictionary<string, FillQueueStatusViewModel> FillOperations = new ConcurrentDictionary<string, FillQueueStatusViewModel>();
 
         /// <summary>
-        /// Maintains a list of queue read operations.
+        /// Maintains a list of queue receive operations.
         /// </summary>
-        private static readonly ConcurrentDictionary<string, ReadQueueStatusViewModel> ReadOperations = new ConcurrentDictionary<string, ReadQueueStatusViewModel>();
+        private static readonly ConcurrentDictionary<string, ReceiveQueueStatusViewModel> ReceiveOperations = new ConcurrentDictionary<string, ReceiveQueueStatusViewModel>();
 
         /// <summary>
         /// Tracks the last created queue.
@@ -164,30 +164,30 @@
         }
 
         /// <summary>
-        /// Handles the HTTP POST /api/slinqy-queue/{queueName}/read-request by reading all the messages in the specified queue.
+        /// Handles the HTTP POST /api/slinqy-queue/{queueName}/receive-request by receiving all the messages in the specified queue.
         /// </summary>
         /// <param name="queueName">
-        /// Specifies the name of the Slinqy queue to read.
+        /// Specifies the name of the Slinqy queue to receive.
         /// </param>
         [HttpPost]
-        [Route("api/slinqy-queue/{queueName}/read-request", Name = "ReadQueue")]
+        [Route("api/slinqy-queue/{queueName}/receive-request", Name = "ReceiveQueue")]
         public
         void
-        StartReadQueue(
+        StartReceiveQueue(
             string queueName)
         {
             // Start the async task.
-            this.ReadQueue(queueName)
+            this.ReceiveQueue(queueName)
                 .ConfigureAwait(false);
 
-            ReadOperations.AddOrUpdate(
-                key: queueName,
-                addValueFactory: name => new ReadQueueStatusViewModel { Status = ReadQueueStatus.Running },
-                updateValueFactory: (name, readOperation) => {
-                    if (readOperation.Status != ReadQueueStatus.Finished)
-                        throw new InvalidOperationException("A previous read operation is still in progress.");
+            ReceiveOperations.AddOrUpdate(
+                key:                queueName,
+                addValueFactory:    name => new ReceiveQueueStatusViewModel { Status = ReceiveQueueStatus.Running },
+                updateValueFactory: (name, receiveOperation) => {
+                    if (receiveOperation.Status != ReceiveQueueStatus.Finished)
+                        throw new InvalidOperationException("A previous receive operation is still in progress.");
 
-                    return new ReadQueueStatusViewModel { Status = ReadQueueStatus.Running };
+                    return new ReceiveQueueStatusViewModel { Status = ReceiveQueueStatus.Running };
                 }
 
             );
@@ -196,19 +196,19 @@
         }
 
         /// <summary>
-        /// Handles the HTTP GET /api/slinqy-queue/{queueName}/read-request by returning the current status.
+        /// Handles the HTTP GET /api/slinqy-queue/{queueName}/receive-request by returning the current status.
         /// </summary>
-        /// <param name="queueName">Specifies the name of the queue to get the read request status for.</param>
-        /// <returns>Returns information about the read status.</returns>
+        /// <param name="queueName">Specifies the name of the queue to get the receive request status for.</param>
+        /// <returns>Returns information about the receive status.</returns>
         [HttpGet]
-        [Route("api/slinqy-queue/{queueName}/read-request", Name = "GetReadQueueStatus")]
+        [Route("api/slinqy-queue/{queueName}/receive-request", Name = "GetReceiveQueueStatus")]
         public
-        ReadQueueStatusViewModel
-        GetReadQueueStatus(
+        ReceiveQueueStatusViewModel
+        GetReceiveQueueStatus(
             string queueName)
         {
             this.ToString();
-            return ReadOperations[queueName];
+            return ReceiveOperations[queueName];
         }
 
         /// <summary>
@@ -267,15 +267,15 @@
         }
 
         /// <summary>
-        /// Attempts to read the specified Slinqy queue until it's empty.
+        /// Attempts to receive the specified Slinqy queue until it's empty.
         /// </summary>
         /// <param name="queueName">
-        /// Specifies the name of the Slinqy queue to read.
+        /// Specifies the name of the Slinqy queue to receive.
         /// </param>
         /// <returns>Returns an async Task for the work.</returns>
         private
         async Task
-        ReadQueue(
+        ReceiveQueue(
             string queueName)
         {
             // Get the queue.
@@ -287,10 +287,10 @@
                 {
                     // Receive the batch of messages.
                     var maxWaitTimeSpan = TimeSpan.FromSeconds(1);
-                    var receivedBatch = await queue.ReceiveBatch(maxWaitTimeSpan)
+                    var receivedBatch   = await queue.ReceiveBatch(maxWaitTimeSpan)
                         .ConfigureAwait(false);
 
-                    ReadOperations[queueName]
+                    ReceiveOperations[queueName]
                         .ReceivedCount += receivedBatch.Count();
                 }
                 catch (Exception exception)
@@ -301,7 +301,7 @@
                 }
             }
 
-            ReadOperations[queueName].Status = ReadQueueStatus.Finished;
+            ReceiveOperations[queueName].Status = ReceiveQueueStatus.Finished;
         }
     }
 }
