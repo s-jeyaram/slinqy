@@ -82,7 +82,9 @@
                 this.physicalQueueService
             );
 
-            shardMonitor.Start();
+            await shardMonitor
+                .Start()
+                .ConfigureAwait(false);
 
             var queue = new SlinqyQueue(
                 shardMonitor

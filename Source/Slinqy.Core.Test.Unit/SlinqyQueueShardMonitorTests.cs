@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using FakeItEasy;
     using Xunit;
 
@@ -43,9 +44,10 @@
         /// <summary>
         /// Verifies that physical queue shards are correctly represented as SlinqyQueueShards.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         SlinqyQueueShardMonitor_PhysicalQueueShardsExists_MatchingSlinqyQueueShardsExist()
         {
             // Arrange
@@ -65,7 +67,7 @@
             ).Returns(physicalQueues);
 
             // Act
-            this.monitor.Start();                  // Start monitoring for shards.
+            await this.monitor.Start();                  // Start monitoring for shards.
 
             var slinqyQueueShards = this.monitor.Shards; // Retrieve shards that were detected.
 
@@ -79,9 +81,10 @@
         /// <summary>
         /// Verifies that the SendShard property reflects the current send shard.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         WriteShard_OneSendReceiveShardExists_SlinqyQueueSendShardIsReturned()
         {
             // Arrange
@@ -104,7 +107,7 @@
             ).Returns(physicalQueues);
 
             // Act
-            this.monitor.Start();
+            await this.monitor.Start();
 
             // Assert
             Assert.Equal(
@@ -116,9 +119,10 @@
         /// <summary>
         /// Verifies that the WriteShard property reflects the current write shard.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         WriteShard_OneReceiveOneSendShardExists_SlinqyQueueSendShardIsReturned()
         {
             // Arrange
@@ -140,7 +144,7 @@
             ).Returns(physicalQueues);
 
             // Act
-            this.monitor.Start();
+            await this.monitor.Start();
 
             // Assert
             Assert.Equal(
@@ -152,9 +156,10 @@
         /// <summary>
         /// Verifies that the SendShard property reflects the current send shard.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         SendShard_OneReceiveManyDisabledOneSendShardExists_SlinqyQueueSendShardIsReturned()
         {
             // Arrange
@@ -185,7 +190,7 @@
             ).Returns(physicalQueues);
 
             // Act
-            this.monitor.Start();
+            await this.monitor.Start();
 
             // Assert
             Assert.Equal(
@@ -203,9 +208,10 @@
         /// send shards exist simultaneously since these operations cannot be
         /// completed as a single atomic operation.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         SendShard_MultipleSendShardsExists_LastSlinqyQueueSendShardIsReturned()
         {
             // Arrange
@@ -231,7 +237,7 @@
             ).Returns(physicalQueues);
 
             // Act
-            this.monitor.Start();
+            await this.monitor.Start();
 
             // Assert
             Assert.Equal(
@@ -243,9 +249,10 @@
         /// <summary>
         /// Verifies that the ReceiveShard property reflects the current receive shard.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         ReceiveShard_OneSendReceiveShardExists_SlinqyQueueReceiveShardIsReturned()
         {
             // Arrange
@@ -263,7 +270,7 @@
                 this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
             ).Returns(physicalQueues);
 
-            this.monitor.Start();
+            await this.monitor.Start();
 
             // Act
             var actualQueueShard = this.monitor.ReceiveShard;
@@ -276,17 +283,20 @@
         /// Verifies that the SlinqyQueueShardMonitor does not end if an unhandled exception occurs
         /// while monitoring the physical queues, but instead retries the operation.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         SlinqyQueueShardMonitor_ExceptionOccursDuringRefresh_Retries()
         {
             // Arrange
-            A.CallTo(() => this.fakeQueueService.ListQueues(A<string>.Ignored)).Throws<Exception>().Once();
+            await this.monitor.Start();
+
+            A.CallTo(() => this.fakeQueueService.ListQueues(A<string>.Ignored))
+                .Throws<Exception>()
+                .Once();
 
             // Act
-            this.monitor.Start();
-
             Thread.Sleep(2000); // TODO: Reduce when monitor poll delay is configurable.
 
             // Assert
@@ -298,13 +308,14 @@
         /// <summary>
         /// Verifies that the SlinqyQueueMonitor stops polling the queuing service after Stop is called.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         StopMonitoring_IsRunning_StopsPollingTheQueuingService()
         {
             // Arrange
-            this.monitor.Start();
+            await this.monitor.Start();
 
             // Act
             this.monitor.StopMonitoring();
@@ -313,7 +324,7 @@
             // Assert
             A.CallTo(
                 () => this.fakeQueueService.ListQueues(A<string>.Ignored)
-            ).MustHaveHappened(Repeated.Exactly.Once);
+            ).MustHaveHappened(Repeated.Exactly.Twice);
         }
     }
 }

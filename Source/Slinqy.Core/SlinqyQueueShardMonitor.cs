@@ -64,15 +64,19 @@
         /// <summary>
         /// Starts polling the physical resources to update the Shards property values.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public
         virtual
-        void
+        async Task
         Start()
         {
+            // Perform the first poll in this call stack before spinning it off.
+            await this.Refresh().ConfigureAwait(false);
+
             // Start polling
             this.monitoring = true;
             this.pollQueuesTask = this.PollQueues();
-            this.pollQueuesTask.ConfigureAwait(false);
+            var x = this.pollQueuesTask.ConfigureAwait(false);
         }
 
         /// <summary>

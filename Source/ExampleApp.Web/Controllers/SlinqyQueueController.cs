@@ -103,7 +103,7 @@
                 createQueueModel.StorageCapacityScaleOutThresholdPercentage / 100D
             );
 
-            slinqyAgent.Start();
+            await slinqyAgent.Start();
 
             return new QueueInformationViewModel(
                 queue.Name,
