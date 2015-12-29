@@ -102,6 +102,27 @@
         }
 
         /// <summary>
+        /// Verifies that the Send method properly submits the message to the underlying physical queue.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [Fact]
+        public
+        async Task
+        Send_MessageIsValid_MessageSentToPhysicalQueue()
+        {
+            // Arrange
+            var validMessage = "message 1";
+
+            // Act
+            await this.slinqyQueueShard.Send(validMessage);
+
+            // Assert
+            A.CallTo(() =>
+                this.fakePhysicalQueue.Send(validMessage)
+            ).MustHaveHappened();
+        }
+
+        /// <summary>
         /// Verifies that the SendBatch method properly submits the batch to the underlying physical queue.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -180,6 +201,25 @@
 
             // Assert
             Assert.True(actualValue);
+        }
+
+        /// <summary>
+        /// Verifies that Receive calls the underlying IPhysicalQueue method.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        Receive_Always_CallsReceiveOnPhysicalQueue()
+        {
+            // Arrange
+            // Act
+            await this.slinqyQueueShard.Receive();
+
+            // Assert
+            A.CallTo(() =>
+                this.fakePhysicalQueue.Receive()
+            ).MustHaveHappened();
         }
 
         /// <summary>

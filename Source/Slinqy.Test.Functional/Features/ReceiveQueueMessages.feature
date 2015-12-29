@@ -5,5 +5,5 @@
 
 Scenario: All queued messages can be receive from a scaled out queue
 	Given a Queue whose storage has scaled out
-	When the Queue Receiver is restored
+	When the Queue Receiver is started
 	Then the all the messages can be received

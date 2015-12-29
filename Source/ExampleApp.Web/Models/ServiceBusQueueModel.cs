@@ -108,5 +108,35 @@
 
             return batch.Select(message => (object)message);
         }
+
+        /// <summary>
+        /// Sends the message to the queue.
+        /// </summary>
+        /// <param name="messageBody">Specifies the body of the message.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public
+        async Task
+        Send(
+            string messageBody)
+        {
+            await this.queueClient
+                .SendAsync(new BrokeredMessage(messageBody))
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Receives the next message from the queue.
+        /// </summary>
+        /// <returns>The body of the message that was received.</returns>
+        public
+        async Task<string>
+        Receive()
+        {
+            var message = await this.queueClient
+                .ReceiveAsync()
+                .ConfigureAwait(false);
+
+            return message.GetBody<string>();
+        }
     }
 }

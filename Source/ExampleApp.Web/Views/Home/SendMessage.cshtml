@@ -1,0 +1,50 @@
+﻿@model ExampleApp.Web.Models.SendMessageCommandModel
+
+<form id="SendMessageForm">
+    @Html.EditorForModel()
+    <button id="SendMessageButton" type="button">Send</button>
+</form>
+
+<script type="text/javascript">
+    // Called when the user initiates a send message AJAX request.
+    function SendMessageStarted() {
+        // Disable the button so it cannot be double clicked, or more.
+        $('#SendMessageButton').prop('disabled', true);
+        $('#SendMessageButton').text('Sending...');
+
+        $('#AjaxStatus').text('STARTED');
+        $('#AjaxStatusMessage').text('Request submitting, awaiting a response from the server.');
+    }
+
+    function SendMessageSucceeded() {
+        $('#AjaxResult').text('SUCCEEDED');
+        $('#AjaxStatusMessage').text('The last request was successful.');
+    }
+
+    function SendMessageFailed(response) {
+        $('#AjaxResult').text('FAILED');
+        $('#AjaxStatusMessage').text(response.responseText);
+    }
+
+    function SendMessageCompleted() {
+        $('#SendMessageButton')
+            .prop('disabled', false)
+            .text('Send');
+
+        $('#AjaxStatus').text('COMPLETED');
+    }
+
+    function SendMessage() {
+        $.post('@Url.HttpRouteUrl("SendMessage", new { queueName = ViewBag.QueueName })', $('#SendMessageForm').serialize())
+            .done(SendMessageSucceeded)
+            .fail(SendMessageFailed)
+            .always(SendMessageCompleted);
+
+        SendMessageStarted();
+    }
+
+    $(function () {
+        $('#SendMessageButton').click(SendMessage);
+    });
+</script>
+

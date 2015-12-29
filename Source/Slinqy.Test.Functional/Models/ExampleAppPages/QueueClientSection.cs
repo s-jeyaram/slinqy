@@ -4,6 +4,7 @@
     using System.Threading;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
+    using Strings;
 
     /// <summary>
     /// Models the queue client section of the Homepage.
@@ -46,6 +47,34 @@
         private IWebElement receiveQueueMessagesReceived = null;
 
         /// <summary>
+        /// A proxy reference to the element in the web browser.
+        /// </summary>
+        /// <remarks>This field is automatically populated by SpecFlow.</remarks>
+        [FindsBy(How = How.Id, Using = "MessageBody")]
+        private IWebElement messageBodyInput = null;
+
+        /// <summary>
+        /// A proxy reference to the element in the web browser.
+        /// </summary>
+        /// <remarks>This field is automatically populated by SpecFlow.</remarks>
+        [FindsBy(How = How.Id, Using = "SendMessageButton")]
+        private IWebElement sendMessageButton = null;
+
+        /// <summary>
+        /// A proxy reference to the element in the web browser.
+        /// </summary>
+        /// <remarks>This field is automatically populated by SpecFlow.</remarks>
+        [FindsBy(How = How.Id, Using = "ReceiveMessageButton")]
+        private IWebElement receiveMessageButton = null;
+
+        /// <summary>
+        /// A proxy reference to the element in the web browser.
+        /// </summary>
+        /// <remarks>This field is automatically populated by SpecFlow.</remarks>
+        [FindsBy(How = How.Id, Using = "ReceivedMessageBody")]
+        private IWebElement receivedMessageBody = null;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="QueueClientSection"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the driver to use for interacting with the web browser.</param>
@@ -82,6 +111,7 @@
             this.fillQueueButton.Click();
 
             // Wait for it to finish
+            // TODO: Timeout after a while.
             while (!this.fillQueueButton.Enabled)
                 Thread.Sleep(500);
 
@@ -100,11 +130,52 @@
             this.receiveQueueButton.Click();
 
             // Wait for it to finish
+            // TODO: Timeout after a while.
             while (!this.receiveQueueButton.Enabled)
                 Thread.Sleep(500);
 
             // Get the # of messages from the UI.
             return int.Parse(this.receiveQueueMessagesReceived.Text, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Sends a randomly generated message to the queue.
+        /// </summary>
+        /// <returns>Returns the body of the randomly generated message.</returns>
+        public
+        string
+        SendMessage()
+        {
+            var randomMessage = StringUtilities.RandomString(10);
+
+            this.messageBodyInput.SendKeys(randomMessage);
+
+            this.sendMessageButton.Click();
+
+            // Wait for it to finish
+            // TODO: Timeout after a while.
+            while (!this.sendMessageButton.Enabled)
+                Thread.Sleep(500);
+
+            return randomMessage;
+        }
+
+        /// <summary>
+        /// Receives a single message from the queue.
+        /// </summary>
+        /// <returns>Returns the body of the queue message that was received.</returns>
+        public
+        string
+        ReceiveQueueMessage()
+        {
+            this.receiveMessageButton.Click();
+
+            // Wait for it to finish
+            // TODO: Timeout after a while.
+            while (!this.receiveMessageButton.Enabled)
+                Thread.Sleep(500);
+
+            return this.receivedMessageBody.Text;
         }
     }
 }

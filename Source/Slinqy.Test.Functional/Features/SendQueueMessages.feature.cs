@@ -18,15 +18,15 @@ namespace Slinqy.Test.Functional.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "1.9.0.77")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ReceiveQueueMessagesFeature : Xunit.IClassFixture<ReceiveQueueMessagesFeature.FixtureData>, System.IDisposable
+    public partial class SendQueueMessagesFeature : Xunit.IClassFixture<SendQueueMessagesFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
         
-#line 1 "ReceiveQueueMessages.feature"
+#line 1 "SendQueueMessages.feature"
 #line hidden
         
-        public ReceiveQueueMessagesFeature()
+        public SendQueueMessagesFeature()
         {
             this.TestInitialize();
         }
@@ -34,8 +34,8 @@ namespace Slinqy.Test.Functional.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Receive Queue Messages", "As a Queue Receiver\r\nI want to be able to always receive messages from the queue\r" +
-                    "\nSo that I can process them", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Send Queue Messages", "As a Queue Sender\r\nI want to be able to always send messages to the queue\r\nSo tha" +
+                    "t I can be sure my messages will eventually be handled", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -64,7 +64,7 @@ namespace Slinqy.Test.Functional.Features
             testRunner.CollectScenarioErrors();
         }
         
-        public virtual void SetFixture(ReceiveQueueMessagesFeature.FixtureData fixtureData)
+        public virtual void SetFixture(SendQueueMessagesFeature.FixtureData fixtureData)
         {
         }
         
@@ -74,19 +74,19 @@ namespace Slinqy.Test.Functional.Features
         }
         
         [Xunit.FactAttribute()]
-        [Xunit.TraitAttribute("FeatureTitle", "Receive Queue Messages")]
-        [Xunit.TraitAttribute("Description", "All queued messages can be receive from a scaled out queue")]
-        public virtual void AllQueuedMessagesCanBeReceiveFromAScaledOutQueue()
+        [Xunit.TraitAttribute("FeatureTitle", "Send Queue Messages")]
+        [Xunit.TraitAttribute("Description", "Queue Writer can send a single Queue Message")]
+        public virtual void QueueWriterCanSendASingleQueueMessage()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("All queued messages can be receive from a scaled out queue", ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Queue Writer can send a single Queue Message", ((string[])(null)));
 #line 6
 this.ScenarioSetup(scenarioInfo);
 #line 7
- testRunner.Given("a Queue whose storage has scaled out", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("a Queue", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 8
- testRunner.When("the Queue Receiver is started", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("a message is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 9
- testRunner.Then("the all the messages can be received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the message can be received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -98,12 +98,12 @@ this.ScenarioSetup(scenarioInfo);
             
             public FixtureData()
             {
-                ReceiveQueueMessagesFeature.FeatureSetup();
+                SendQueueMessagesFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ReceiveQueueMessagesFeature.FeatureTearDown();
+                SendQueueMessagesFeature.FeatureTearDown();
             }
         }
     }

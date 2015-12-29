@@ -103,6 +103,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ReceiveQueueMessages.feature</DependentUpon>
     </Compile>
+    <Compile Include="Features\SendQueueMessages.feature.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SendQueueMessages.feature</DependentUpon>
+    </Compile>
     <Compile Include="Models\ExampleAppPages\CreateQueueForm.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
@@ -113,6 +118,7 @@
     <Compile Include="Models\ExampleAppPages\QueueInformationSection.cs" />
     <Compile Include="Models\SeleniumWebBase.cs" />
     <Compile Include="Models\ExampleAppPages\SlinqyExampleWebPage.cs" />
+    <Compile Include="Models\Strings\StringUtilities.cs" />
     <Compile Include="Models\WebBrowser.cs" />
     <Compile Include="Models\WebPage.cs" />
     <Compile Include="Models\WebPageWidget.cs" />
@@ -139,6 +145,10 @@
     <None Include="Features\ReceiveQueueMessages.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>ReceiveQueueMessages.feature.cs</LastGenOutput>
+    </None>
+    <None Include="Features\SendQueueMessages.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>SendQueueMessages.feature.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
