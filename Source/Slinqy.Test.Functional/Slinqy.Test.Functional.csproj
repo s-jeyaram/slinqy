@@ -129,6 +129,8 @@
     <Compile Include="Steps\QueueSteps.cs" />
     <Compile Include="Steps\VersionSteps.cs" />
     <Compile Include="Setup.cs" />
+    <Compile Include="Utilities\Polling\Poll.cs" />
+    <Compile Include="Utilities\Polling\PollTimeoutException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
