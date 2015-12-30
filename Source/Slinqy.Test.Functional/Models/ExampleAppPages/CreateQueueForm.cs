@@ -2,7 +2,6 @@
 {
     using System;
     using System.Globalization;
-    using System.Linq;
     using System.Threading;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
@@ -76,15 +75,11 @@
         ManageQueueSection
         CreateQueue()
         {
-            const int OneGb      = 1024;
-            const int OnePercent = 1;
-
-            var name = "test-" + StringUtilities.RandomString(4);
-
             var createParams = new CreateQueueParameters(
-                queueName:                  name,
-                storageCapacityMegabytes:   OneGb,
-                scaleUpThresholdPercentage: OnePercent
+                queueName:                  "test",
+                storageCapacityMegabytes:   1024,
+                scaleUpThresholdPercentage: 1,
+                randomizeQueueName:         true
             );
 
             return this.CreateQueue(createParams);
@@ -101,9 +96,14 @@
             if (createQueueParameters == null)
                 throw new ArgumentNullException(nameof(createQueueParameters));
 
+            var createQueueName = createQueueParameters.QueueName;
+
+            if (createQueueParameters.RandomizeQueueName)
+                createQueueName += StringUtilities.RandomString(4);
+
             // Enter parameters in to form.
             this.queueName.Clear();
-            this.queueName.SendKeys(createQueueParameters.QueueName);
+            this.queueName.SendKeys(createQueueName);
             this.maxQueueSizeMegabytes.Clear();
             this.maxQueueSizeMegabytes.SendKeys(createQueueParameters.StorageCapacityMegabytes.ToString(CultureInfo.InvariantCulture));
             this.storageCapacityScaleOutThresholdPercentage.Clear();
