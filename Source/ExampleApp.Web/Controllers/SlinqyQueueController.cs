@@ -154,12 +154,12 @@
         /// <returns>Returns information about the fill status.</returns>
         [HttpGet]
         [Route("api/slinqy-queue/{queueName}/fill-request", Name = "GetFillQueueStatus")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "WebAPI will not route static methods.")]
         public
         FillQueueStatusViewModel
         GetFillQueueStatus(
             string queueName)
         {
-            this.ToString();
             return FillOperations[queueName];
         }
 
@@ -202,12 +202,12 @@
         /// <returns>Returns information about the receive status.</returns>
         [HttpGet]
         [Route("api/slinqy-queue/{queueName}/receive-request", Name = "GetReceiveQueueStatus")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "WebAPI will not route static methods.")]
         public
         ReceiveQueueStatusViewModel
         GetReceiveQueueStatus(
             string queueName)
         {
-            this.ToString();
             return ReceiveOperations[queueName];
         }
 

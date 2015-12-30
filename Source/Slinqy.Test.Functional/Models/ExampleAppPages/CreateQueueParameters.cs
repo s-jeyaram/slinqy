@@ -11,15 +11,37 @@
         /// <param name="queueName">Specifies the name of the new queue.</param>
         /// <param name="storageCapacityMegabytes">Specifies the desired storage capacity for the new queue.</param>
         /// <param name="scaleUpThresholdPercentage">Specifies the scale up threshold for the new queue.</param>
+        /// <param name="randomizeQueueName">Specifies if random characters should be added to the queueName.</param>
+        public CreateQueueParameters(
+            string  queueName,
+            int     storageCapacityMegabytes,
+            int     scaleUpThresholdPercentage,
+            bool    randomizeQueueName)
+        {
+            this.QueueName                  = queueName;
+            this.RandomizeQueueName         = randomizeQueueName;
+            this.StorageCapacityMegabytes   = storageCapacityMegabytes;
+            this.ScaleUpThresholdPercentage = scaleUpThresholdPercentage;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateQueueParameters"/> class.
+        /// </summary>
+        /// <param name="queueName">Specifies the name of the new queue.</param>
+        /// <param name="storageCapacityMegabytes">Specifies the desired storage capacity for the new queue.</param>
+        /// <param name="scaleUpThresholdPercentage">Specifies the scale up threshold for the new queue.</param>
         public CreateQueueParameters(
             string  queueName,
             int     storageCapacityMegabytes,
             int     scaleUpThresholdPercentage)
+                : this(queueName, storageCapacityMegabytes, scaleUpThresholdPercentage, true)
         {
-            this.QueueName                  = queueName;
-            this.StorageCapacityMegabytes   = storageCapacityMegabytes;
-            this.ScaleUpThresholdPercentage = scaleUpThresholdPercentage;
         }
+
+        /// <summary>
+        /// Gets a value indicating whether random characters will be appended (true) to the QueueName, or not (false).
+        /// </summary>
+        public bool     RandomizeQueueName          { get; private set; }
 
         /// <summary>
         /// Gets the name of the new queue.
