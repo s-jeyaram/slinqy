@@ -28,7 +28,7 @@
         {
             var stopwatch = Stopwatch.StartNew();
 
-            while (until(from()))
+            while (until(from()) == false)
             {
                 if (stopwatch.Elapsed > maxPollDuration)
                     throw new PollTimeoutException(maxPollDuration);
