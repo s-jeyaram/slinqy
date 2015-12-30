@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Concurrent;
     using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -11,11 +10,6 @@
     /// </summary>
     public class SlinqyQueueClient
     {
-        /// <summary>
-        /// Defines the default value for a shard index on a new queue.
-        /// </summary>
-        private const int DefaultShardIndex = 0;
-
         /// <summary>
         /// Maintains a list of references to SlinqyQueue's that have been instantiated since they are expensive to create.
         /// </summary>
