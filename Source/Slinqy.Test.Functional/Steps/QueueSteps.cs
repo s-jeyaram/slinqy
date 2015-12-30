@@ -131,7 +131,7 @@
         [When]
         public
         void
-        WhenTheQueueReceiverIsRestored()
+        WhenTheQueueReceiverIsStarted()
         {
             this.ToString();
 
@@ -156,6 +156,60 @@
             var receivedCount = ContextGet<int>("receivedCount");
 
             Assert.AreEqual(sentCount, receivedCount);
+        }
+
+        /// <summary>
+        /// Creates a minimal Slinqy Queue with all default settings.
+        /// </summary>
+        [Given]
+        public
+        void
+        GivenAQueue()
+        {
+            var homepage = this.WebBrowser.NavigateTo<Homepage>();
+
+            var manageQueueSection = homepage
+                .CreateQueueForm
+                .CreateQueue();
+
+            QueueSteps.ContextSet(manageQueueSection);
+        }
+
+        /// <summary>
+        /// Sends a randomly generated message to a previously created queue.
+        /// </summary>
+        [When]
+        public
+        void
+        WhenAMessageIsSent()
+        {
+            this.ToString();
+
+            var sentMessage = QueueSteps.ContextGet<ManageQueueSection>()
+                .QueueClient
+                .SendMessage();
+
+            BaseSteps.ContextSet(sentMessage);
+        }
+
+        /// <summary>
+        /// Verifies that the message that was originally sent can be received.
+        /// </summary>
+        [Then]
+        public
+        void
+        ThenTheMessageCanBeReceived()
+        {
+            this.ToString();
+
+            var sentMessage     = ContextGet<string>();
+            var receivedMessage = ContextGet<ManageQueueSection>()
+                .QueueClient.ReceiveQueueMessage();
+
+            Assert.AreEqual(
+                sentMessage,
+                receivedMessage
+            );
         }
     }
 }

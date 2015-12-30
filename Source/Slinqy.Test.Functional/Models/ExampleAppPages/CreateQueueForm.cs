@@ -2,9 +2,11 @@
 {
     using System;
     using System.Globalization;
+    using System.Linq;
     using System.Threading;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
+    using Strings;
 
     /// <summary>
     /// Models the form for creating a new queue.
@@ -64,6 +66,28 @@
             IWebDriver webBrowserDriver)
                 : base(webBrowserDriver)
         {
+        }
+
+        /// <summary>
+        /// Creates a new queue with all default minimal settings.
+        /// </summary>
+        /// <returns>Returns the queue management section that appears after creating a new queue.</returns>
+        public
+        ManageQueueSection
+        CreateQueue()
+        {
+            const int OneGb      = 1024;
+            const int OnePercent = 1;
+
+            var name = "test-" + StringUtilities.RandomString(4);
+
+            var createParams = new CreateQueueParameters(
+                queueName:                  name,
+                storageCapacityMegabytes:   OneGb,
+                scaleUpThresholdPercentage: OnePercent
+            );
+
+            return this.CreateQueue(createParams);
         }
 
         /// <summary>

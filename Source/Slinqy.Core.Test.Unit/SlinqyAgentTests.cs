@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
     using FakeItEasy;
     using Xunit;
 
@@ -88,16 +89,17 @@
         /// Verifies that when the current write shard exceeds the defined capacity
         /// threshold that the SlinqyAgent takes action to add a new shard.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         SlinqyAgent_WriteQueueShardExceedsCapacityThreshold_ASendOnlyShardIsAdded()
         {
             // Arrange
             A.CallTo(() => this.fakeShard.StorageUtilization).Returns(ValidStorageCapacityScaleOutThreshold + 0.01);
 
             // Act
-            this.slinqyAgent.Start();
+            await this.slinqyAgent.Start();
 
             // Assert
             A.CallTo(() =>
@@ -109,9 +111,10 @@
         /// Verifies that the agent doesn't add shards when the write
         /// queues size increases but remains under the scale up threshold.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         SlinqyAgent_WriteQueueShardSizeUnderCapacityThreshold_AnotherShardIsNotAdded()
         {
             // Arrange
@@ -121,7 +124,7 @@
             A.CallTo(() => this.fakeShard.PhysicalQueue.CurrentSizeBytes).Returns(sizeBytes);
 
             // Act
-            this.slinqyAgent.Start();
+            await this.slinqyAgent.Start();
 
             // Assert
             A.CallTo(() =>
@@ -132,9 +135,10 @@
         /// <summary>
         /// Verifies that the previous shard is set to be receive only after a new write shard is added.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         SlinqyAgent_SecondShardAdded_FirstShardIsSetToReceiveOnly()
         {
             // Arrange
@@ -149,7 +153,7 @@
                 .Returns(fakeAdditionalShard.PhysicalQueue);
 
             // Act
-            this.slinqyAgent.Start();
+            await this.slinqyAgent.Start();
 
             // Assert
             A.CallTo(() =>
@@ -160,9 +164,10 @@
         /// <summary>
         /// Verifies that shards existing in between the send and receive shard are disabled.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         SlinqyAgent_ThirdShardIsAdded_MiddleShardIsDisabled()
         {
             // Arrange
@@ -191,7 +196,7 @@
                 .Returns(newSendOnlyShard.PhysicalQueue);
 
             // Act
-            this.slinqyAgent.Start();
+            await this.slinqyAgent.Start();
 
             // Assert
             A.CallTo(() =>
@@ -202,9 +207,10 @@
         /// <summary>
         /// Verifies that once a shard has been disabled the agent doesn't continually try to disable it.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         SlinqyAgent_ShardsAlreadyDisabled_DoesNotDisableAgain()
         {
             // Arrange
@@ -219,7 +225,7 @@
             this.fakeShards.Add(fakeSendOnlyShard);
 
             // Act
-            this.slinqyAgent.Start();
+            await this.slinqyAgent.Start();
 
             // Assert
             A.CallTo(() =>
@@ -230,16 +236,17 @@
         /// <summary>
         /// Verifies that if a send-able/receivable shard is found to be send only, it will be set to active.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         SlinqyAgent_SendReceivableShardIsSendOnly_IsSetToEnabled()
         {
             // Arrange
             A.CallTo(() => this.fakeShard.IsReceiveOnly).Returns(false);
 
             // Act
-            this.slinqyAgent.Start();
+            await this.slinqyAgent.Start();
 
             // Assert
             A.CallTo(() =>
@@ -250,9 +257,10 @@
         /// <summary>
         /// Verifies that the agent will retry a scale out operation after encountering unhandled exceptions.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         SlinqyAgent_ExceptionOccursDuringScaleOut_Retries()
         {
             // Arrange
@@ -261,7 +269,7 @@
             A.CallTo(() => this.fakeQueueService.CreateSendOnlyQueue(A<string>.Ignored)).Throws<Exception>().Once();
 
             // Act
-            this.slinqyAgent.Start();
+            await this.slinqyAgent.Start();
 
             // Assert
             A.CallTo(() =>
@@ -272,13 +280,14 @@
         /// <summary>
         /// Verifies that the agent stops polling the SlinqyQueueMonitor after Stop is called.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         Stop_IsRunning_StopsPollingTheMonitor()
         {
             // Arrange
-            this.slinqyAgent.Start();
+            await this.slinqyAgent.Start();
 
             // Act
             this.slinqyAgent.Stop();
@@ -293,13 +302,14 @@
         /// <summary>
         /// Verifies that the agent stops the monitor when Stop is called.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
-        void
+        async Task
         Stop_IsRunning_StopsTheMonitor()
         {
             // Arrange
-            this.slinqyAgent.Start();
+            await this.slinqyAgent.Start();
 
             // Act
             this.slinqyAgent.Stop();

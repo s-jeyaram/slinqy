@@ -56,6 +56,7 @@
 
             A.CallTo(() => this.fakeQueueShardMonitor.Shards).Returns(shards);
             A.CallTo(() => this.fakeQueueShardMonitor.SendShard).Returns(this.fakeSendShard);
+            A.CallTo(() => this.fakeQueueShardMonitor.ReceiveShard).Returns(this.fakeReceiveShard);
 
             this.slinqyQueue = new SlinqyQueue(
                 this.fakeQueueShardMonitor
@@ -101,13 +102,34 @@
         }
 
         /// <summary>
-        /// Verifies that the SendBatch method properly submits the batch to the underlying write shard.
+        /// Verifies that the Send method properly submits the batch to the underlying send shard.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [Fact]
         public
         async Task
-        SendBatch_BatchIsValid_BatchSentToWriteShard()
+        Send_MessageIsValid_MessageSentToSendShard()
+        {
+            // Arrange
+            var validMessage = "message 1";
+
+            // Act
+            await this.slinqyQueue.Send(validMessage);
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeSendShard.Send(validMessage)
+            ).MustHaveHappened();
+        }
+
+        /// <summary>
+        /// Verifies that the SendBatch method properly submits the batch to the underlying send shard.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [Fact]
+        public
+        async Task
+        SendBatch_BatchIsValid_BatchSentToSendShard()
         {
             // Arrange
             var validBatch = new List<string> { "message 1", "message 2" };
@@ -128,19 +150,34 @@
         [Fact]
         public
         async Task
-        ReceiveBatch_Always_CallsReceiveBatchOnReceiveShard()
+        Receive_Always_CallsReceiveOnReceiveShard()
         {
             // Arrange
-            A.CallTo(() =>
-                this.fakeQueueShardMonitor.ReceiveShard
-            ).Returns(this.fakeReceiveShard);
-
             // Act
             await this.slinqyQueue.ReceiveBatch(this.validMaxWaitTimeSpan);
 
             // Assert
             A.CallTo(() =>
                 this.fakeReceiveShard.ReceiveBatch(A<TimeSpan>.Ignored)
+            ).MustHaveHappened();
+        }
+
+        /// <summary>
+        /// Verifies that the SlinqyQueue uses the ReceiveShard to perform receive operations.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        ReceiveBatch_Always_CallsReceiveBatchOnReceiveShard()
+        {
+            // Arrange
+            // Act
+            await this.slinqyQueue.Receive();
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeReceiveShard.Receive()
             ).MustHaveHappened();
         }
     }

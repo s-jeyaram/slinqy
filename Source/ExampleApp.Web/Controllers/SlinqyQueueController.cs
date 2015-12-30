@@ -103,7 +103,7 @@
                 createQueueModel.StorageCapacityScaleOutThresholdPercentage / 100D
             );
 
-            slinqyAgent.Start();
+            await slinqyAgent.Start();
 
             return new QueueInformationViewModel(
                 queue.Name,
@@ -209,6 +209,49 @@
         {
             this.ToString();
             return ReceiveOperations[queueName];
+        }
+
+        /// <summary>
+        /// Handles the HTTP POST /api/slinqy-queue/{queueName}/messages by submitting specified messages.
+        /// </summary>
+        /// <param name="queueName">Specifies the name of the queue.</param>
+        /// <param name="sendMessageCommand">Specifies the parameters for sending a message.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [HttpPost]
+        [Route("api/slinqy-queue/{queueName}/messages", Name = "SendMessage")]
+        public
+        async Task
+        SendMessage(
+            string                  queueName,
+            SendMessageCommandModel sendMessageCommand)
+        {
+            if (sendMessageCommand == null)
+                throw new ArgumentNullException(nameof(sendMessageCommand));
+
+            var queue = SlinqyQueueClient.Get(queueName);
+
+            await queue
+                .Send(sendMessageCommand.MessageBody)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Handles the HTTP POST /api/slinqy-queue/{queueName}/messages/next by returning the next message from the queue.
+        /// </summary>
+        /// <param name="queueName">Specifies the name of the queue.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        [HttpGet]
+        [Route("api/slinqy-queue/{queueName}/messages", Name = "ReceiveMessage")]
+        public
+        async Task<string>
+        ReceiveMessage(
+            string queueName)
+        {
+            var queue = SlinqyQueueClient.Get(queueName);
+
+            return await queue
+                .Receive()
+                .ConfigureAwait(false);
         }
 
         /// <summary>

@@ -179,6 +179,36 @@
         }
 
         /// <summary>
+        /// Sends the specified message body to the queue.
+        /// </summary>
+        /// <param name="messageBody">Specifies the body of the message to send.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public
+        virtual
+        async Task
+        Send(
+            string messageBody)
+        {
+            await this.PhysicalQueue
+                .Send(messageBody)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Receives the next message from the queue.
+        /// </summary>
+        /// <returns>Returns the body of the message that was received.</returns>
+        public
+        virtual
+        async Task<string>
+        Receive()
+        {
+            return await this.PhysicalQueue
+                .Receive()
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
         /// Parses the specified name and returns the Slinqy Queue name.
         /// </summary>
         /// <param name="name">

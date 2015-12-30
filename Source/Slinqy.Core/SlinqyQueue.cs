@@ -47,9 +47,9 @@
         public long CurrentQueueSizeBytes => this.queueShardMonitor.Shards.Sum(s => s.PhysicalQueue.CurrentSizeBytes);
 
         /// <summary>
-        /// Sends the specified batch of messages to the current write queue.
+        /// Sends the specified batch of messages to the current send queue.
         /// </summary>
-        /// <param name="batch">Specifies the batch to submit to the write queue.</param>
+        /// <param name="batch">Specifies the batch to submit to the send queue.</param>
         /// <returns>Returns the async Task for the work.</returns>
         public
         Task
@@ -67,12 +67,40 @@
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule wasn't designed for async Tasks.")]
         public
         async Task<IEnumerable<object>>
-        ReceiveBatch(TimeSpan maxWaitTime)
+        ReceiveBatch(
+            TimeSpan maxWaitTime)
         {
             return await this.queueShardMonitor
                 .ReceiveShard
                 .ReceiveBatch(maxWaitTime)
                 .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Sends the specified message to the current send queue.
+        /// </summary>
+        /// <param name="messageBody">Specifies the body of the message.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public
+        async Task
+        Send(
+            string messageBody)
+        {
+            await this.queueShardMonitor
+                .SendShard
+                .Send(messageBody)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Receives the next message from the queue.
+        /// </summary>
+        /// <returns>Returns the body of the message that was received.</returns>
+        public
+        async Task<string>
+        Receive()
+        {
+            return await this.queueShardMonitor.ReceiveShard.Receive();
         }
     }
 }
