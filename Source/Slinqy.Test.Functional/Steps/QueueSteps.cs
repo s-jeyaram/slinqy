@@ -65,6 +65,72 @@
         }
 
         /// <summary>
+        /// Verifies that all the queue messages can be received.
+        /// </summary>
+        [Then]
+        public
+        static
+        void
+        ThenTheAllTheMessagesCanBeReceived()
+        {
+            var sentCount = ContextGet<int>("sentCount");
+            var receivedCount = ContextGet<int>("receivedCount");
+
+            Assert.AreEqual(sentCount, receivedCount);
+        }
+
+        /// <summary>
+        /// Starts receiving messages from the queue.
+        /// </summary>
+        [When]
+        public
+        static
+        void
+        WhenTheQueueReceiverIsStarted()
+        {
+            var receivedCount = QueueSteps.ContextGet<ManageQueueSection>()
+                .QueueClient
+                .ReceiveQueue();
+
+            QueueSteps.ContextSet(receivedCount, nameof(receivedCount));
+        }
+
+        /// <summary>
+        /// Sends a randomly generated message to a previously created queue.
+        /// </summary>
+        [When]
+        public
+        static
+        void
+        WhenAMessageIsSent()
+        {
+            var sentMessage = QueueSteps.ContextGet<ManageQueueSection>()
+                .QueueClient
+                .SendMessage();
+
+            BaseSteps.ContextSet(sentMessage);
+        }
+
+        /// <summary>
+        /// Verifies that the message that was originally sent can be received.
+        /// </summary>
+        [Then]
+        public
+        static
+        void
+        ThenTheMessageCanBeReceived()
+        {
+            var sentMessage = ContextGet<string>();
+            var receivedMessage = ContextGet<ManageQueueSection>()
+                .QueueClient.ReceiveQueueMessage();
+
+            Assert.AreEqual(
+                sentMessage,
+                receivedMessage
+            );
+        }
+
+        /// <summary>
         /// Creates a Queue with the Queue Storage Utilization Scale Up Threshold setting.
         /// </summary>
         [Given]
@@ -126,39 +192,6 @@
         }
 
         /// <summary>
-        /// Starts receiving messages from the queue.
-        /// </summary>
-        [When]
-        public
-        void
-        WhenTheQueueReceiverIsStarted()
-        {
-            this.ToString();
-
-            var receivedCount = QueueSteps.ContextGet<ManageQueueSection>()
-                .QueueClient
-                .ReceiveQueue();
-
-            QueueSteps.ContextSet(receivedCount, nameof(receivedCount));
-        }
-
-        /// <summary>
-        /// Verifies that all the queue messages can be received.
-        /// </summary>
-        [Then]
-        public
-        void
-        ThenTheAllTheMessagesCanBeReceived()
-        {
-            this.ToString();
-
-            var sentCount     = ContextGet<int>("sentCount");
-            var receivedCount = ContextGet<int>("receivedCount");
-
-            Assert.AreEqual(sentCount, receivedCount);
-        }
-
-        /// <summary>
         /// Creates a minimal Slinqy Queue with all default settings.
         /// </summary>
         [Given]
@@ -173,43 +206,6 @@
                 .CreateQueue();
 
             QueueSteps.ContextSet(manageQueueSection);
-        }
-
-        /// <summary>
-        /// Sends a randomly generated message to a previously created queue.
-        /// </summary>
-        [When]
-        public
-        void
-        WhenAMessageIsSent()
-        {
-            this.ToString();
-
-            var sentMessage = QueueSteps.ContextGet<ManageQueueSection>()
-                .QueueClient
-                .SendMessage();
-
-            BaseSteps.ContextSet(sentMessage);
-        }
-
-        /// <summary>
-        /// Verifies that the message that was originally sent can be received.
-        /// </summary>
-        [Then]
-        public
-        void
-        ThenTheMessageCanBeReceived()
-        {
-            this.ToString();
-
-            var sentMessage     = ContextGet<string>();
-            var receivedMessage = ContextGet<ManageQueueSection>()
-                .QueueClient.ReceiveQueueMessage();
-
-            Assert.AreEqual(
-                sentMessage,
-                receivedMessage
-            );
         }
     }
 }
