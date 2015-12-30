@@ -6,6 +6,7 @@
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
     using Strings;
+    using Utilities.Polling;
 
     /// <summary>
     /// Models the form for creating a new queue.
@@ -113,8 +114,12 @@
             this.createQueueButton.Click();
 
             // Wait for it to finish
-            while (this.ajaxStatus.Text != "COMPLETED")
-                Thread.Sleep(500);
+            Poll.Value(
+                from:               ()   => this.ajaxStatus.Text,
+                until:              text => text != "COMPLETED",
+                maxPollDuration:    TimeSpan.FromSeconds(15),
+                interval:           TimeSpan.FromMilliseconds(500)
+            );
 
             // Check the result
             if (this.ajaxResult.Text == "FAILED")
