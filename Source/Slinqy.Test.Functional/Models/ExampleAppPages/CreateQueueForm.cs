@@ -2,7 +2,6 @@
 {
     using System;
     using System.Globalization;
-    using System.Threading;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
     using Utilities.Polling;
@@ -117,7 +116,7 @@
             Poll.Value(
                 from:               ()   => this.ajaxStatus.Text,
                 until:              text => text != "COMPLETED",
-                maxPollDuration:    TimeSpan.FromSeconds(15),
+                maxDuration:    TimeSpan.FromSeconds(15),
                 interval:           TimeSpan.FromMilliseconds(500)
             );
 

@@ -113,10 +113,10 @@
 
             // Wait for it to finish
             Poll.Value(
-                from:               () => this.fillQueueButton.Enabled,
-                until:              enabled => enabled,
-                interval:           TimeSpan.FromMilliseconds(500),
-                maxPollDuration:    TimeSpan.FromSeconds(30)
+                from:           () => this.fillQueueButton.Enabled,
+                until:          enabled => enabled,
+                interval:       TimeSpan.FromMilliseconds(500),
+                maxDuration:    TimeSpan.FromSeconds(30)
             );
 
             // Get the # of messages from the UI.
@@ -135,10 +135,10 @@
 
             // Wait for it to finish
             Poll.Value(
-                from:               () => this.receiveQueueButton.Enabled,
-                until:              enabled => enabled,
-                interval:           TimeSpan.FromMilliseconds(500),
-                maxPollDuration:    TimeSpan.FromSeconds(15)
+                from:           () => this.receiveQueueButton.Enabled,
+                until:          enabled => enabled,
+                interval:       TimeSpan.FromMilliseconds(500),
+                maxDuration:    TimeSpan.FromSeconds(15)
             );
 
             // Get the # of messages from the UI.
@@ -161,10 +161,10 @@
 
             // Wait for it to finish
             Poll.Value(
-                from:               () => this.sendMessageButton.Enabled,
-                until:              enabled => enabled,
-                interval:           TimeSpan.FromMilliseconds(500),
-                maxPollDuration:    TimeSpan.FromSeconds(15)
+                from:           () => this.sendMessageButton.Enabled,
+                until:          enabled => enabled,
+                interval:       TimeSpan.FromMilliseconds(500),
+                maxDuration:    TimeSpan.FromSeconds(15)
             );
 
             return randomMessage;
@@ -182,10 +182,10 @@
 
             // Wait for it to finish
             Poll.Value(
-                from:               () => this.receivedMessageBody.Text,
-                until:              body => !string.IsNullOrWhiteSpace(body),
-                interval:           TimeSpan.FromMilliseconds(500),
-                maxPollDuration:    TimeSpan.FromSeconds(15)
+                from:           () => this.receivedMessageBody.Text,
+                until:          body => !string.IsNullOrWhiteSpace(body),
+                interval:       TimeSpan.FromMilliseconds(500),
+                maxDuration:    TimeSpan.FromSeconds(15)
             );
 
             return this.receivedMessageBody.Text;
