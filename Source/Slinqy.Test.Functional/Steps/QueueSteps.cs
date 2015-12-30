@@ -53,10 +53,10 @@
             var createQueueParams  = ContextGet<CreateQueueParameters>();
 
             Poll.Value(
-                from:               () => manageQueueSection.QueueInformation.StorageCapacityMegabytes,
-                until:              capacity => capacity > createQueueParams.StorageCapacityMegabytes,
+                from:           () => manageQueueSection.QueueInformation.StorageCapacityMegabytes,
+                until:          capacity => capacity > createQueueParams.StorageCapacityMegabytes,
                 maxDuration:    TimeSpan.FromSeconds(30),
-                interval:           TimeSpan.FromMilliseconds(500)
+                interval:       TimeSpan.FromMilliseconds(500)
             );
         }
 
@@ -69,7 +69,7 @@
         void
         ThenTheAllTheMessagesCanBeReceived()
         {
-            var sentCount = ContextGet<int>("sentCount");
+            var sentCount     = ContextGet<int>("sentCount");
             var receivedCount = ContextGet<int>("receivedCount");
 
             Assert.AreEqual(sentCount, receivedCount);
@@ -116,7 +116,7 @@
         void
         ThenTheMessageCanBeReceived()
         {
-            var sentMessage = ContextGet<string>();
+            var sentMessage     = ContextGet<string>();
             var receivedMessage = ContextGet<ManageQueueSection>()
                 .QueueClient.ReceiveQueueMessage();
 
