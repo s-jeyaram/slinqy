@@ -1,4 +1,4 @@
-﻿namespace Slinqy.Test.Functional.Models.Strings
+﻿namespace Slinqy.Test.Functional.Utilities.Strings
 {
     using System;
     using System.Linq;

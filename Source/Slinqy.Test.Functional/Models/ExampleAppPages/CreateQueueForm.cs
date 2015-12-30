@@ -5,8 +5,8 @@
     using System.Threading;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
-    using Strings;
     using Utilities.Polling;
+    using Utilities.Strings;
 
     /// <summary>
     /// Models the form for creating a new queue.

@@ -118,7 +118,6 @@
     <Compile Include="Models\ExampleAppPages\QueueInformationSection.cs" />
     <Compile Include="Models\SeleniumWebBase.cs" />
     <Compile Include="Models\ExampleAppPages\SlinqyExampleWebPage.cs" />
-    <Compile Include="Models\Strings\StringUtilities.cs" />
     <Compile Include="Models\WebBrowser.cs" />
     <Compile Include="Models\WebPage.cs" />
     <Compile Include="Models\WebPageWidget.cs" />
@@ -131,6 +130,7 @@
     <Compile Include="Setup.cs" />
     <Compile Include="Utilities\Polling\Poll.cs" />
     <Compile Include="Utilities\Polling\PollTimeoutException.cs" />
+    <Compile Include="Utilities\Strings\StringUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
