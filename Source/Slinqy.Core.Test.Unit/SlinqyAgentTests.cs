@@ -118,10 +118,7 @@
         SlinqyAgent_WriteQueueShardSizeUnderCapacityThreshold_AnotherShardIsNotAdded()
         {
             // Arrange
-            var scaleOutSizeMegabytes = Math.Floor(ValidMaxSizeMegabytes * ValidStorageCapacityScaleOutThreshold);
-            var sizeBytes             = Convert.ToInt64(scaleOutSizeMegabytes * 1024 * 1024);
-
-            A.CallTo(() => this.fakeShard.PhysicalQueue.CurrentSizeBytes).Returns(sizeBytes);
+            A.CallTo(() => this.fakeShard.StorageUtilization).Returns(ValidStorageCapacityScaleOutThreshold - 0.01);
 
             // Act
             await this.slinqyAgent.Start();
