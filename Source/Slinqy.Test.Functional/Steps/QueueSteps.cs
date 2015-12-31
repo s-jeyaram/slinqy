@@ -55,7 +55,7 @@
             Poll.Value(
                 from:           () => manageQueueSection.QueueInformation.StorageCapacityMegabytes,
                 until:          capacity => capacity > createQueueParams.StorageCapacityMegabytes,
-                maxDuration:    TimeSpan.FromSeconds(30),
+                maxDuration:    TimeSpan.FromSeconds(60),
                 interval:       TimeSpan.FromMilliseconds(500)
             );
         }
@@ -84,7 +84,7 @@
         void
         WhenTheQueueReceiverIsStarted()
         {
-            var receivedCount = QueueSteps.ContextGet<ManageQueueSection>()
+            var receivedCount = ContextGet<ManageQueueSection>()
                 .QueueClient
                 .ReceiveQueue();
 
@@ -100,7 +100,7 @@
         void
         WhenAMessageIsSent()
         {
-            var sentMessage = QueueSteps.ContextGet<ManageQueueSection>()
+            var sentMessage = ContextGet<ManageQueueSection>()
                 .QueueClient
                 .SendMessage();
 

@@ -138,7 +138,7 @@
                 from:           () => this.receiveQueueButton.Enabled,
                 until:          enabled => enabled,
                 interval:       TimeSpan.FromMilliseconds(500),
-                maxDuration:    TimeSpan.FromSeconds(60)
+                maxDuration:    TimeSpan.FromSeconds(120)
             );
 
             // Get the # of messages from the UI.

@@ -137,26 +137,24 @@
             var queues = this.queueShardMonitor.Shards.ToArray();
 
             // Determine what the receivable and sendable shards *should* be.
-            var sendShard    = queues.Last();
-            var receiveShard = queues.FirstOrDefault(q => q.StorageUtilization > 0) ?? sendShard;
-
-            var sendQueue    = sendShard.PhysicalQueue;
-            var receiveQueue = receiveShard.PhysicalQueue;
+            var sendShard        = queues.Last();
+            var receiveShard     = queues.FirstOrDefault(q => q.StorageUtilization > 0) ?? sendShard;
+            var receiveQueueName = receiveShard.PhysicalQueue.Name;
 
             if (sendShard == receiveShard && !sendShard.IsSendReceiveEnabled)
             {
-                await this.queueService.SetQueueEnabled(receiveQueue.Name);
+                await this.queueService.SetQueueEnabled(receiveQueueName);
                 return;
             }
 
             // If the send and receive queues are not the same, then make sure sending to it is disabled.
             if (sendShard != receiveShard && !receiveShard.IsReceiveOnly)
-                await this.queueService.SetQueueReceiveOnly(receiveQueue.Name);
+                await this.queueService.SetQueueReceiveOnly(receiveQueueName);
 
             // Make sure all shards in between are disabled.
             var inBetweenShards = queues.Where(s =>
-                s.PhysicalQueue != receiveQueue &&
-                s.PhysicalQueue != sendQueue
+                s != receiveShard &&
+                s != sendShard
             );
 
             foreach (var shard in inBetweenShards)
