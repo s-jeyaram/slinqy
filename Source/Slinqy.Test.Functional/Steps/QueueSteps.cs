@@ -55,7 +55,7 @@
             Poll.Value(
                 from:           () => manageQueueSection.QueueInformation.StorageCapacityMegabytes,
                 until:          capacity => capacity > createQueueParams.StorageCapacityMegabytes,
-                maxDuration:    TimeSpan.FromSeconds(30),
+                maxDuration:    TimeSpan.FromSeconds(60),
                 interval:       TimeSpan.FromMilliseconds(500)
             );
         }
