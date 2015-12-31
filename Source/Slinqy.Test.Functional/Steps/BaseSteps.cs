@@ -9,11 +9,6 @@
     public abstract class BaseSteps
     {
         /// <summary>
-        /// Maintains a reference to the WebBrowser driver to use for interacting with the web browser.
-        /// </summary>
-        private readonly WebBrowser webBrowser;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="BaseSteps"/> class.
         /// </summary>
         /// <param name="browser">
@@ -23,13 +18,13 @@
         BaseSteps(
             WebBrowser browser)
         {
-            this.webBrowser = browser;
+            this.WebBrowser = browser;
         }
 
         /// <summary>
         /// Gets the WebBrowser instance for interacting with the web browser.
         /// </summary>
-        protected WebBrowser    WebBrowser => this.webBrowser;
+        protected WebBrowser WebBrowser { get; }
 
         /// <summary>
         /// Saves the specified value in the scenario context for subsequent steps to use.

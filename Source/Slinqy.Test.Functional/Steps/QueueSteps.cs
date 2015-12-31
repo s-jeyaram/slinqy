@@ -84,7 +84,7 @@
         void
         WhenTheQueueReceiverIsStarted()
         {
-            var receivedCount = QueueSteps.ContextGet<ManageQueueSection>()
+            var receivedCount = ContextGet<ManageQueueSection>()
                 .QueueClient
                 .ReceiveQueue();
 
@@ -100,7 +100,7 @@
         void
         WhenAMessageIsSent()
         {
-            var sentMessage = QueueSteps.ContextGet<ManageQueueSection>()
+            var sentMessage = ContextGet<ManageQueueSection>()
                 .QueueClient
                 .SendMessage();
 
