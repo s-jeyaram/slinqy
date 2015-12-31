@@ -1,10 +1,11 @@
 ﻿namespace Slinqy.Test.Functional.Models.ExampleAppPages
 {
+    using System;
     using System.Globalization;
-    using System.Threading;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
-    using Strings;
+    using Utilities.Polling;
+    using Utilities.Strings;
 
     /// <summary>
     /// Models the queue client section of the Homepage.
@@ -111,9 +112,12 @@
             this.fillQueueButton.Click();
 
             // Wait for it to finish
-            // TODO: Timeout after a while.
-            while (!this.fillQueueButton.Enabled)
-                Thread.Sleep(500);
+            Poll.Value(
+                from:           () => this.fillQueueButton.Enabled,
+                until:          enabled => enabled,
+                interval:       TimeSpan.FromMilliseconds(500),
+                maxDuration:    TimeSpan.FromSeconds(30)
+            );
 
             // Get the # of messages from the UI.
             return int.Parse(this.fillQueueMessagesSent.Text, CultureInfo.InvariantCulture);
@@ -130,9 +134,12 @@
             this.receiveQueueButton.Click();
 
             // Wait for it to finish
-            // TODO: Timeout after a while.
-            while (!this.receiveQueueButton.Enabled)
-                Thread.Sleep(500);
+            Poll.Value(
+                from:           () => this.receiveQueueButton.Enabled,
+                until:          enabled => enabled,
+                interval:       TimeSpan.FromMilliseconds(500),
+                maxDuration:    TimeSpan.FromSeconds(30)
+            );
 
             // Get the # of messages from the UI.
             return int.Parse(this.receiveQueueMessagesReceived.Text, CultureInfo.InvariantCulture);
@@ -153,9 +160,12 @@
             this.sendMessageButton.Click();
 
             // Wait for it to finish
-            // TODO: Timeout after a while.
-            while (!this.sendMessageButton.Enabled)
-                Thread.Sleep(500);
+            Poll.Value(
+                from:           () => this.sendMessageButton.Enabled,
+                until:          enabled => enabled,
+                interval:       TimeSpan.FromMilliseconds(500),
+                maxDuration:    TimeSpan.FromSeconds(15)
+            );
 
             return randomMessage;
         }
@@ -171,9 +181,12 @@
             this.receiveMessageButton.Click();
 
             // Wait for it to finish
-            // TODO: Timeout after a while.
-            while (!this.receiveMessageButton.Enabled)
-                Thread.Sleep(500);
+            Poll.Value(
+                from:           () => this.receivedMessageBody.Text,
+                until:          body => !string.IsNullOrWhiteSpace(body),
+                interval:       TimeSpan.FromMilliseconds(500),
+                maxDuration:    TimeSpan.FromSeconds(15)
+            );
 
             return this.receivedMessageBody.Text;
         }

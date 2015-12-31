@@ -5,6 +5,7 @@
     using Models;
     using Models.ExampleAppPages;
     using TechTalk.SpecFlow;
+    using Utilities.Polling;
 
     /// <summary>
     /// Defines steps for working with the queues of the Example App.
@@ -51,17 +52,12 @@
             var manageQueueSection = ContextGet<ManageQueueSection>();
             var createQueueParams  = ContextGet<CreateQueueParameters>();
 
-            var pollMaxSeconds     = 30;
-            var pollStartTimestamp = DateTimeOffset.UtcNow;
-
-            // TODO: Make poll logic a generic function
-            while (DateTimeOffset.UtcNow.Subtract(pollStartTimestamp).TotalSeconds <= pollMaxSeconds)
-            {
-                if (manageQueueSection.QueueInformation.StorageCapacityMegabytes > createQueueParams.StorageCapacityMegabytes)
-                    return;
-            }
-
-            Assert.Fail("The Queue Storage Capacity was not increased.");
+            Poll.Value(
+                from:           () => manageQueueSection.QueueInformation.StorageCapacityMegabytes,
+                until:          capacity => capacity > createQueueParams.StorageCapacityMegabytes,
+                maxDuration:    TimeSpan.FromSeconds(30),
+                interval:       TimeSpan.FromMilliseconds(500)
+            );
         }
 
         /// <summary>
@@ -73,7 +69,7 @@
         void
         ThenTheAllTheMessagesCanBeReceived()
         {
-            var sentCount = ContextGet<int>("sentCount");
+            var sentCount     = ContextGet<int>("sentCount");
             var receivedCount = ContextGet<int>("receivedCount");
 
             Assert.AreEqual(sentCount, receivedCount);
@@ -120,7 +116,7 @@
         void
         ThenTheMessageCanBeReceived()
         {
-            var sentMessage = ContextGet<string>();
+            var sentMessage     = ContextGet<string>();
             var receivedMessage = ContextGet<ManageQueueSection>()
                 .QueueClient.ReceiveQueueMessage();
 
