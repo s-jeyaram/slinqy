@@ -22,7 +22,7 @@ Dequeues messages for processing.  At least one instance per queue *per applicat
 
 ### Slinqy Shard Monitor
 
-Periodically pulls the current status of the shards from your queue infrastructure, typically shard by multiple components.  One instance per queue *per application process* is required.  This is the only component that polls the state of the physical queues.
+Periodically pulls the current status of the shards from your queue infrastructure, typically shared by multiple components.  One instance per queue *per application process* is required.  This is the only component that polls the state of the physical queues.
 
 ### Slinqy Agent
 
