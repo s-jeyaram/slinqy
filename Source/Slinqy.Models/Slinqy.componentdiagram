@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<componentModel xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" xmlns:dm1="http://schemas.microsoft.com/dsltools/Kernel" xmlns:dm2="http://schemas.microsoft.com/dsltools/Component" xmlns:dm3="http://schemas.microsoft.com/dsltools/Activity" xmlns:dm4="http://schemas.microsoft.com/dsltools/Interaction" xmlns:dm5="http://schemas.microsoft.com/dsltools/UseCase" xmlns:dm6="http://schemas.microsoft.com/dsltools/UmlModelLibrary" xmlns:dm7="http://schemas.microsoft.com/dsltools/UmlDiagrams" xmlns:dm8="http://schemas.microsoft.com/dsltools/ModelStore" xmlns:dm9="http://schemas.microsoft.com/dsltools/LogicalClassDesigner" dslVersion="1.0.0.0" Id="d79a758a-fb24-4d81-94eb-17cdaa1b0800" name="Slinqy Components" linkedPackageId="1ce5eee1-521b-441a-b09b-3d093ef47768" xmlns="http://schemas.microsoft.com/VisualStudio/TeamArchitect/ComponentDesigner">
+  <packagedElements>
+    <componentModelHasComponents>
+      <component Id="d2ae0fbd-32b1-41bc-8e2a-4103fcf55e55" name="Slinqy Agent" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="f1b99359-880f-4460-9de8-77bf01e397a5" />
+        <suppliersInternal>
+          <dependency Id="d7ae733e-9b63-49f7-87de-ca104ee15107" name="Get List of Queues">
+            <componentMoniker Id="42bb5a39-f483-4935-8a8d-38fe0854bfbf" LastKnownName="Slinqy Shard Monitor" />
+            <elementDefinition Id="b7f42e00-c3ce-4680-a236-78f9434bf407" />
+          </dependency>
+        </suppliersInternal>
+        <ownedAttributesInternal>
+          <requiredInterface Id="ff3d6614-513d-4d02-896e-5056b3bbcde0" name="Port1" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isService="false" isBehavior="false">
+            <elementDefinition Id="d9fe47c4-9861-4ead-a2d1-8037e1cc6656" />
+            <suppliersInternal>
+              <dependency Id="a0333368-5a8c-4d15-abb3-c2e35b776633" name="Add Queue Shards">
+                <providedInterfaceMoniker Id="4d759c3b-7c3c-4ac0-928f-5bffe3716157" LastKnownName="Port1" />
+                <elementDefinition Id="238702f1-7b3d-471d-97cb-eb8fd76e45b4" />
+              </dependency>
+            </suppliersInternal>
+            <type_NamedElement>
+              <interfaceMoniker Id="94455646-a7c3-4943-93e8-40b51a4d350e" LastKnownName="IPhysicalQueueService" />
+            </type_NamedElement>
+          </requiredInterface>
+        </ownedAttributesInternal>
+      </component>
+    </componentModelHasComponents>
+    <componentModelHasComponents>
+      <component Id="135bcfc9-d32c-4d50-8ee2-20f34bfd948c" name="Slinqy Queue Sender" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="0d13171a-c79f-425e-8973-7a22ce98b698" />
+        <suppliersInternal>
+          <dependency Id="9f11e732-ef9d-46f6-8eca-8bc72c7b4744" name="Get Send Shard">
+            <componentMoniker Id="42bb5a39-f483-4935-8a8d-38fe0854bfbf" LastKnownName="Slinqy Shard Monitor" />
+            <elementDefinition Id="e4b581f8-c17c-41e2-b10f-4bed83ae5312" />
+          </dependency>
+        </suppliersInternal>
+      </component>
+    </componentModelHasComponents>
+    <componentModelHasComponents>
+      <component Id="c6f564c7-b08e-403f-9284-6b058cf2b9c7" name="Slinqy Queue Receiver" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="ff2a544e-b4ab-4052-b888-a2874359e566" />
+        <suppliersInternal>
+          <dependency Id="25d59ea3-02ce-40d4-9846-fbcc5ead4942" name="Get Receive Shard">
+            <componentMoniker Id="42bb5a39-f483-4935-8a8d-38fe0854bfbf" LastKnownName="Slinqy Shard Monitor" />
+            <elementDefinition Id="0b2f8241-993f-4c12-8679-9fe2746547b1" />
+          </dependency>
+        </suppliersInternal>
+      </component>
+    </componentModelHasComponents>
+    <componentModelHasComponents>
+      <component Id="9d190807-23c5-4810-9df7-ad73c5164a75" name="Queue Service" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="d4348c25-a7d0-4a8a-bacd-8f0bdfb248d5" />
+        <ownedAttributesInternal>
+          <part Id="dbf2034a-4716-4b2a-a21e-96be74a19fdb" name="Shard0" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Composite" isComposite="true">
+            <elementDefinition Id="bd97970a-fd5b-40e4-9760-3a1d7925258c" />
+            <type_NamedElement>
+              <componentMoniker Id="13085a6e-b7a1-41cb-88ad-3e3fefcb1e20" LastKnownName="Queue" />
+            </type_NamedElement>
+          </part>
+          <part Id="f23b6c4d-800f-44fb-943c-b00f786e7c24" name="Shard1" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Composite" isComposite="true">
+            <elementDefinition Id="b4dd804c-78d1-4458-b3de-1e16258bb530" />
+            <type_NamedElement>
+              <componentMoniker Id="8ebb9cf0-0c32-46f6-8dc7-2fe70392af5d" LastKnownName="Queue" />
+            </type_NamedElement>
+          </part>
+          <part Id="9dc168f5-d309-4471-9891-be1cfb77f6bb" name="Etc..." isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Composite" isComposite="true">
+            <elementDefinition Id="f21228ee-bd28-44d1-8a85-e116f2f0b85d" />
+            <type_NamedElement>
+              <componentMoniker Id="2b073f3c-1310-42dc-b26c-fc8fb6ebf22e" LastKnownName="Queue" />
+            </type_NamedElement>
+          </part>
+          <providedInterface Id="4d759c3b-7c3c-4ac0-928f-5bffe3716157" name="Port1" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isService="false" isBehavior="false">
+            <elementDefinition Id="ad4a70a7-2b7a-4191-8432-7b5252e45263" />
+            <type_NamedElement>
+              <interfaceMoniker Id="1cfcf00f-7f06-48d9-9eb2-1b2bfd356815" LastKnownName="IPhysicalQueueService" />
+            </type_NamedElement>
+          </providedInterface>
+        </ownedAttributesInternal>
+      </component>
+    </componentModelHasComponents>
+    <componentModelHasComponents>
+      <component Id="13085a6e-b7a1-41cb-88ad-3e3fefcb1e20" name="Queue" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="99f58d52-c183-4679-b182-ebb22f540fcd" />
+        <ownedAttributesInternal>
+          <providedInterface Id="3551a10f-33cd-4d24-86a2-29812f8d69ef" name="Port1" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isService="false" isBehavior="false">
+            <elementDefinition Id="2157d5b7-e6d6-4f6a-b86d-a8ba1c86f3ce" />
+            <type_NamedElement>
+              <interfaceMoniker Id="0bb5a20b-f894-450e-807a-ec7c648a5dda" LastKnownName="IPhysicalQueue" />
+            </type_NamedElement>
+          </providedInterface>
+        </ownedAttributesInternal>
+      </component>
+    </componentModelHasComponents>
+    <componentModelHasComponents>
+      <component Id="8ebb9cf0-0c32-46f6-8dc7-2fe70392af5d" name="Queue" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="99f58d52-c183-4679-b182-ebb22f540fcd" />
+        <ownedAttributesInternal>
+          <providedInterface Id="425e92d6-3ea7-4432-93c9-3457fdf80b3f" name="Port1" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isService="false" isBehavior="false">
+            <elementDefinition Id="2157d5b7-e6d6-4f6a-b86d-a8ba1c86f3ce" />
+            <type_NamedElement>
+              <interfaceMoniker Id="342e4f06-e134-4a0a-9bf5-369651e17d14" LastKnownName="IPhysicalQueue" />
+            </type_NamedElement>
+          </providedInterface>
+        </ownedAttributesInternal>
+      </component>
+    </componentModelHasComponents>
+    <componentModelHasComponents>
+      <component Id="2b073f3c-1310-42dc-b26c-fc8fb6ebf22e" name="Queue" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="99f58d52-c183-4679-b182-ebb22f540fcd" />
+        <ownedAttributesInternal>
+          <providedInterface Id="7eadc63c-36d8-4a02-93cd-4d526d3c47ff" name="Port1" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isService="false" isBehavior="false">
+            <elementDefinition Id="2157d5b7-e6d6-4f6a-b86d-a8ba1c86f3ce" />
+            <type_NamedElement>
+              <interfaceMoniker Id="a3ecb389-a938-4835-857b-60d6516b5b76" LastKnownName="IPhysicalQueue" />
+            </type_NamedElement>
+          </providedInterface>
+        </ownedAttributesInternal>
+      </component>
+    </componentModelHasComponents>
+    <modelContainsNamedElements>
+      <Interface Id="1cfcf00f-7f06-48d9-9eb2-1b2bfd356815" name="IPhysicalQueueService" isAbstract="false" isLeaf="false">
+        <elementDefinition Id="6f803bbe-4113-4dc1-aa95-7014872c59bc" />
+      </Interface>
+    </modelContainsNamedElements>
+    <modelContainsNamedElements>
+      <Interface Id="0bb5a20b-f894-450e-807a-ec7c648a5dda" name="IPhysicalQueue" isAbstract="false" isLeaf="false">
+        <elementDefinition Id="0046be43-59e5-41c6-91a5-94df76d3fe5e" />
+      </Interface>
+    </modelContainsNamedElements>
+    <modelContainsNamedElements>
+      <Interface Id="342e4f06-e134-4a0a-9bf5-369651e17d14" name="IPhysicalQueue" isAbstract="false" isLeaf="false">
+        <elementDefinition Id="0046be43-59e5-41c6-91a5-94df76d3fe5e" />
+      </Interface>
+    </modelContainsNamedElements>
+    <modelContainsNamedElements>
+      <Interface Id="a3ecb389-a938-4835-857b-60d6516b5b76" name="IPhysicalQueue" isAbstract="false" isLeaf="false">
+        <elementDefinition Id="0046be43-59e5-41c6-91a5-94df76d3fe5e" />
+      </Interface>
+    </modelContainsNamedElements>
+    <modelContainsNamedElements>
+      <Interface Id="94455646-a7c3-4943-93e8-40b51a4d350e" name="IPhysicalQueueService" isAbstract="false" isLeaf="false">
+        <elementDefinition Id="6f803bbe-4113-4dc1-aa95-7014872c59bc" />
+      </Interface>
+    </modelContainsNamedElements>
+    <componentModelHasComponents>
+      <component Id="42bb5a39-f483-4935-8a8d-38fe0854bfbf" name="Slinqy Shard Monitor" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="3ead820f-fb46-4a45-b8d3-2c8e8b21f894" />
+        <ownedAttributesInternal>
+          <requiredInterface Id="a4be0ac0-29b1-4830-9347-d5c52b9c0e0e" name="Port1" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isService="false" isBehavior="false">
+            <elementDefinition Id="084a2d00-1aa8-4216-9a1d-5dcd24109136" />
+            <suppliersInternal>
+              <dependency Id="d1fe5790-a6ac-4520-abd9-866f6f6c0011" name="Get List of Queues">
+                <providedInterfaceMoniker Id="4d759c3b-7c3c-4ac0-928f-5bffe3716157" LastKnownName="Port1" />
+                <elementDefinition Id="cbc54c94-1883-462a-92b5-bf7014dd43de" />
+              </dependency>
+            </suppliersInternal>
+            <type_NamedElement>
+              <interfaceMoniker Id="bb9967f2-94f9-44b3-a78c-d6cf79e9ddd2" LastKnownName="IPhysicalQueueService" />
+            </type_NamedElement>
+          </requiredInterface>
+        </ownedAttributesInternal>
+      </component>
+    </componentModelHasComponents>
+    <modelContainsNamedElements>
+      <Interface Id="bb9967f2-94f9-44b3-a78c-d6cf79e9ddd2" name="IPhysicalQueueService" isAbstract="false" isLeaf="false">
+        <elementDefinition Id="6f803bbe-4113-4dc1-aa95-7014872c59bc" />
+      </Interface>
+    </modelContainsNamedElements>
+  </packagedElements>
+  <package Id="1ce5eee1-521b-441a-b09b-3d093ef47768" name="Slinqy">
+    <elementDefinition Id="756270a8-5cd3-4c22-9f05-71c3771fcc22" />
+    <profileInstances>
+      <packageHasProfileInstances Id="a0dedf42-27bc-4efd-88cf-f0a022772e80">
+        <profileInstance Id="34a417a6-6590-4f27-a489-c8cbe25e67a4" name="StandardProfileL2">
+          <elementDefinition Id="e34d544e-0fea-4ed6-ac5e-1b74119ac791" />
+        </profileInstance>
+        <elementDefinition Id="0caec977-1f8c-4ba3-a7db-8cc9ad9cc73b" />
+      </packageHasProfileInstances>
+      <packageHasProfileInstances Id="c8f8fedf-f2b0-4953-8d92-20d47f51f105">
+        <profileInstance Id="5d1aa92e-8821-4d76-afc9-219d229ab79b" name="StandardProfileL3">
+          <elementDefinition Id="532ea607-fb19-44b8-8502-3351b05452be" />
+        </profileInstance>
+        <elementDefinition Id="29349502-908c-4fda-9054-c48619c59ed0" />
+      </packageHasProfileInstances>
+    </profileInstances>
+  </package>
+</componentModel>

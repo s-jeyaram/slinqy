@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{5EF54597-E1C7-4A1E-A903-70B6BBBEBBF2}"
 	ProjectSection(SolutionItems) = preProject
@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slinqy.Core.Test.Unit", "Sl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slinqy.Core", "Slinqy.Core\Slinqy.Core.csproj", "{FAB647C5-0C68-49B4-BB25-EAE93B93FA44}"
 EndProject
+Project("{F088123C-0E9E-452A-89E6-6BA2F21D5CAC}") = "Slinqy.Models", "Slinqy.Models\Slinqy.Models.modelproj", "{BDD1E993-4611-4641-AFCF-FBF59FE16CE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Any CPU = Release|Any CPU
@@ -50,6 +52,7 @@ Global
 		{6D311BA9-A06F-4C77-8CDA-E398C73C9433}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FAB647C5-0C68-49B4-BB25-EAE93B93FA44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAB647C5-0C68-49B4-BB25-EAE93B93FA44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDD1E993-4611-4641-AFCF-FBF59FE16CE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

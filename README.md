@@ -4,14 +4,66 @@ A tool for applications to automatically scale their queue resources at runtime 
 [![Build status](https://ci.appveyor.com/api/projects/status/3msjix5fdfe5u5fs?svg=true)](https://ci.appveyor.com/project/rakutensf-malex/slinqy)
 [![Coverage Status](https://coveralls.io/repos/stealthlab/slinqy/badge.svg?branch=master&service=github)](https://coveralls.io/github/stealthlab/slinqy?branch=master)
 
-## How it Works
+## Overview - How Slinqy Works
 
-Slinqy works by sitting in between your application code and your queuing infrastructure.
+Slinqy is a library that simply wraps calls to your existing queuing infrastructure so that it can scale your queuing infrastructure for you, dynamically at runtime and transparently to your application.
+
+There are several parts to Slinqy:
+
+![Slinqy Components](Docs/Images/slinqy-components.png "Slinqy Components")
+
+### Slinqy Queue Sender
+
+Enqueues your messages.  At least one instance per queue *per application process* is required.  This is the only component that sends messages to the queue.
+
+### Slinqy Queue Receiver
+
+Dequeues messages for processing.  At least one instance per queue *per application process* is required.  This is the only component that receives messages from the queue.
+
+### Slinqy Shard Monitor
+
+Periodically pulls the current status of the shards from your queue infrastructure, typically shard by multiple components.  One instance per queue *per application process* is required.  This is the only component that polls the state of the physical queues.
+
+### Slinqy Agent
+
+Periodically evaluates the shards and performs scaling actions if necessary.  One instance per queue *per application* is required.  This is the only autonomous component that manipulates your queue infrastructure.
+
+### For Example
+
+Code Such As:
+
+```csharp
+YourCurrentQueueClient queueClient = QueueClient.CreateFromConnectionString(
+    connectionString,
+    queueName
+);
+
+await queueClient.Send(message);
+await queueClient.SendBatch(messages);
+var message  = await queueClient.Receive();
+var messages = await queueClient.ReceiveBatch();
+etc...
+```
+Becomes:
+```csharp
+IPhysicalQueueService physicalQueueService = new YourQueueServiceWrapper(connectionString);
+SlinqyQueueClient     slinqyQueueClient    = new SlinqyQueueClient(physicalQueueService);
+
+SlinqyQueue queueClient = slinqyQueueClient.Get(queueName);
+
+await queueClient.Send(message);
+await queueClient.SendBatch(messages);
+var message  = await queueClient.Receive();
+var messages = await queueClient.ReceiveBatch();
+etc...
+```
+
+As you can see, construction of the client differs when using Slinqy, but the rest of your code around sending/receiving messages shouldn't have to change much, if at all.
 
 ## Features
 ### Auto Expanding Storage Capacity
 
-During normal operation, your application will process queue messages in a timely fashion.  
+During normal operation, your application will process queue messages in a timely fashion.
 
 Unfortunately, issues can arise that prevent your back end from processing queue messages for prolonged periods of time.
 Queues, high traffic queues in particular, can become full in such situations.  Either requiring frantic manual intervention or worse,
@@ -19,11 +71,9 @@ reaches full and the upstream users begin receiving errors...
 
 Slinqy will automatically grow the storage capacity of your queue if utilization nears full so that you and your users never encounter queue full errors.
 
-#### How it Works
+#### How It Works
 
 A Slinqy queue is a virtual queue that can be made up of one or more physical queue shards.
-
-Your application will only be aware of the virtual queue, the underlying physical queue shards are automatically managed by Slinqy.
 
 Under normal circumstances, Slinqy will only use one queue shard.  But if queue storage utilization reaches or exceeds the threshold you configure then Slinqy will automatically add additional queue shards to compensate, which will be seamless to your application.
 
@@ -39,7 +89,7 @@ The core logic of Slinqy is not written against any particular queuing technolog
 2. No waiting or being held to older versions of your queuing tools.
 3. Can work with any queuing technology.
 
-#### How it Works
+#### How It Works
 
 Slinqy works against a set of interfaces that you implement.  Since you provide the queue technology specific implementation, it can be anything!
 
