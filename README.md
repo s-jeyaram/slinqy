@@ -10,8 +10,26 @@ Slinqy is a library that simply wraps calls to your existing queuing infrastruct
 
 ### 1.1 Your Application, Without Slinqy
 ![Without Slinqy](Docs/Images/your-application-without-slinqy.png "Without Slinqy")
+
+```csharp
+YourCurrentQueueClient queueClient = QueueClient.CreateFromConnectionString(connectionString, queueName);
+
+await queueClient.Send(message);
+var message  = await queueClient.Receive();
+etc...
+```
+
 ### 1.1 Your Application, With Slinqy, Normal Operation
 ![With Slinqy Normal](Docs/Images/your-application-with-slinqy-normal-operation.png "With Slinqy Normal")
+
+```csharp
+IPhysicalQueueService physicalQueueService = new YourQueueServiceWrapper(connectionString);
+SlinqyQueue           queueClient          = new SlinqyQueueClient(physicalQueueService).Get(queueName);
+
+await queueClient.Send(message);
+var message  = await queueClient.Receive();
+etc...
+```
 
 ## 2 Features
 ### 2.1 Auto Expanding Storage Capacity
@@ -82,35 +100,3 @@ Periodically pulls the current status of the shards from your queue infrastructu
 #### Slinqy Agent
 
 Periodically evaluates the shards and performs scaling actions if necessary.  One instance per queue *per application* is required.  This is the only autonomous component that manipulates your queue infrastructure.
-
-### 4.2 For Example
-
-Code Such As:
-
-```csharp
-YourCurrentQueueClient queueClient = QueueClient.CreateFromConnectionString(
-    connectionString,
-    queueName
-);
-
-await queueClient.Send(message);
-await queueClient.SendBatch(messages);
-var message  = await queueClient.Receive();
-var messages = await queueClient.ReceiveBatch();
-etc...
-```
-Becomes:
-```csharp
-IPhysicalQueueService physicalQueueService = new YourQueueServiceWrapper(connectionString);
-SlinqyQueueClient     slinqyQueueClient    = new SlinqyQueueClient(physicalQueueService);
-
-SlinqyQueue queueClient = slinqyQueueClient.Get(queueName);
-
-await queueClient.Send(message);
-await queueClient.SendBatch(messages);
-var message  = await queueClient.Receive();
-var messages = await queueClient.ReceiveBatch();
-etc...
-```
-
-As you can see, construction of the client differs when using Slinqy, but the rest of your code around sending/receiving messages shouldn't have to change much, if at all.
