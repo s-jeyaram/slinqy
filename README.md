@@ -8,6 +8,10 @@ A tool for applications to automatically scale their queue resources at runtime 
 
 Slinqy is a library that simply wraps calls to your existing queuing infrastructure so that it can scale your queuing infrastructure for you, dynamically at runtime and transparently to your application.
 
+![Without Slinqy](Docs/Images/your-application-without-slinqy.png "Without Slinqy")
+![With Slinqy Normal](Docs/Images/your-application-with-slinqy-normal-operation.png "With Slinqy Normal")
+![With Slinqy Backend Failure](Docs/Images/your-application-with-slinqy-backend-failure.png "With Slinqy Backend Failure")
+
 There are several parts to Slinqy:
 
 ![Slinqy Components](Docs/Images/slinqy-components.png "Slinqy Components")
@@ -22,7 +26,7 @@ Dequeues messages for processing.  At least one instance per queue *per applicat
 
 ### Slinqy Shard Monitor
 
-Periodically pulls the current status of the shards from your queue infrastructure, typically shared by multiple components.  One instance per queue *per application process* is required.  This is the only component that polls the state of the physical queues.
+Periodically pulls the current status of the shards from your queue infrastructure, typically shard by multiple components.  One instance per queue *per application process* is required.  This is the only component that polls the state of the physical queues.
 
 ### Slinqy Agent
 
