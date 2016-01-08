@@ -57,6 +57,8 @@
             string  queueName,
             int     shardIndexPadding)
         {
+            // TODO: Refactor - Much of this functionality overlaps with the Agent,
+            //       let Agent create first shard too and remove this code.
             if (string.IsNullOrWhiteSpace(queueName))
                 throw new ArgumentNullException(nameof(queueName));
 
@@ -116,6 +118,7 @@
         Get(
             string queueName)
         {
+            // TODO: Remove this method (it's basically doing service location work)
             var queue = this.slinqyQueues.GetOrAdd(
                 queueName,
                 name => new SlinqyQueue(new SlinqyQueueShardMonitor(queueName, this.physicalQueueService))
