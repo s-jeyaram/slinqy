@@ -8,6 +8,13 @@ A tool for applications to automatically scale their queue resources at runtime 
 
 Slinqy is a library that simply wraps calls to your existing queuing infrastructure so that it can scale your queuing infrastructure for you, dynamically at runtime and transparently to your application.
 
+### Your Application, Without Slinqy
+![Without Slinqy](Docs/Images/your-application-without-slinqy.png "Without Slinqy")
+### Your Application, With Slinqy, Normal Operation
+![With Slinqy Normal](Docs/Images/your-application-with-slinqy-normal-operation.png "With Slinqy Normal")
+### Your Application, With Slinqy, Backend Failure
+![With Slinqy Backend Failure](Docs/Images/your-application-with-slinqy-backend-failure.png "With Slinqy Backend Failure")
+
 There are several parts to Slinqy:
 
 ![Slinqy Components](Docs/Images/slinqy-components.png "Slinqy Components")
@@ -77,7 +84,7 @@ A Slinqy queue is a virtual queue that can be made up of one or more physical qu
 
 Under normal circumstances, Slinqy will only use one queue shard.  But if queue storage utilization reaches or exceeds the threshold you configure then Slinqy will automatically add additional queue shards to compensate, which will be seamless to your application.
 
-Slinqy will always send new messages to the highest physical queue shard and always read from the lowest physical queue shard in order to maintain the order of your messages.
+Slinqy will always send new messages to the highest physical queue shard and always read from the lowest physical queue shard to maintain the order of your messages.
 
 ![Slinqy High Level Diagram](Docs/Images/slinqy-high-level.png "Slinqy High Level Diagram")
 
