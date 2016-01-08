@@ -15,7 +15,7 @@ Slinqy is a library that simply wraps calls to your existing queuing infrastruct
 YourCurrentQueueClient queueClient = QueueClient.CreateFromConnectionString(connectionString, queueName);
 
 await queueClient.Send(message);
-var message  = await queueClient.Receive();
+message = await queueClient.Receive();
 etc...
 ```
 
@@ -27,7 +27,7 @@ IPhysicalQueueService physicalQueueService = new YourQueueServiceWrapper(connect
 SlinqyQueue           queueClient          = new SlinqyQueueClient(physicalQueueService).Get(queueName);
 
 await queueClient.Send(message);
-var message  = await queueClient.Receive();
+message = await queueClient.Receive();
 etc...
 ```
 
