@@ -84,7 +84,7 @@ A Slinqy queue is a virtual queue that can be made up of one or more physical qu
 
 Under normal circumstances, Slinqy will only use one queue shard.  But if queue storage utilization reaches or exceeds the threshold you configure then Slinqy will automatically add additional queue shards to compensate, which will be seamless to your application.
 
-Slinqy will always send new messages to the highest physical queue shard and always read from the lowest physical queue shard in order to maintain the order of your messages.
+Slinqy will always send new messages to the highest physical queue shard and always read from the lowest physical queue shard to maintain the order of your messages.
 
 ![Slinqy High Level Diagram](Docs/Images/slinqy-high-level.png "Slinqy High Level Diagram")
 
