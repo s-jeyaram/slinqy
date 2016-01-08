@@ -70,10 +70,9 @@ Slinqy works against a set of interfaces that you implement.  Since you provide 
 ### 3.1 Get Slinqy
 Slinqy is currently only available in source form from this repository.  It will soon be available via NuGet.
 ### 3.2 Implement Interfaces
-#### 3.2.1 IPhysicalQueueService
-The interface that allows Slinqy to manage your queuing technology of choice.
-#### 3.2.2 IPhysicalQueue
-The interface that allows Slinqy to send and receive messages.
+[IPhysicalQueueService](Source/Slinqy.Core/IPhysicalQueueService.cs): The interface that allows Slinqy to manage your queuing technology of choice.
+
+[IPhysicalQueue](Source/Slinqy.Core/IPhysicalQueue.cs): The interface that allows Slinqy to send and receive messages.
 ### 3.3 Integrate
 #### 3.3.1 Sending Queue Messages
 #### 3.3.2 Receiving Queue Messages
