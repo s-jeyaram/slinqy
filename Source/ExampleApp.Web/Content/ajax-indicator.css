@@ -1,0 +1,11 @@
+﻿.ajax-running {
+    color: darkorange;
+}
+
+.ajax-succeeded {
+    color: green;
+}
+
+.ajax-failed {
+    color: red;
+}

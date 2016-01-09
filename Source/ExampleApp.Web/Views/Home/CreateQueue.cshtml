@@ -5,7 +5,7 @@
 <form id="CreateQueueForm">
     @Html.EditorForModel()
     <button id="CreateQueueButton" type="button">Create</button>
-    <div id="CreateQueueAjaxStatus">?</div>
+    <div id="CreateQueueAjaxStatus"></div>
 </form>
 
 <script type="text/javascript">
@@ -33,7 +33,7 @@
             .text('Creating');
 
         // The request should be starting or running at this point, start reporting status...
-        ajax.indicate(ajaxRequest, $('#CreateQueueAjaxStatus'));
+        ajax.indicate(ajaxRequest, $('#CreateQueueAjaxStatus'), true);
     }
 
     $(function () {

@@ -6,7 +6,7 @@
     @Html.LabelFor(m => m.CurrentQueueSizeMegabytes)    <span id="QueueInformation_CurrentQueueSize">@Model.CurrentQueueSizeMegabytes</span> MB
     @Html.LabelFor(m => m.MaxQueueSizeMegabytes)        <span id="QueueInformation_MaxQueueSize">@Model.MaxQueueSizeMegabytes</span> MB
 
-    <div id="QueueInformationAjaxStatus">?</div>
+    <div id="QueueInformationAjaxStatus"></div>
 
     <script type="text/javascript">
         function updateQueueInformation() {
@@ -20,7 +20,7 @@
                     setTimeout(updateQueueInformation, 2000);
                 });
 
-            ajax.indicate(ajaxRequest, $('#QueueInformationAjaxStatus'));
+            ajax.indicate(ajaxRequest, $('#QueueInformationAjaxStatus'), false);
         }
 
         updateQueueInformation();
