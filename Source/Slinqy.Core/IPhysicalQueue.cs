@@ -58,7 +58,7 @@
         /// </summary>
         /// <param name="messageBody">Specifies the body of the message.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        Task Send(string messageBody);
+        Task Send(string messageBody); // TODO: Should be: Task Send(object messageBody)
 
         /// <summary>
         /// Receives the next message from the queue.
