@@ -28,6 +28,11 @@
         private readonly AjaxIndicatorSection receiveMessageAjaxStatusSection;
 
         /// <summary>
+        /// The proxy reference to the AJAX request result message element on the web page.
+        /// </summary>
+        private readonly AjaxIndicatorSection receiveQueueAjaxStatusSection;
+
+        /// <summary>
         /// A proxy reference to the element in the web browser.
         /// </summary>
         /// <remarks>This field is automatically populated by SpecFlow.</remarks>
@@ -109,6 +114,12 @@
         private IWebElement receiveMessageAjaxStatusSectionElement = null;
 
         /// <summary>
+        /// The proxy reference to the AJAX request result message element on the web page.
+        /// </summary>
+        [FindsBy(How = How.Id, Using = "ReceiveQueueAjaxStatus")]
+        private IWebElement receiveQueueAjaxStatusSectionElement = null;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="QueueClientSection"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the driver to use for interacting with the web browser.</param>
@@ -130,6 +141,11 @@
             this.receiveMessageAjaxStatusSection = new AjaxIndicatorSection(
                 webBrowserDriver,
                 this.receiveMessageAjaxStatusSectionElement
+            );
+
+            this.receiveQueueAjaxStatusSection = new AjaxIndicatorSection(
+                webBrowserDriver,
+                this.receiveQueueAjaxStatusSectionElement
             );
         }
 
@@ -183,7 +199,10 @@
         {
             this.receiveQueueButton.Click();
 
-            // Wait for it to finish
+            // Wait for the receive queue request to start or fail.
+            this.receiveQueueAjaxStatusSection.WaitForResult(TimeSpan.FromSeconds(15));
+
+            // Wait for the receive to finish.
             Poll.Value(
                 from:           () => this.receiveQueueButton.Enabled,
                 until:          enabled => enabled,
