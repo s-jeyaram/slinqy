@@ -4,45 +4,40 @@
 
 <form id="CreateQueueForm">
     @Html.EditorForModel()
-    <input id="CreateQueueButton" type="button" value="Create"/>
+    <button id="CreateQueueButton" type="button">Create</button>
+    <div id="CreateQueueAjaxStatus"></div>
 </form>
 
 <script type="text/javascript">
-    // Called when the user initiates a create queue AJAX request.
-    function ReceiveMessageStarted() {
-        $('#AjaxStatus').text('STARTED');
-        $('#AjaxStatusMessage').text('Request submitting, awaiting a response from the server.');
-    }
-
-    function ReceiveMessageSucceeded(response) {
-        $('#AjaxResult').text('SUCCEEDED');
-        $('#AjaxStatusMessage').text('The last request was successful.');
-
+    function CreateQueueSucceeded(response) {
         var url = '@Url.Action("ManageQueue")?queueName=' + response.QueueName;
 
         // Swap out the Create Queue form for the Manage Queue form
         $('#MainBody').load(url);
     }
 
-    function ReceiveMessageFailed(response) {
-        $('#AjaxResult').text('FAILED');
-        $('#AjaxStatusMessage').text(response.responseText);
-    }
+    function CreateQueue() {
+        // Make the AJAX request and make sure the button works again afterward.
+        var ajaxRequest = $.post(
+            '@Url.HttpRouteUrl("CreateQueue", null)',
+            $('#CreateQueueForm').serialize()
+        ).always(function() {
+            $('#CreateQueueButton')
+                .prop('disabled', false)
+                .text('Create');
+        }).done(CreateQueueSucceeded);
 
-    function ReceiveMessageCompleted() {
-        $('#AjaxStatus').text('COMPLETED');
-    }
+        // Disable the button so it cannot be clicked repeatedly.
+        $('#CreateQueueButton')
+            .prop('disabled', true)
+            .text('Creating');
 
-    function ReceiveMessage() {
-        $.post('@Url.HttpRouteUrl("CreateQueue", null)', $('#CreateQueueForm').serialize())
-            .done(ReceiveMessageSucceeded)
-            .fail(ReceiveMessageFailed)
-            .always(ReceiveMessageCompleted);
-
-        ReceiveMessageStarted();
+        // The request should be starting or running at this point, start reporting status...
+        ajax.indicate(ajaxRequest, $('#CreateQueueAjaxStatus'), true);
     }
 
     $(function () {
-        $('#CreateQueueButton').click(ReceiveMessage);
+        // Tie the button to the function.
+        $('#CreateQueueButton').click(CreateQueue);
     });
 </script>

@@ -4,7 +4,6 @@
     using System.Globalization;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
-    using Utilities.Polling;
     using Utilities.Strings;
 
     /// <summary>
@@ -12,6 +11,11 @@
     /// </summary>
     public class CreateQueueForm : SeleniumWebBase
     {
+        /// <summary>
+        /// The proxy reference to the AJAX request result message element on the web page.
+        /// </summary>
+        private readonly AjaxIndicatorSection createQueueAjaxStatusSection;
+
         /// <summary>
         /// The proxy reference to the queue name input on the web page.
         /// </summary>
@@ -37,22 +41,10 @@
         private IWebElement createQueueButton = null;
 
         /// <summary>
-        /// The proxy reference to the AJAX request status element on the web page.
-        /// </summary>
-        [FindsBy(How = How.Id, Using = "AjaxStatus")]
-        private IWebElement ajaxStatus = null;
-
-        /// <summary>
-        /// The proxy reference to the AJAX request result element on the web page.
-        /// </summary>
-        [FindsBy(How = How.Id, Using = "AjaxResult")]
-        private IWebElement ajaxResult = null;
-
-        /// <summary>
         /// The proxy reference to the AJAX request result message element on the web page.
         /// </summary>
-        [FindsBy(How = How.Id, Using = "AjaxStatusMessage")]
-        private IWebElement ajaxStatusMessage = null;
+        [FindsBy(How = How.Id, Using = "CreateQueueAjaxStatus")]
+        private IWebElement createQueueAjaxStatusSectionElement = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateQueueForm"/> class.
@@ -65,6 +57,10 @@
             IWebDriver webBrowserDriver)
                 : base(webBrowserDriver)
         {
+            this.createQueueAjaxStatusSection = new AjaxIndicatorSection(
+                webBrowserDriver,
+                this.createQueueAjaxStatusSectionElement
+            );
         }
 
         /// <summary>
@@ -113,16 +109,7 @@
             this.createQueueButton.Click();
 
             // Wait for it to finish
-            Poll.Value(
-                from:               ()   => this.ajaxStatus.Text,
-                until:              text => text != "COMPLETED",
-                maxDuration:    TimeSpan.FromSeconds(15),
-                interval:           TimeSpan.FromMilliseconds(500)
-            );
-
-            // Check the result
-            if (this.ajaxResult.Text == "FAILED")
-                throw new InvalidOperationException(this.ajaxStatusMessage.Text);
+            this.createQueueAjaxStatusSection.WaitForResult(maxDuration: TimeSpan.FromSeconds(15));
 
             // Return queue info
             return new ManageQueueSection(this.WebBrowserDriver);

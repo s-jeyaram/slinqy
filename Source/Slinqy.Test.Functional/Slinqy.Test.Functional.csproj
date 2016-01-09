@@ -108,6 +108,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SendQueueMessages.feature</DependentUpon>
     </Compile>
+    <Compile Include="Models\ExampleAppPages\AjaxIndicatorSection.cs" />
     <Compile Include="Models\ExampleAppPages\CreateQueueForm.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>

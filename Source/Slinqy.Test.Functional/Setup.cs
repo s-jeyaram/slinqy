@@ -57,7 +57,7 @@
                 .Manage()
                 .Timeouts()
                 .ImplicitlyWait(
-                    TimeSpan.FromSeconds(10)
+                    TimeSpan.FromSeconds(5)
                 );
 
             this.objectContainer.RegisterInstanceAs(this.webBrowser);

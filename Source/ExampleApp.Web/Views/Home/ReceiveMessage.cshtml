@@ -1,6 +1,9 @@
-﻿<div id="ReceiveMessageSection">
+﻿<h2>Dequeue a Message</h2>
+
+<div id="ReceiveMessageSection">
     <button id="ReceiveMessageButton" type="button">Receive</button>
     <div id="ReceivedMessageBody"></div>
+    <div id="ReceiveMessageAjaxStatus"></div>
 </div>
 
 <script type="text/javascript">
@@ -10,37 +13,25 @@
         $('#ReceiveMessageButton')
             .prop('disabled', true)
             .text('Receiving...');
-
-        $('#AjaxStatus').text('STARTED');
-        $('#AjaxStatusMessage').text('Request submitting, awaiting a response from the server.');
     }
 
     function ReceiveMessageSucceeded(messageBody) {
         $('#ReceivedMessageBody')
             .text(messageBody);
-
-        $('#AjaxResult').text('SUCCEEDED');
-        $('#AjaxStatusMessage').text('The last request was successful.');
-    }
-
-    function ReceiveMessageFailed(response) {
-        $('#AjaxResult').text('FAILED');
-        $('#AjaxStatusMessage').text(response.responseText);
     }
 
     function ReceiveMessageCompleted() {
         $('#ReceiveMessageButton')
             .prop('disabled', false)
             .text('Receive');
-
-        $('#AjaxStatus').text('COMPLETED');
     }
 
     function ReceiveMessage() {
-        $.get('@Url.HttpRouteUrl("ReceiveMessage", new { queueName = ViewBag.QueueName })')
+        var ajaxRequest = $.get('@Url.HttpRouteUrl("ReceiveMessage", new { queueName = ViewBag.QueueName })')
             .done(ReceiveMessageSucceeded)
-            .fail(ReceiveMessageFailed)
             .always(ReceiveMessageCompleted);
+
+        ajax.indicate(ajaxRequest, $('#ReceiveMessageAjaxStatus'), true);
 
         ReceiveMessageStarted();
     }

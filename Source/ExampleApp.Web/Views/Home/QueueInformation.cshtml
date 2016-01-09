@@ -6,33 +6,21 @@
     @Html.LabelFor(m => m.CurrentQueueSizeMegabytes)    <span id="QueueInformation_CurrentQueueSize">@Model.CurrentQueueSizeMegabytes</span> MB
     @Html.LabelFor(m => m.MaxQueueSizeMegabytes)        <span id="QueueInformation_MaxQueueSize">@Model.MaxQueueSizeMegabytes</span> MB
 
+    <div id="QueueInformationAjaxStatus"></div>
+
     <script type="text/javascript">
-        // TODO: Refactor in to a reusable AJAX UI status widget.
-
         function updateQueueInformation() {
-            $('#AjaxResult').text('');
-            $('#AjaxStatusMessage').text('');
-            $('#AjaxStatus').text('STARTING');
-
-            $.get('@Url.HttpRouteUrl("GetQueue", new {queueName = Model.QueueName})')
+            var ajaxRequest = $.get('@Url.HttpRouteUrl("GetQueue", new {queueName = Model.QueueName})')
                 .done(function (data) {
                     $('#QueueInformation_QueueName').text(data.QueueName);
                     $('#QueueInformation_CurrentQueueSize').text(data.CurrentQueueSizeMegabytes);
                     $('#QueueInformation_MaxQueueSize').text(data.MaxQueueSizeMegabytes);
-
-                    $('#AjaxResult').text('SUCCEEDED');
-                })
-                .fail(function (jqxhr, textStatus, error) {
-                    $('#AjaxResult').text('FAILED!');
-                    $('#AjaxStatusMessage').text('textStatus: ' + textStatus + 'error: ' + error + ', response: ' + JSON.stringify(jqxhr));
                 })
                 .always(function () {
-                    $('#AjaxStatus').text('COMPLETED');
-
                     setTimeout(updateQueueInformation, 2000);
                 });
 
-            $('#AjaxStatus').text('STARTED');
+            ajax.indicate(ajaxRequest, $('#QueueInformationAjaxStatus'), false);
         }
 
         updateQueueInformation();
