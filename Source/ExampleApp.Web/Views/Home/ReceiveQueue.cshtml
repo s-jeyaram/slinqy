@@ -1,5 +1,7 @@
 ﻿@model ExampleApp.Web.Models.ReceiveQueueCommandModel
 
+<h2>Receive All Queued Messages</h2>
+
 <form id="ReceiveQueueForm">
     @Html.EditorForModel()
     <button id="StartReceivingQueueButton" type="button">Start</button>
@@ -14,7 +16,7 @@
         var ajaxRequest = $.post(receiveQueueUrl, payload)
             .done(StartReceiveQueueSucceeded);
 
-        ajax.indicate(ajaxRequest, $('#ReceiveQueueAjaxStatus'));
+        ajax.indicate(ajaxRequest, $('#ReceiveQueueAjaxStatus'), true);
 
         StartReceiveQueueStarted();
     }

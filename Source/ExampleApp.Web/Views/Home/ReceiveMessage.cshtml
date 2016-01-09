@@ -1,4 +1,6 @@
-﻿<div id="ReceiveMessageSection">
+﻿<h2>Dequeue a Message</h2>
+
+<div id="ReceiveMessageSection">
     <button id="ReceiveMessageButton" type="button">Receive</button>
     <div id="ReceivedMessageBody"></div>
     <div id="ReceiveMessageAjaxStatus"></div>
@@ -29,7 +31,7 @@
             .done(ReceiveMessageSucceeded)
             .always(ReceiveMessageCompleted);
 
-        ajax.indicate(ajaxRequest, $('#ReceiveMessageAjaxStatus'));
+        ajax.indicate(ajaxRequest, $('#ReceiveMessageAjaxStatus'), true);
 
         ReceiveMessageStarted();
     }

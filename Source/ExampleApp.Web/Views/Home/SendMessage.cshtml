@@ -1,5 +1,7 @@
 ﻿@model ExampleApp.Web.Models.SendMessageCommandModel
 
+<h2>Enqueue a Message</h2>
+
 <form id="SendMessageForm">
     @Html.EditorForModel()
     <button id="SendMessageButton" type="button">Send</button>
@@ -24,7 +26,7 @@
         var ajaxRequest = $.post('@Url.HttpRouteUrl("SendMessage", new { queueName = ViewBag.QueueName })', $('#SendMessageForm').serialize())
             .always(SendMessageCompleted);
 
-        ajax.indicate(ajaxRequest, $('#SendMessageAjaxStatus'));
+        ajax.indicate(ajaxRequest, $('#SendMessageAjaxStatus'), true);
 
         SendMessageStarted();
     }

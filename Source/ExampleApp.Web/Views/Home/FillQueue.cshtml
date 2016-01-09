@@ -1,5 +1,7 @@
 ﻿@model ExampleApp.Web.Models.FillQueueCommandModel
 
+<h2>Fill the Queue with Random Data</h2>
+
 <form id="FillQueueForm">
     @Html.EditorForModel()
     <button id="StartFillingQueueButton" type="button">Start</button>
@@ -18,7 +20,7 @@
         // Disable the button so it cannot be double clicked, or more.
         $('#StartFillingQueueButton').prop('disabled', true);
 
-        ajax.indicate(ajaxRequest, $('#FillQueueStatusAjaxStatus'));
+        ajax.indicate(ajaxRequest, $('#FillQueueStatusAjaxStatus'), true);
     }
 
     function StartFillQueueSucceeded() {

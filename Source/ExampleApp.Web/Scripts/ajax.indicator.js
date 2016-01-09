@@ -23,7 +23,7 @@ ajax = function () {
         }
     }
 
-    // Called when an aJAX request finished, regardless if it was successful or not.
+    // Called when an AJAX request finished, regardless if it was successful or not.
     function onAjaxRequestCompleted(statusElement) {
         statusElement
             .addClass('ajax-completed')
