@@ -4,60 +4,35 @@
     @Html.EditorForModel()
     <button id="StartFillingQueueButton" type="button">Start</button>
     <span id="FillQueueMessagesSent">0</span> messages sent
+    <div id="FillQueueStatusAjaxStatus"></div>
 </form>
 
 <script type="text/javascript">
     function FillQueue() {
         var fillQueueUrl = '@Url.HttpRouteUrl("FillQueue", new { queueName = ViewBag.QueueName })';
         var payload = $('#FillQueueForm').serialize();
-        $.post(fillQueueUrl, payload)
-            .done(StartFillQueueSucceeded)
-            .fail(StartFillQueueFailed)
-            .always(StartFillQueueCompleted);
 
-        StartFillQueueStarted();
-    }
+        var ajaxRequest = $.post(fillQueueUrl, payload)
+            .done(StartFillQueueSucceeded);
 
-    // Called when the user initiates a fill queue AJAX request.
-    function StartFillQueueStarted() {
         // Disable the button so it cannot be double clicked, or more.
         $('#StartFillingQueueButton').prop('disabled', true);
 
-        $('#AjaxStatus').text('STARTED');
-        $('#AjaxStatusMessage').text('Request submitted, awaiting a response from the server.');
+        ajax.indicate(ajaxRequest, $('#FillQueueStatusAjaxStatus'));
     }
 
     function StartFillQueueSucceeded() {
-        $('#AjaxResult').text('SUCCEEDED');
-        $('#AjaxStatusMessage').text('Request accepted by server, the queue is now being filled...');
-
         // Start polling for completion...
         setTimeout(PollFillStatus, 500);
-    }
-
-    function StartFillQueueFailed(response) {
-        $('#AjaxResult').text('FAILED');
-        $('#AjaxStatusMessage').text(response.responseText);
-    }
-
-    function StartFillQueueCompleted() {
-        $('#AjaxStatus').text('COMPLETED');
     }
 
     function PollFillStatus() {
         var fillStatusUrl = '@Url.HttpRouteUrl("GetFillQueueStatus", new { queueName = ViewBag.QueueName })';
 
-        $.getJSON(fillStatusUrl)
-            .done(UpdateFillStatus)
-            .fail(UpdateFillStatusFailed)
-            .always(UpdateFillStatusCompleted);
+        var ajaxRequest = $.getJSON(fillStatusUrl)
+            .done(UpdateFillStatus);
 
-        GetFillQueueStatusStarted();
-    }
-
-    function GetFillQueueStatusStarted() {
-        $('#AjaxStatus').text('STARTED');
-        $('#AjaxStatusMessage').text('Request submitted, awaiting a response from the server.');
+        ajax.indicate(ajaxRequest, $('#FillQueueStatusAjaxStatus'));
     }
 
     function UpdateFillStatus(fillOperation) {
@@ -86,17 +61,6 @@
 
         $('#FillQueueMessagesSent')
             .text(fillOperation.SentCount);
-    }
-
-    function UpdateFillStatusFailed(response) {
-        $('#AjaxResult').text('FAILED');
-        $('#AjaxStatusMessage').text(response.responseText);
-
-        alert(response.responseText);
-    }
-
-    function UpdateFillStatusCompleted() {
-        $('#AjaxStatus').text('COMPLETED');
     }
 
     $(function () {
