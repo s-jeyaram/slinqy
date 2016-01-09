@@ -23,6 +23,11 @@
         private readonly AjaxIndicatorSection sendMessageAjaxStatusSection;
 
         /// <summary>
+        /// The proxy reference to the AJAX request result message element on the web page.
+        /// </summary>
+        private readonly AjaxIndicatorSection receiveMessageAjaxStatusSection;
+
+        /// <summary>
         /// A proxy reference to the element in the web browser.
         /// </summary>
         /// <remarks>This field is automatically populated by SpecFlow.</remarks>
@@ -98,6 +103,12 @@
         private IWebElement sendMessageAjaxStatusSectionElement = null;
 
         /// <summary>
+        /// The proxy reference to the AJAX request result message element on the web page.
+        /// </summary>
+        [FindsBy(How = How.Id, Using = "ReceiveMessageAjaxStatus")]
+        private IWebElement receiveMessageAjaxStatusSectionElement = null;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="QueueClientSection"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the driver to use for interacting with the web browser.</param>
@@ -114,6 +125,11 @@
             this.sendMessageAjaxStatusSection = new AjaxIndicatorSection(
                 webBrowserDriver,
                 this.sendMessageAjaxStatusSectionElement
+            );
+
+            this.receiveMessageAjaxStatusSection = new AjaxIndicatorSection(
+                webBrowserDriver,
+                this.receiveMessageAjaxStatusSectionElement
             );
         }
 
@@ -210,12 +226,7 @@
             this.receiveMessageButton.Click();
 
             // Wait for it to finish
-            Poll.Value(
-                from:           () => this.receivedMessageBody.Text,
-                until:          body => !string.IsNullOrWhiteSpace(body),
-                interval:       TimeSpan.FromMilliseconds(500),
-                maxDuration:    TimeSpan.FromSeconds(15)
-            );
+            this.receiveMessageAjaxStatusSection.WaitForResult(TimeSpan.FromSeconds(15));
 
             return this.receivedMessageBody.Text;
         }
