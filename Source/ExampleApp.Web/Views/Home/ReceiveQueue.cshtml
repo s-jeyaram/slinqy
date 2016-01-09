@@ -4,16 +4,17 @@
     @Html.EditorForModel()
     <button id="StartReceivingQueueButton" type="button">Start</button>
     <div id="ReceiveQueueMessagesReceived">0</div> received
+    <div id="ReceiveQueueAjaxStatus">?</div>
 </form>
 
 <script type="text/javascript">
     function ReceiveQueue() {
         var receiveQueueUrl = '@Url.HttpRouteUrl("ReceiveQueue", new { queueName = ViewBag.QueueName })';
         var payload = $('#ReceiveQueueForm').serialize();
-        $.post(receiveQueueUrl, payload)
-            .done(StartReceiveQueueSucceeded)
-            .fail(StartReceiveQueueFailed)
-            .always(StartReceiveQueueCompleted);
+        var ajaxRequest = $.post(receiveQueueUrl, payload)
+            .done(StartReceiveQueueSucceeded);
+
+        ajax.indicate(ajaxRequest, $('#ReceiveQueueAjaxStatus'));
 
         StartReceiveQueueStarted();
     }
@@ -22,42 +23,20 @@
     function StartReceiveQueueStarted() {
         // Disable the button so it cannot be double clicked, or more.
         $('#StartReceivingQueueButton').prop('disabled', true);
-
-        $('#AjaxStatus').text('STARTED');
-        $('#AjaxStatusMessage').text('Request submitted, awaiting a response from the server.');
     }
 
     function StartReceiveQueueSucceeded() {
-        $('#AjaxResult').text('SUCCEEDED');
-        $('#AjaxStatusMessage').text('Request accepted by server, the queue is now being received...');
-
         // Start polling for completion...
         setTimeout(PollReceiveStatus, 500);
-    }
-
-    function StartReceiveQueueFailed(response) {
-        $('#AjaxResult').text('FAILED');
-        $('#AjaxStatusMessage').text(response.responseText);
-    }
-
-    function StartReceiveQueueCompleted() {
-        $('#AjaxStatus').text('COMPLETED');
     }
 
     function PollReceiveStatus() {
         var receiveStatusUrl = '@Url.HttpRouteUrl("GetReceiveQueueStatus", new { queueName = ViewBag.QueueName })';
 
-        $.getJSON(receiveStatusUrl)
-            .done(UpdateReceiveStatus)
-            .fail(UpdateReceiveStatusFailed)
-            .always(UpdateReceiveStatusCompleted);
+        var ajaxRequest = $.getJSON(receiveStatusUrl)
+            .done(UpdateReceiveStatus);
 
-        GetReceiveQueueStatusStarted();
-    }
-
-    function GetReceiveQueueStatusStarted() {
-        $('#AjaxStatus').text('STARTED');
-        $('#AjaxStatusMessage').text('Request submitted, awaiting a response from the server.');
+        ajax.indicate(ajaxRequest, $('#ReceiveQueueAjaxStatus'));
     }
 
     function UpdateReceiveStatus(receiveOperation) {
@@ -86,17 +65,6 @@
 
         $('#ReceiveQueueMessagesReceived')
             .text(receiveOperation.ReceivedCount);
-    }
-
-    function UpdateReceiveStatusFailed(response) {
-        $('#AjaxResult').text('FAILED');
-        $('#AjaxStatusMessage').text(response.responseText);
-
-        alert(response.responseText);
-    }
-
-    function UpdateReceiveStatusCompleted() {
-        $('#AjaxStatus').text('COMPLETED');
     }
 
     $(function () {
