@@ -18,6 +18,11 @@
         private readonly AjaxIndicatorSection fillQueueAjaxStatusSection;
 
         /// <summary>
+        /// The proxy reference to the AJAX request result message element on the web page.
+        /// </summary>
+        private readonly AjaxIndicatorSection sendMessageAjaxStatusSection;
+
+        /// <summary>
         /// A proxy reference to the element in the web browser.
         /// </summary>
         /// <remarks>This field is automatically populated by SpecFlow.</remarks>
@@ -87,6 +92,12 @@
         private IWebElement fillQueueStatusAjaxStatusSectionElement = null;
 
         /// <summary>
+        /// The proxy reference to the AJAX request result message element on the web page.
+        /// </summary>
+        [FindsBy(How = How.Id, Using = "SendMessageAjaxStatus")]
+        private IWebElement sendMessageAjaxStatusSectionElement = null;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="QueueClientSection"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the driver to use for interacting with the web browser.</param>
@@ -98,6 +109,11 @@
             this.fillQueueAjaxStatusSection = new AjaxIndicatorSection(
                 webBrowserDriver,
                 this.fillQueueStatusAjaxStatusSectionElement
+            );
+
+            this.sendMessageAjaxStatusSection = new AjaxIndicatorSection(
+                webBrowserDriver,
+                this.sendMessageAjaxStatusSectionElement
             );
         }
 
@@ -178,12 +194,7 @@
             this.sendMessageButton.Click();
 
             // Wait for it to finish
-            Poll.Value(
-                from:           () => this.sendMessageButton.Enabled,
-                until:          enabled => enabled,
-                interval:       TimeSpan.FromMilliseconds(500),
-                maxDuration:    TimeSpan.FromSeconds(15)
-            );
+            this.sendMessageAjaxStatusSection.WaitForResult(TimeSpan.FromSeconds(15));
 
             return randomMessage;
         }
