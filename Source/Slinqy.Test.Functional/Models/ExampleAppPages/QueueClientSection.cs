@@ -13,6 +13,11 @@
     public class QueueClientSection : SeleniumWebBase
     {
         /// <summary>
+        /// The proxy reference to the AJAX request result message element on the web page.
+        /// </summary>
+        private readonly AjaxIndicatorSection fillQueueAjaxStatusSection;
+
+        /// <summary>
         /// A proxy reference to the element in the web browser.
         /// </summary>
         /// <remarks>This field is automatically populated by SpecFlow.</remarks>
@@ -76,6 +81,12 @@
         private IWebElement receivedMessageBody = null;
 
         /// <summary>
+        /// The proxy reference to the AJAX request result message element on the web page.
+        /// </summary>
+        [FindsBy(How = How.Id, Using = "FillQueueStatusAjaxStatus")]
+        private IWebElement fillQueueStatusAjaxStatusSectionElement = null;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="QueueClientSection"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the driver to use for interacting with the web browser.</param>
@@ -84,6 +95,10 @@
             IWebDriver webBrowserDriver)
                 : base(webBrowserDriver)
         {
+            this.fillQueueAjaxStatusSection = new AjaxIndicatorSection(
+                webBrowserDriver,
+                this.fillQueueStatusAjaxStatusSectionElement
+            );
         }
 
         /// <summary>
@@ -111,7 +126,10 @@
 
             this.fillQueueButton.Click();
 
-            // Wait for it to finish
+            // Wait for the fill request to start or fail.
+            this.fillQueueAjaxStatusSection.WaitForResult(TimeSpan.FromSeconds(15));
+
+            // Wait for the fill to finish.
             Poll.Value(
                 from:           () => this.fillQueueButton.Enabled,
                 until:          enabled => enabled,
