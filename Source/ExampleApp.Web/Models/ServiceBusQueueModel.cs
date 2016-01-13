@@ -96,17 +96,18 @@
         /// Receives a batch of messages from the queue in a single transaction.
         /// </summary>
         /// <param name="maxWaitTime">Specifies the maximum amount of time to wait for messages before returning.</param>
+        /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
         /// <returns>Returns an enumeration of the messages that were received.</returns>
         public
-        async Task<IEnumerable<object>>
-        ReceiveBatch(
+        async Task<IEnumerable<T>>
+        ReceiveBatch<T>(
             TimeSpan maxWaitTime)
         {
             var batch = await this.queueClient
                 .ReceiveBatchAsync(messageCount: 100, serverWaitTime: maxWaitTime)
                 .ConfigureAwait(false);
 
-            return batch.Select(message => (object)message);
+            return batch.Select(message => message.GetBody<T>());
         }
 
         /// <summary>

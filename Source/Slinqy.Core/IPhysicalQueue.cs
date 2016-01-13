@@ -49,9 +49,10 @@
         /// Receives a batch of messages from the queue.
         /// </summary>
         /// <param name="maxWaitTime">Specifies the maximum amount of time to wait for messages before returning.</param>
+        /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
         /// <returns>Returns an enumeration of messages that were received.</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule wasn't designed for async Tasks.")]
-        Task<IEnumerable<object>> ReceiveBatch(TimeSpan maxWaitTime);
+        Task<IEnumerable<T>> ReceiveBatch<T>(TimeSpan maxWaitTime);
 
         /// <summary>
         /// Sends a message to the queue.

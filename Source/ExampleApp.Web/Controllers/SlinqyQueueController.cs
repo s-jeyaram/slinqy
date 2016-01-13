@@ -330,7 +330,7 @@
                 {
                     // Receive the batch of messages.
                     var maxWaitTimeSpan = TimeSpan.FromSeconds(1);
-                    var receivedBatch   = await queue.ReceiveBatch(maxWaitTimeSpan)
+                    var receivedBatch   = await queue.ReceiveBatch<byte[]>(maxWaitTimeSpan)
                         .ConfigureAwait(false);
 
                     ReceiveOperations[queueName]

@@ -154,11 +154,11 @@
         {
             // Arrange
             // Act
-            await this.slinqyQueue.ReceiveBatch(this.validMaxWaitTimeSpan);
+            await this.slinqyQueue.ReceiveBatch<object>(this.validMaxWaitTimeSpan);
 
             // Assert
             A.CallTo(() =>
-                this.fakeReceiveShard.ReceiveBatch(A<TimeSpan>.Ignored)
+                this.fakeReceiveShard.ReceiveBatch<object>(A<TimeSpan>.Ignored)
             ).MustHaveHappened();
         }
 

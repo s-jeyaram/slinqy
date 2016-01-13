@@ -165,16 +165,17 @@
         /// Receives a batch of messages from the queue.
         /// </summary>
         /// <param name="maxWaitTime">Specifies the maximum amount of time to wait for messages before returning.</param>
+        /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
         /// <returns>Returns an enumeration of messages that were received.</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule wasn't designed for async Tasks.")]
         public
         virtual
-        async Task<IEnumerable<object>>
-        ReceiveBatch(
+        async Task<IEnumerable<T>>
+        ReceiveBatch<T>(
             TimeSpan maxWaitTime)
         {
             return await this.PhysicalQueue
-                .ReceiveBatch(maxWaitTime)
+                .ReceiveBatch<T>(maxWaitTime)
                 .ConfigureAwait(false);
         }
 
