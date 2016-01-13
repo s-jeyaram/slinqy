@@ -8,7 +8,11 @@ A tool for applications to automatically scale their queue resources at runtime 
 
 Slinqy is a library that simply wraps calls to your existing queuing infrastructure so that it can scale your queuing infrastructure for you, dynamically at runtime and transparently to your application.
 
-### 1.1 Your Application, Without Slinqy
+### 1.1 When Should Slinqy Be Used?
+
+If you have a queue-based application that receives a constant influx of traffic and you cannot afford to lose or reject any of it due to a backend failure, then Slinqy may be a good solution for your application.
+
+### 1.2 Your Application, Without Slinqy
 ![Without Slinqy](Docs/Images/your-application-without-slinqy.png "Without Slinqy")
 
 ```csharp
@@ -19,7 +23,7 @@ message = await queueClient.Receive();
 etc...
 ```
 
-### 1.1 Your Application, With Slinqy, Normal Operation
+### 1.3 Your Application, With Slinqy, Normal Operation
 ![With Slinqy Normal](Docs/Images/your-application-with-slinqy-normal-operation.png "With Slinqy Normal")
 
 ```csharp
