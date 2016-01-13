@@ -83,13 +83,13 @@
         /// </param>
         /// <returns>Returns an async Task for the work.</returns>
         public
-        Task
+        async Task
         SendBatch(
             IEnumerable<object> batch)
         {
-            return this.queueClient.SendBatchAsync(
-                batch.Select(o => new BrokeredMessage(o))
-            );
+            await this.queueClient
+                .SendBatchAsync(batch.Select(o => new BrokeredMessage(o)))
+                .ConfigureAwait(false);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@
         public
         async Task
         Send(
-            string messageBody)
+            object messageBody)
         {
             await this.queueClient
                 .SendAsync(new BrokeredMessage(messageBody))
@@ -127,16 +127,17 @@
         /// <summary>
         /// Receives the next message from the queue.
         /// </summary>
+        /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
         /// <returns>The body of the message that was received.</returns>
         public
-        async Task<string>
-        Receive()
+        async Task<T>
+        Receive<T>()
         {
             var message = await this.queueClient
                 .ReceiveAsync()
                 .ConfigureAwait(false);
 
-            return message.GetBody<string>();
+            return message.GetBody<T>();
         }
     }
 }

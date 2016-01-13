@@ -197,14 +197,15 @@
         /// <summary>
         /// Receives the next message from the queue.
         /// </summary>
+        /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
         /// <returns>Returns the body of the message that was received.</returns>
         public
         virtual
-        async Task<string>
-        Receive()
+        async Task<T>
+        Receive<T>()
         {
             return await this.PhysicalQueue
-                .Receive()
+                .Receive<T>()
                 .ConfigureAwait(false);
         }
 

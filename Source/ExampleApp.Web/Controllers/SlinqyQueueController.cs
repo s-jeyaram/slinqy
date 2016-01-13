@@ -250,7 +250,7 @@
             var queue = SlinqyQueueClient.Get(queueName);
 
             return await queue
-                .Receive()
+                .Receive<string>()
                 .ConfigureAwait(false);
         }
 

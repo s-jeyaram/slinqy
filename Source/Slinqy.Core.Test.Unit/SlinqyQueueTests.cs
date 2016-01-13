@@ -173,11 +173,11 @@
         {
             // Arrange
             // Act
-            await this.slinqyQueue.Receive();
+            await this.slinqyQueue.Receive<string>();
 
             // Assert
             A.CallTo(() =>
-                this.fakeReceiveShard.Receive()
+                this.fakeReceiveShard.Receive<string>()
             ).MustHaveHappened();
         }
     }

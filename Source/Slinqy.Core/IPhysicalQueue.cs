@@ -58,12 +58,13 @@
         /// </summary>
         /// <param name="messageBody">Specifies the body of the message.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        Task Send(string messageBody); // TODO: Should be: Task Send(object messageBody)
+        Task Send(object messageBody);
 
         /// <summary>
         /// Receives the next message from the queue.
         /// </summary>
+        /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
         /// <returns>The body of the message that was received.</returns>
-        Task<string> Receive();
+        Task<T> Receive<T>();
     }
 }
