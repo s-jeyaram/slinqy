@@ -8,7 +8,7 @@ A tool for applications to automatically scale their queue resources at runtime 
 
 Slinqy is a library that simply wraps calls to your existing queuing infrastructure so that it can scale your queuing infrastructure for you, dynamically at runtime and transparently to your application.
 
-1.1 When Should Slinqy Be Used?
+### 1.1 When Should Slinqy Be Used?
 
 If you have a queue-based application that receives a constant influx of traffic and you cannot afford to lose or reject any of it due to a backend failure, then Slinqy may be a good solution for your application.
 
