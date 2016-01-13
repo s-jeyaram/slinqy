@@ -83,30 +83,31 @@
         /// </param>
         /// <returns>Returns an async Task for the work.</returns>
         public
-        Task
+        async Task
         SendBatch(
             IEnumerable<object> batch)
         {
-            return this.queueClient.SendBatchAsync(
-                batch.Select(o => new BrokeredMessage(o))
-            );
+            await this.queueClient
+                .SendBatchAsync(batch.Select(o => new BrokeredMessage(o)))
+                .ConfigureAwait(false);
         }
 
         /// <summary>
         /// Receives a batch of messages from the queue in a single transaction.
         /// </summary>
         /// <param name="maxWaitTime">Specifies the maximum amount of time to wait for messages before returning.</param>
+        /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
         /// <returns>Returns an enumeration of the messages that were received.</returns>
         public
-        async Task<IEnumerable<object>>
-        ReceiveBatch(
+        async Task<IEnumerable<T>>
+        ReceiveBatch<T>(
             TimeSpan maxWaitTime)
         {
             var batch = await this.queueClient
                 .ReceiveBatchAsync(messageCount: 100, serverWaitTime: maxWaitTime)
                 .ConfigureAwait(false);
 
-            return batch.Select(message => (object)message);
+            return batch.Select(message => message.GetBody<T>());
         }
 
         /// <summary>
@@ -117,7 +118,7 @@
         public
         async Task
         Send(
-            string messageBody)
+            object messageBody)
         {
             await this.queueClient
                 .SendAsync(new BrokeredMessage(messageBody))
@@ -127,16 +128,17 @@
         /// <summary>
         /// Receives the next message from the queue.
         /// </summary>
+        /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
         /// <returns>The body of the message that was received.</returns>
         public
-        async Task<string>
-        Receive()
+        async Task<T>
+        Receive<T>()
         {
             var message = await this.queueClient
                 .ReceiveAsync()
                 .ConfigureAwait(false);
 
-            return message.GetBody<string>();
+            return message.GetBody<T>();
         }
     }
 }

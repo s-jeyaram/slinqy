@@ -63,16 +63,17 @@
         /// Retrieves the next batch of messages from the queue.
         /// </summary>
         /// <param name="maxWaitTime">Specifies the maximum amount of time to wait for messages before returning.</param>
+        /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule wasn't designed for async Tasks.")]
         public
-        async Task<IEnumerable<object>>
-        ReceiveBatch(
+        async Task<IEnumerable<T>>
+        ReceiveBatch<T>(
             TimeSpan maxWaitTime)
         {
             return await this.queueShardMonitor
                 .ReceiveShard
-                .ReceiveBatch(maxWaitTime)
+                .ReceiveBatch<T>(maxWaitTime)
                 .ConfigureAwait(false);
         }
 
@@ -95,12 +96,15 @@
         /// <summary>
         /// Receives the next message from the queue.
         /// </summary>
+        /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
         /// <returns>Returns the body of the message that was received.</returns>
         public
-        async Task<string>
-        Receive()
+        async Task<T>
+        Receive<T>()
         {
-            return await this.queueShardMonitor.ReceiveShard.Receive();
+            return await this.queueShardMonitor
+                .ReceiveShard
+                .Receive<T>();
         }
     }
 }
