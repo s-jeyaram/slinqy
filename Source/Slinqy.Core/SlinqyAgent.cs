@@ -30,11 +30,6 @@
         private readonly SlinqyQueueShardMonitor queueShardMonitor;
 
         /// <summary>
-        /// Gets a value indicating whether monitoring is active (true) or not (false).
-        /// </summary>
-        private bool monitoring;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyAgent"/> class.
         /// </summary>
         /// <param name="queueService">
@@ -54,7 +49,6 @@
             SlinqyQueueShardMonitor slinqyQueueShardMonitor,
             double                  storageCapacityScaleOutThreshold)
         {
-            this.monitoring                         = false;
             this.queueService                       = queueService;
             this.queueShardMonitor                  = slinqyQueueShardMonitor;
             this.storageCapacityScaleOutThreshold   = storageCapacityScaleOutThreshold;
@@ -75,12 +69,6 @@
             await this.queueShardMonitor
                 .Start()
                 .ConfigureAwait(false);
-
-            this.monitoring = true;
-
-            // Start checking the monitor periodically to respond if need be.
-            var x = this.PollShardState()
-                .ConfigureAwait(false);
         }
 
         /// <summary>
@@ -91,7 +79,6 @@
         Stop()
         {
             this.queueShardMonitor.StopMonitoring();
-            this.monitoring = false;
         }
 
         /// <summary>
@@ -177,33 +164,6 @@
         }
 
         /// <summary>
-        /// Periodically evaluates the shards.
-        /// </summary>
-        /// <returns>Returns the async Task for the work.</returns>
-        private
-        async Task
-        PollShardState()
-        {
-            while (this.monitoring)
-            {
-                try
-                {
-                    // Evaluate the current state.
-                    await this.EvaluateShards().ConfigureAwait(false);
-                }
-                catch
-                {
-                    // Do nothing.
-                    // TODO: Log exception
-                }
-
-                // Wait before checking again.
-                // TODO: Make duration more configurable.
-                await Task.Delay(1000).ConfigureAwait(false);
-            }
-        }
-
-        /// <summary>
         /// Initializes the agent queue.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -229,6 +189,9 @@
             }
 
             // Start reading the queue.
+            agentQueue.OnReceive<EvaluateShardsCommand>(
+                command => this.EvaluateShards()
+            );
         }
     }
 }

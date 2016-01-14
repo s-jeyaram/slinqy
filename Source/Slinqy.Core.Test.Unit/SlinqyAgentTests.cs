@@ -63,9 +63,19 @@
         private readonly List<SlinqyQueueShard> fakeShards;
 
         /// <summary>
+        /// A fake IPhysicalQueue that represents the agents queue.
+        /// </summary>
+        private IPhysicalQueue fakeAgentQueue;
+
+        /// <summary>
         /// Maintains a count of the number of shards that have been created to simplify generating of shard indexes and names.
         /// </summary>
         private int shardIndexCounter;
+
+        /// <summary>
+        /// A reference to the function internal to the SlinqyAgent that handles new messages so that the unit tests can invoke is as if it was received.
+        /// </summary>
+        private Func<EvaluateShardsCommand, Task> agentEvaluateShardsCommandHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyAgentTests"/> class with default/common behaviors and values.
@@ -79,6 +89,15 @@
             // Configures the fake shard monitor to use the fake shards.
             this.fakeQueueShardMonitor = A.Fake<SlinqyQueueShardMonitor>();
             this.fakeShards = new List<SlinqyQueueShard> { this.fakeShard };
+
+            // Configures the fake agent queue to use.
+            this.fakeAgentQueue = CreateFakeAgentQueue();
+
+            A.CallTo(() => this.fakeQueueService.CreateQueue(ValidSlinqyAgentName)).Returns(this.fakeAgentQueue);
+            A.CallTo(() => this.fakeAgentQueue.OnReceive(A<Func<EvaluateShardsCommand, Task>>.Ignored)).Invokes(call =>
+            {
+                this.agentEvaluateShardsCommandHandler = call.GetArgument<Func<EvaluateShardsCommand, Task>>(0);
+            });
 
             A.CallTo(() => this.fakeQueueShardMonitor.SendShard).Returns(this.fakeShard);
             A.CallTo(() => this.fakeQueueShardMonitor.QueueName).Returns(ValidSlinqyQueueName);
@@ -104,9 +123,10 @@
         {
             // Arrange
             A.CallTo(() => this.fakeShard.StorageUtilization).Returns(ValidStorageCapacityScaleOutThreshold + 0.01);
+            await this.slinqyAgent.Start();
 
             // Act
-            await this.slinqyAgent.Start();
+            await this.agentEvaluateShardsCommandHandler(new EvaluateShardsCommand());
 
             // Assert
             A.CallTo(() =>
@@ -150,7 +170,9 @@
         {
             // Arrange
             // Configure the write shards size to trigger scaling.
-            A.CallTo(() => this.fakeShard.StorageUtilization).Returns(ValidStorageCapacityScaleOutThreshold + 0.01);
+            A.CallTo(() =>
+                this.fakeShard.StorageUtilization
+            ).Returns(ValidStorageCapacityScaleOutThreshold + 0.01);
 
             // Configure the new shard that will be added as a result of the scaling.
             var fakeAdditionalShard = this.CreateFakeSendOnlyQueue();
@@ -159,8 +181,10 @@
                 .Invokes(() => this.fakeShards.Add(fakeAdditionalShard))
                 .Returns(fakeAdditionalShard.PhysicalQueue);
 
-            // Act
             await this.slinqyAgent.Start();
+
+            // Act
+            await this.agentEvaluateShardsCommandHandler(new EvaluateShardsCommand());
 
             // Assert
             A.CallTo(() =>
@@ -202,8 +226,10 @@
                 .Invokes(() => this.fakeShards.Add(newSendOnlyShard))
                 .Returns(newSendOnlyShard.PhysicalQueue);
 
-            // Act
             await this.slinqyAgent.Start();
+
+            // Act
+            await this.agentEvaluateShardsCommandHandler(new EvaluateShardsCommand());
 
             // Assert
             A.CallTo(() =>
@@ -251,36 +277,14 @@
         {
             // Arrange
             A.CallTo(() => this.fakeShard.IsReceiveOnly).Returns(false);
+            await this.slinqyAgent.Start();
 
             // Act
-            await this.slinqyAgent.Start();
+            await this.agentEvaluateShardsCommandHandler(new EvaluateShardsCommand());
 
             // Assert
             A.CallTo(() =>
                 this.fakeQueueService.SetQueueEnabled(A<string>.Ignored)
-            ).MustHaveHappened();
-        }
-
-        /// <summary>
-        /// Verifies that the agent will retry a scale out operation after encountering unhandled exceptions.
-        /// </summary>
-        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
-        [Fact]
-        public
-        async Task
-        SlinqyAgent_ExceptionOccursDuringScaleOut_Retries()
-        {
-            // Arrange
-            // Configure the write shards size to trigger scaling.
-            A.CallTo(() => this.fakeShard.StorageUtilization).Returns(ValidStorageCapacityScaleOutThreshold + 0.01);
-            A.CallTo(() => this.fakeQueueService.CreateSendOnlyQueue(A<string>.Ignored)).Throws<Exception>().Once();
-
-            // Act
-            await this.slinqyAgent.Start();
-
-            // Assert
-            A.CallTo(() =>
-                this.fakeQueueService.CreateSendOnlyQueue(A<string>.Ignored)
             ).MustHaveHappened();
         }
 
@@ -295,6 +299,7 @@
         {
             // Arrange
             await this.slinqyAgent.Start();
+            await this.agentEvaluateShardsCommandHandler(new EvaluateShardsCommand());
 
             // Act
             this.slinqyAgent.Stop();
@@ -376,6 +381,31 @@
             // Assert
             A.CallTo(() =>
                 fakeAgentQueue.Send(A<object>.That.IsInstanceOf(typeof(EvaluateShardsCommand)))
+            ).MustHaveHappened();
+        }
+
+        /// <summary>
+        /// Verifies that the SlinqyAgent starts receiving its agent queue.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        Start_Always_StartsReceivingAgentQueue()
+        {
+            // Arrange
+            var fakeAgentQueue = CreateFakeAgentQueue();
+
+            A.CallTo(() =>
+                this.fakeQueueService.ListQueues(ValidSlinqyAgentName)
+            ).Returns(new[] { fakeAgentQueue });
+
+            // Act
+            await this.slinqyAgent.Start();
+
+            // Assert
+            A.CallTo(() =>
+                fakeAgentQueue.OnReceive(A<Func<EvaluateShardsCommand, Task>>.Ignored)
             ).MustHaveHappened();
         }
 

@@ -140,5 +140,23 @@
 
             return message.GetBody<T>();
         }
+
+        /// <summary>
+        /// Registers a message handler for the specified type.
+        /// </summary>
+        /// <typeparam name="T">Specifies the expected message Type.</typeparam>
+        /// <param name="handler">
+        /// Specifies a function that will take instances of the specified Type and process them.
+        /// The message is presumed to be handled successfully if no exception is thrown by the handler function.
+        /// </param>
+        public
+        void
+        OnReceive<T>(
+            Func<T, Task> handler)
+        {
+            this.queueClient.OnMessageAsync(
+                brokeredMessage => handler(brokeredMessage.GetBody<T>())
+            );
+        }
     }
 }
