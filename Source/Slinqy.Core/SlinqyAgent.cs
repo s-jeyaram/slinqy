@@ -10,6 +10,11 @@
     public class SlinqyAgent
     {
         /// <summary>
+        /// The suffix that will be appended to the name of the Slinqy queue to generate the name of the Slinqy Agent queue.
+        /// </summary>
+        public const string AgentQueueNameSuffix = "-agent";
+
+        /// <summary>
         /// The threshold at which the agent should scale out storage capacity.
         /// </summary>
         private readonly double storageCapacityScaleOutThreshold;
@@ -63,7 +68,10 @@
         async Task
         Start()
         {
-            // Start the monitor.
+            // Initialize the agents own queue.
+            await this.InitializeAgentQueue();
+
+            // Start the shard monitor.
             await this.queueShardMonitor
                 .Start()
                 .ConfigureAwait(false);
@@ -193,6 +201,25 @@
                 // TODO: Make duration more configurable.
                 await Task.Delay(1000).ConfigureAwait(false);
             }
+        }
+
+        /// <summary>
+        /// Initializes the agent queue.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        private
+        async Task
+        InitializeAgentQueue()
+        {
+            // Create the agent queue.
+            var agentQueueName = this.queueShardMonitor.QueueName + AgentQueueNameSuffix;
+
+            // Get the agent queue (if it exists).
+            var agentQueue = (await this.queueService.ListQueues(agentQueueName).ConfigureAwait(false)).SingleOrDefault();
+
+            // Create it if it doesn't exist.
+            if (agentQueue == null)
+                await this.queueService.CreateQueue(agentQueueName).ConfigureAwait(false);
         }
     }
 }

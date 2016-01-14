@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using FakeItEasy;
@@ -17,6 +18,12 @@
         /// Should not be a special value other than it is guaranteed to be valid.
         /// </summary>
         private const string ValidSlinqyQueueName = "queue-name";
+
+        /// <summary>
+        /// Represents a valid value where one is needed for a Slinqy Agent name.
+        /// Should not be a special value other than it is guaranteed to be valid.
+        /// </summary>
+        private const string ValidSlinqyAgentName = ValidSlinqyQueueName + SlinqyAgent.AgentQueueNameSuffix;
 
         /// <summary>
         /// Represents a valid value where one is needed for max size parameters.
@@ -108,24 +115,27 @@
         }
 
         /// <summary>
-        /// Verifies that the agent doesn't add shards when the write
+        /// Verifies that the agent doesn't add shards when the send
         /// queues size increases but remains under the scale up threshold.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
         async Task
-        SlinqyAgent_WriteQueueShardSizeUnderCapacityThreshold_AnotherShardIsNotAdded()
+        SlinqyAgent_SendQueueShardSizeUnderCapacityThreshold_AnotherShardIsNotAdded()
         {
             // Arrange
-            A.CallTo(() => this.fakeShard.StorageUtilization).Returns(ValidStorageCapacityScaleOutThreshold - 0.01);
+            A.CallTo(() =>
+                this.fakeShard.StorageUtilization
+            ).Returns(ValidStorageCapacityScaleOutThreshold - 0.01);
 
             // Act
             await this.slinqyAgent.Start();
 
             // Assert
+            // Basically says: A call to CreateQueue must not have happened unless the name is ValidSlinqyAgentName.
             A.CallTo(() =>
-                this.fakeQueueService.CreateQueue(A<string>.Ignored)
+                this.fakeQueueService.CreateQueue(A<string>.That.Matches(name => name != ValidSlinqyAgentName))
             ).MustNotHaveHappened();
         }
 
@@ -315,6 +325,72 @@
             A.CallTo(
                 () => this.fakeQueueShardMonitor.StopMonitoring()
             ).MustHaveHappened();
+        }
+
+        /// <summary>
+        /// Verifies that the SlinqyAgent creates it's own queue (for polling purposes) if it doesn't already exist.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        Start_AgentQueueDoesNotExist_AgentQueueIsCreated()
+        {
+            // Arrange
+            A.CallTo(() =>
+                this.fakeQueueService.ListQueues(ValidSlinqyAgentName)
+            ).Returns(Enumerable.Empty<IPhysicalQueue>());
+
+            // Act
+            await this.slinqyAgent.Start();
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeQueueService.CreateQueue(ValidSlinqyAgentName)
+            ).MustHaveHappened();
+        }
+
+        /// <summary>
+        /// Verifies that the SlinqyAgent doesn't try to create it's own queue if it already exists.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        Start_AgentQueueExists_DoesNotTryToCreateAgain()
+        {
+            // Arrange
+            var fakePhysicalQueues = new List<IPhysicalQueue> {
+                CreateFakeAgentQueue()
+            };
+
+            A.CallTo(() =>
+                this.fakeQueueService.ListQueues(ValidSlinqyAgentName)
+            ).Returns(fakePhysicalQueues);
+
+            // Act
+            await this.slinqyAgent.Start();
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeQueueService.CreateQueue(ValidSlinqyAgentName)
+            ).MustNotHaveHappened();
+        }
+
+        /// <summary>
+        /// Create a new fake IPhysicalQueue configured as a Slinqy Agent queue.
+        /// </summary>
+        /// <returns>Returns the fake queue.</returns>
+        private
+        static
+        IPhysicalQueue
+        CreateFakeAgentQueue()
+        {
+            var fakeAgentQueue = A.Fake<IPhysicalQueue>();
+
+            A.CallTo(() => fakeAgentQueue.Name).Returns(ValidSlinqyAgentName);
+
+            return fakeAgentQueue;
         }
 
         /// <summary>

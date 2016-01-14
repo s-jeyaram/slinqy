@@ -37,6 +37,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slinqy.Core", "Slinqy.Core\
 EndProject
 Project("{F088123C-0E9E-452A-89E6-6BA2F21D5CAC}") = "Slinqy.Models", "Slinqy.Models\Slinqy.Models.modelproj", "{BDD1E993-4611-4641-AFCF-FBF59FE16CE7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{19E7307D-4682-4E76-ABF8-0004E0F55AA7}"
+	ProjectSection(SolutionItems) = preProject
+		SlinqyAgent.md = SlinqyAgent.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Any CPU = Release|Any CPU
