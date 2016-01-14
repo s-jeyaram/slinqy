@@ -219,7 +219,16 @@
 
             // Create it if it doesn't exist.
             if (agentQueue == null)
-                await this.queueService.CreateQueue(agentQueueName).ConfigureAwait(false);
+            {
+                agentQueue = await this.queueService
+                    .CreateQueue(agentQueueName)
+                    .ConfigureAwait(false);
+
+                // Enqueue first poll message...
+                await agentQueue.Send(new EvaluateShardsCommand());
+            }
+
+            // Start reading the queue.
         }
     }
 }

@@ -351,6 +351,35 @@
         }
 
         /// <summary>
+        /// Verifies that the SlinqyAgent enqueues the polling message in its agent queue after it is created.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        Start_AgentQueueIsCreated_EvaluateShardsCommandIsSent()
+        {
+            // Arrange
+            A.CallTo(() =>
+                this.fakeQueueService.ListQueues(ValidSlinqyAgentName)
+            ).Returns(Enumerable.Empty<IPhysicalQueue>());
+
+            var fakeAgentQueue = CreateFakeAgentQueue();
+
+            A.CallTo(() =>
+                this.fakeQueueService.CreateQueue(ValidSlinqyAgentName)
+            ).Returns(fakeAgentQueue);
+
+            // Act
+            await this.slinqyAgent.Start();
+
+            // Assert
+            A.CallTo(() =>
+                fakeAgentQueue.Send(A<object>.That.IsInstanceOf(typeof(EvaluateShardsCommand)))
+            ).MustHaveHappened();
+        }
+
+        /// <summary>
         /// Verifies that the SlinqyAgent doesn't try to create it's own queue if it already exists.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
