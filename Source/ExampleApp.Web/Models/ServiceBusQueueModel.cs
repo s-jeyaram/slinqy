@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.ServiceBus.Messaging;
@@ -126,6 +127,23 @@
         }
 
         /// <summary>
+        /// Sends the message to the queue.
+        /// </summary>
+        /// <param name="messageBody">Specifies the body of the message.</param>
+        /// <param name="scheduleEnqueueTime">Specifies a time in the future in which the message should be enqueued, instead of immediately.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public
+        async Task
+        Send(
+            object          messageBody,
+            DateTimeOffset  scheduleEnqueueTime)
+        {
+            await this.queueClient
+                .SendAsync(new BrokeredMessage(messageBody) { ScheduledEnqueueTimeUtc = scheduleEnqueueTime.UtcDateTime })
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
         /// Receives the next message from the queue.
         /// </summary>
         /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
@@ -155,7 +173,13 @@
             Func<T, Task> handler)
         {
             this.queueClient.OnMessageAsync(
-                brokeredMessage => handler(brokeredMessage.GetBody<T>())
+                async brokeredMessage =>
+                {
+                    var body = brokeredMessage.GetBody<T>();
+
+                    await handler(body);
+                },
+                new OnMessageOptions { AutoComplete = true }
             );
         }
     }

@@ -1,5 +1,6 @@
 ﻿namespace Slinqy.Core
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
@@ -30,7 +31,47 @@
         private readonly SlinqyQueueShardMonitor queueShardMonitor;
 
         /// <summary>
+        /// The queue that agent uses to synchronize polling across multiple instances/VMs.
+        /// </summary>
+        private IPhysicalQueue agentQueue;
+
+        /// <summary>
+        /// Specifies how many digits the shard index can occupy in the physical queue name.
+        /// </summary>
+        private int shardIndexPadding;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyAgent"/> class.
+        /// </summary>
+        /// <param name="queueService">
+        /// Specifies the reference to use for managing the queue service.
+        /// </param>
+        /// <param name="slinqyQueueShardMonitor">
+        /// Specifies the monitor of the queue shards.
+        /// </param>
+        /// <param name="storageCapacityScaleOutThreshold">
+        /// Specifies at what percentage of the current physical write queues storage
+        /// utilization that the agent should take a scale out action (add another shard).
+        /// </param>
+        /// <param name="shardIndexPadding">
+        /// Specifies how many digits the shard index can occupy in the physical queue name.
+        /// </param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "This rule was not designed for async calls.")]
+        public
+        SlinqyAgent(
+            IPhysicalQueueService   queueService,
+            SlinqyQueueShardMonitor slinqyQueueShardMonitor,
+            double                  storageCapacityScaleOutThreshold,
+            int                     shardIndexPadding)
+        {
+            this.queueService                       = queueService;
+            this.queueShardMonitor                  = slinqyQueueShardMonitor;
+            this.storageCapacityScaleOutThreshold   = storageCapacityScaleOutThreshold;
+            this.shardIndexPadding                  = shardIndexPadding;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SlinqyAgent"/> class with a default of 1 shardIndexPadding.
         /// </summary>
         /// <param name="queueService">
         /// Specifies the reference to use for managing the queue service.
@@ -48,10 +89,8 @@
             IPhysicalQueueService   queueService,
             SlinqyQueueShardMonitor slinqyQueueShardMonitor,
             double                  storageCapacityScaleOutThreshold)
+                : this(queueService, slinqyQueueShardMonitor, storageCapacityScaleOutThreshold, 1)
         {
-            this.queueService                       = queueService;
-            this.queueShardMonitor                  = slinqyQueueShardMonitor;
-            this.storageCapacityScaleOutThreshold   = storageCapacityScaleOutThreshold;
         }
 
         /// <summary>
@@ -64,6 +103,9 @@
         {
             // Initialize the agents own queue.
             await this.InitializeAgentQueue();
+
+            // Perform the first call directly to return any obvious errors to the caller.
+            await this.EvaluateShards();
 
             // Start the shard monitor.
             await this.queueShardMonitor
@@ -92,12 +134,33 @@
             // Get the send queue shard.
             var sendShard = this.queueShardMonitor.SendShard;
 
-            // Scale if needed.
-            if (sendShard.StorageUtilization > this.storageCapacityScaleOutThreshold)
-                await this.ScaleOut(sendShard).ConfigureAwait(false);
+            if (sendShard == null)
+            {
+                var firstShardName = SlinqyQueueShard.GenerateFirstShardName(
+                    this.queueShardMonitor.QueueName,
+                    this.shardIndexPadding
+                );
 
-            // Make sure shard states are set properly.
-            await this.SetShardStates();
+                await this.queueService
+                    .CreateQueue(firstShardName)
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                // Scale if needed.
+                if (sendShard.StorageUtilization > this.storageCapacityScaleOutThreshold)
+                    await this.ScaleOut(sendShard).ConfigureAwait(false);
+
+                // Make sure shard states are set properly.
+                await this.SetShardStates()
+                    .ConfigureAwait(
+                        false);
+            }
+
+            // Finally queue it all to happen again!
+            await this.agentQueue
+                .Send(new EvaluateShardsCommand(), DateTimeOffset.UtcNow.AddSeconds(5))
+                .ConfigureAwait(false);
         }
 
         /// <summary>
@@ -175,22 +238,19 @@
             var agentQueueName = this.queueShardMonitor.QueueName + AgentQueueNameSuffix;
 
             // Get the agent queue (if it exists).
-            var agentQueue = (await this.queueService.ListQueues(agentQueueName).ConfigureAwait(false)).SingleOrDefault();
+            this.agentQueue = (await this.queueService.ListQueues(agentQueueName).ConfigureAwait(false)).SingleOrDefault();
 
             // Create it if it doesn't exist.
-            if (agentQueue == null)
+            if (this.agentQueue == null)
             {
-                agentQueue = await this.queueService
+                this.agentQueue = await this.queueService
                     .CreateQueue(agentQueueName)
                     .ConfigureAwait(false);
-
-                // Enqueue first poll message...
-                await agentQueue.Send(new EvaluateShardsCommand());
             }
 
             // Start reading the queue.
-            agentQueue.OnReceive<EvaluateShardsCommand>(
-                command => this.EvaluateShards()
+            this.agentQueue.OnReceive<EvaluateShardsCommand>(
+                async command => await this.EvaluateShards()
             );
         }
     }

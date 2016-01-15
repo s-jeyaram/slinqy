@@ -299,7 +299,6 @@
         {
             // Arrange
             await this.slinqyAgent.Start();
-            await this.agentEvaluateShardsCommandHandler(new EvaluateShardsCommand());
 
             // Act
             this.slinqyAgent.Stop();
@@ -380,7 +379,7 @@
 
             // Assert
             A.CallTo(() =>
-                fakeAgentQueue.Send(A<object>.That.IsInstanceOf(typeof(EvaluateShardsCommand)))
+                fakeAgentQueue.Send(A<object>.That.IsInstanceOf(typeof(EvaluateShardsCommand)), A<DateTimeOffset>.Ignored)
             ).MustHaveHappened();
         }
 
@@ -434,6 +433,48 @@
             A.CallTo(() =>
                 this.fakeQueueService.CreateQueue(ValidSlinqyAgentName)
             ).MustNotHaveHappened();
+        }
+
+        /// <summary>
+        /// Verifies that a new EvaluateShardsCommand is enqueued after successfully processing the current one (but before it is deleted from the queue).
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        SlinqyAgent_EvaluateShardsCommandIsProcessed_NewEvaluateShardsCommandIsScheduled()
+        {
+            // Arrange
+            await this.slinqyAgent.Start();
+
+            // Act
+            await this.agentEvaluateShardsCommandHandler(new EvaluateShardsCommand());
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeAgentQueue.Send(A<EvaluateShardsCommand>.That.Not.IsNull(), A<DateTimeOffset>.Ignored)
+            ).MustHaveHappened(Repeated.Exactly.Twice);
+        }
+
+        /// <summary>
+        /// Verifies that the first shard is created if it doesn't exist.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        Start_SendShardDoesNotExist_SendShardIsCreated()
+        {
+            // Arrange
+            A.CallTo(() => this.fakeQueueShardMonitor.SendShard).Returns(null);
+
+            // Act
+            await this.slinqyAgent.Start();
+
+            // Assert
+            A.CallTo(() =>
+                this.fakeQueueService.CreateQueue(ValidSlinqyQueueName + "0")
+            ).MustHaveHappened();
         }
 
         /// <summary>
