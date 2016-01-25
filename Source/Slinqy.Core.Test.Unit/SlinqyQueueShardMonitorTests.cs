@@ -191,19 +191,7 @@
         ReceiveShard_OneSendReceiveShardExists_SlinqyQueueReceiveShardIsReturned()
         {
             // Arrange
-            var fakeSendReceivePhysicalQueue = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() => fakeSendReceivePhysicalQueue.Name).Returns(ValidSlinqyQueueName + "0");
-            A.CallTo(() => fakeSendReceivePhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeSendReceivePhysicalQueue.IsReceiveEnabled).Returns(true);
-
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakeSendReceivePhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            var fakeSendReceivePhysicalQueue = this.AddNewSendReceiveQueue();
 
             await this.monitor.Start();
 
