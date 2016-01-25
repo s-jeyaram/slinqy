@@ -167,26 +167,9 @@
         SendShard_MultipleSendShardsExists_LastSlinqyQueueSendShardIsReturned()
         {
             // Arrange
-            var fakeReceivePhysicalQueue    = A.Fake<IPhysicalQueue>();
-            var fakeOldSendPhysicalQueue    = A.Fake<IPhysicalQueue>();
-            var fakeNewSendPhysicalQueue    = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() => fakeReceivePhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => fakeReceivePhysicalQueue.Name).Returns("shard0");
-            A.CallTo(() => fakeOldSendPhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeOldSendPhysicalQueue.Name).Returns("shard1");
-            A.CallTo(() => fakeNewSendPhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeNewSendPhysicalQueue.Name).Returns("shard2");
-
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakeReceivePhysicalQueue,
-                fakeOldSendPhysicalQueue,
-                fakeNewSendPhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            this.AddNewReceiveOnlyQueue();
+            this.AddNewSendOnlyQueue();
+            var fakeNewSendPhysicalQueue = this.AddNewSendOnlyQueue();
 
             // Act
             await this.monitor.Start();
