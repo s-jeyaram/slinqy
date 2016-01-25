@@ -34,6 +34,7 @@
     <Compile Include="..\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
     </Compile>
+    <Compile Include="EvaluateShardsCommand.cs" />
     <Compile Include="IPhysicalQueue.cs" />
     <Compile Include="IPhysicalQueueService.cs" />
     <Compile Include="SlinqyAgent.cs" />
@@ -44,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\CustomDictionary.xml">

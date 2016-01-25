@@ -103,3 +103,5 @@ Periodically pulls the current status of the shards from your queue infrastructu
 #### Slinqy Agent
 
 Periodically evaluates the shards and performs scaling actions if necessary.  One instance per queue *per application* is required.  This is the only autonomous component that manipulates your queue infrastructure.
+
+[More Details](Docs/SlinqyAgent.md)

@@ -62,10 +62,28 @@
         Task Send(object messageBody);
 
         /// <summary>
+        /// Sends a message to the queue.
+        /// </summary>
+        /// <param name="messageBody">Specifies the body of the message.</param>
+        /// <param name="scheduleEnqueueTime">Specifies a time in the future in which the message should be enqueued, instead of immediately.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        Task Send(object messageBody, DateTimeOffset scheduleEnqueueTime);
+
+        /// <summary>
         /// Receives the next message from the queue.
         /// </summary>
         /// <typeparam name="T">Specifies the Type that is expected to return.</typeparam>
         /// <returns>The body of the message that was received.</returns>
         Task<T> Receive<T>();
+
+        /// <summary>
+        /// Registers a message handler for the specified type.
+        /// </summary>
+        /// <typeparam name="T">Specifies the expected message Type.</typeparam>
+        /// <param name="handler">
+        /// Specifies a function that will take instances of the specified Type and process them.
+        /// The message is presumed to be handled successfully if no exception is thrown by the handler function.
+        /// </param>
+        void OnReceive<T>(Func<T, Task> handler);
     }
 }

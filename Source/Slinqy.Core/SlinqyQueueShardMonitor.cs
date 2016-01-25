@@ -54,7 +54,7 @@
         /// <summary>
         /// Gets the current shard for sending new queue messages.
         /// </summary>
-        public virtual SlinqyQueueShard SendShard => this.Shards.Last(s => s.PhysicalQueue.IsSendEnabled);
+        public virtual SlinqyQueueShard SendShard => this.Shards.LastOrDefault(s => s.PhysicalQueue.IsSendEnabled);
 
         /// <summary>
         /// Gets the current shard for receiving queue messages for processing.
@@ -98,10 +98,14 @@
         async Task
         Refresh()
         {
-            var physicalShards = await this.queueService.ListQueues(this.QueueName)
+            var physicalShards = await this.queueService
+                .ListQueues(this.QueueName)
                 .ConfigureAwait(false);
 
-            this.Shards = physicalShards.Select(ps => new SlinqyQueueShard(ps)).ToArray();
+            this.Shards = physicalShards
+                .Where(s => !s.Name.EndsWith(SlinqyAgent.AgentQueueNameSuffix))
+                .Select(ps => new SlinqyQueueShard(ps))
+                .ToArray();
         }
 
         /// <summary>

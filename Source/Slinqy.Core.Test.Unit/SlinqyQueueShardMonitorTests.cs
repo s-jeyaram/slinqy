@@ -326,5 +326,61 @@
                 () => this.fakeQueueService.ListQueues(A<string>.Ignored)
             ).MustHaveHappened(Repeated.Exactly.Twice);
         }
+
+        /// <summary>
+        /// Verifies that the Slinqy Agent Queue doesn't make its way to the monitors list of queue shards.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public
+        async Task
+        SlinqyQueueShardMonitor_AgentQueueExistsInPhysicalQueueList_DoesNotAppearInShardsProperty()
+        {
+            // Arrange
+            var fakeSendReceivePhysicalQueue = A.Fake<IPhysicalQueue>();
+            var fakeSlinqyAgentPhysicalQueue = A.Fake<IPhysicalQueue>();
+
+            A.CallTo(() => fakeSendReceivePhysicalQueue.Name).Returns(ValidSlinqyQueueName + "0");
+            A.CallTo(() => fakeSendReceivePhysicalQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeSendReceivePhysicalQueue.IsReceiveEnabled).Returns(true);
+            A.CallTo(() => fakeSlinqyAgentPhysicalQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeSlinqyAgentPhysicalQueue.IsReceiveEnabled).Returns(true);
+            A.CallTo(() => fakeSlinqyAgentPhysicalQueue.Name).Returns(ValidSlinqyQueueName + "-agent");
+
+            var physicalQueues = new List<IPhysicalQueue> {
+                fakeSlinqyAgentPhysicalQueue,
+                fakeSendReceivePhysicalQueue
+            };
+
+            A.CallTo(() =>
+                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
+            ).Returns(physicalQueues);
+
+            // Act
+            await this.monitor.Start();
+
+            // Assert
+            Assert.False(this.monitor.Shards.Any(s => s.PhysicalQueue.Name.Contains("-agent")));
+        }
+
+        /// <summary>
+        /// Verifies that SendShard returns null when there are no send shards.
+        /// </summary>
+        [Fact]
+        public
+        void
+        SendShard_NoSendEnabledPhysicalQueues_ReturnsNull()
+        {
+            // Arrange
+            A.CallTo(() =>
+                this.fakeQueueService.ListQueues(A<string>.Ignored)
+            ).Returns(Enumerable.Empty<IPhysicalQueue>());
+
+            // Act
+            var actual = this.monitor.SendShard;
+
+            // Assert
+            Assert.Null(actual);
+        }
     }
 }

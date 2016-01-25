@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Configuration;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -19,6 +20,9 @@
         // The following static fields are making up for not having proper dependency injection in place.
         // Use DI if dependencies become more than a handful of fields...
 
+        // TODO: Create known queues on app-start to better mimic how a real application would operate
+        //       and so the static dependencies below can also be handled in a more standard fashion.
+
         /// <summary>
         /// The queue service for managing queue resources.
         /// </summary>
@@ -27,11 +31,9 @@
         );
 
         /// <summary>
-        /// Used to interact with virtual queues.
+        /// Maintains a list of references to SlinqyQueue's that have been instantiated since they are expensive to create.
         /// </summary>
-        private static readonly SlinqyQueueClient SlinqyQueueClient = new SlinqyQueueClient(
-            PhysicalQueueService
-        );
+        private static readonly Dictionary<string, SlinqyQueue> SlinqyQueues = new Dictionary<string, SlinqyQueue>();
 
         /// <summary>
         /// Maintains a list of queue fill operations.
@@ -48,7 +50,7 @@
         /// This currently does not support running multiple instances of the website.
         /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Storing statically until proper DI is available.")]
-        private static SlinqyAgent slinqyAgent; // TODO: Modify to support running on multiple instances.
+        private static SlinqyAgent slinqyAgent;
 
         /// <summary>
         /// Handles HTTP GET /api/slinqy-queue/{queueName} by returning information about the requested queue.
@@ -63,7 +65,7 @@
         GetQueue(
             string queueName)
         {
-            var queue = SlinqyQueueClient.Get(queueName);
+            var queue = SlinqyQueues[queueName];
 
             return new QueueInformationViewModel(
                 queue.Name,
@@ -87,11 +89,6 @@
             if (createQueueModel == null)
                 throw new ArgumentNullException(nameof(createQueueModel));
 
-            var queue = await SlinqyQueueClient.CreateQueueAsync(
-                queueName:          createQueueModel.QueueName,
-                shardIndexPadding:  4
-            );
-
             var monitor = new SlinqyQueueShardMonitor(
                 createQueueModel.QueueName,
                 PhysicalQueueService
@@ -100,15 +97,21 @@
             slinqyAgent = new SlinqyAgent(
                 PhysicalQueueService,
                 monitor,
-                createQueueModel.StorageCapacityScaleOutThresholdPercentage / 100D
+                createQueueModel.StorageCapacityScaleOutThresholdPercentage / 100D,
+                4
             );
 
             await slinqyAgent.Start();
 
+            SlinqyQueues.Add(
+                createQueueModel.QueueName,
+                new SlinqyQueue(monitor)
+            );
+
             return new QueueInformationViewModel(
-                queue.Name,
-                queue.MaxQueueSizeMegabytes,
-                queue.CurrentQueueSizeBytes
+                createQueueModel.QueueName,
+                createQueueModel.MaxQueueSizeMegabytes,
+                0
             );
         }
 
@@ -228,7 +231,7 @@
             if (sendMessageCommand == null)
                 throw new ArgumentNullException(nameof(sendMessageCommand));
 
-            var queue = SlinqyQueueClient.Get(queueName);
+            var queue = SlinqyQueues[queueName];
 
             await queue
                 .Send(sendMessageCommand.MessageBody)
@@ -247,7 +250,7 @@
         ReceiveMessage(
             string queueName)
         {
-            var queue = SlinqyQueueClient.Get(queueName);
+            var queue = SlinqyQueues[queueName];
 
             return await queue
                 .Receive<string>()
@@ -269,7 +272,7 @@
             int     sizeMegabytes)
         {
             // Get the queue.
-            var queue = SlinqyQueueClient.Get(queueName);
+            var queue = SlinqyQueues[queueName];
 
             // Prepare to generate some random data.
             var messagesPerBatch        = 250;
@@ -322,7 +325,7 @@
             string queueName)
         {
             // Get the queue.
-            var queue = SlinqyQueueClient.Get(queueName);
+            var queue = SlinqyQueues[queueName];
 
             while (queue.CurrentQueueSizeBytes > 0)
             {
