@@ -260,24 +260,15 @@
         SlinqyQueueShardMonitor_AgentQueueExistsInPhysicalQueueList_DoesNotAppearInShardsProperty()
         {
             // Arrange
-            var fakeSendReceivePhysicalQueue = A.Fake<IPhysicalQueue>();
+            this.AddNewSendReceiveQueue();
+
             var fakeSlinqyAgentPhysicalQueue = A.Fake<IPhysicalQueue>();
 
-            A.CallTo(() => fakeSendReceivePhysicalQueue.Name).Returns(ValidSlinqyQueueName + "0");
-            A.CallTo(() => fakeSendReceivePhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeSendReceivePhysicalQueue.IsReceiveEnabled).Returns(true);
             A.CallTo(() => fakeSlinqyAgentPhysicalQueue.IsSendEnabled).Returns(true);
             A.CallTo(() => fakeSlinqyAgentPhysicalQueue.IsReceiveEnabled).Returns(true);
             A.CallTo(() => fakeSlinqyAgentPhysicalQueue.Name).Returns(ValidSlinqyQueueName + "-agent");
 
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakeSlinqyAgentPhysicalQueue,
-                fakeSendReceivePhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            this.fakeQueueServicePhysicalQueues.Add(fakeSlinqyAgentPhysicalQueue);
 
             // Act
             await this.monitor.Start();
