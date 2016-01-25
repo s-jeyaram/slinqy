@@ -65,11 +65,8 @@
         SlinqyQueueShardMonitor_PhysicalQueueShardsExists_MatchingSlinqyQueueShardsExist()
         {
             // Arrange
-            var fakePhysicalQueue1 = this.CreateFakePhysicalQueue();
-            var fakePhysicalQueue2 = this.CreateFakePhysicalQueue();
-
-            this.fakeQueueServicePhysicalQueues.Add(fakePhysicalQueue1);
-            this.fakeQueueServicePhysicalQueues.Add(fakePhysicalQueue2);
+            this.fakeQueueServicePhysicalQueues.Add(this.CreateFakePhysicalQueue());
+            this.fakeQueueServicePhysicalQueues.Add(this.CreateFakePhysicalQueue());
 
             // Act
             await this.monitor.Start();                  // Start monitoring for shards.
@@ -90,26 +87,10 @@
         [Fact]
         public
         async Task
-        WriteShard_OneSendReceiveShardExists_SlinqyQueueSendShardIsReturned()
+        SendShard_OneSendReceiveShardExists_SlinqyQueueSendShardIsReturned()
         {
             // Arrange
-            var fakeSendReceivePhysicalQueue = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() =>
-                fakeSendReceivePhysicalQueue.Name
-            ).Returns(ValidSlinqyQueueName + "0");
-
-            A.CallTo(() =>
-                fakeSendReceivePhysicalQueue.IsSendEnabled
-            ).Returns(true);
-
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakeSendReceivePhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            var fakeSendReceivePhysicalQueue = this.AddNewSendReceiveQueue();
 
             // Act
             await this.monitor.Start();
@@ -386,6 +367,24 @@
 
             // Assert
             Assert.Null(actual);
+        }
+
+        /// <summary>
+        /// Creates a new fake IPhysicalQueue and adds it to the fake IPhysicalQueueServices list of queues.
+        /// </summary>
+        /// <returns>Returns the instance that was created.</returns>
+        private
+        IPhysicalQueue
+        AddNewSendReceiveQueue()
+        {
+            var fakeQueue = this.CreateFakePhysicalQueue();
+
+            A.CallTo(() => fakeQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeQueue.IsReceiveEnabled).Returns(true);
+
+            this.fakeQueueServicePhysicalQueues.Add(fakeQueue);
+
+            return fakeQueue;
         }
 
         /// <summary>
