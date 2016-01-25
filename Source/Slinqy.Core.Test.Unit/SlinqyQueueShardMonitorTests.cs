@@ -25,9 +25,19 @@
         private readonly IPhysicalQueueService fakeQueueService = A.Fake<IPhysicalQueueService>();
 
         /// <summary>
+        /// The list of physical queues that the fake IPhysicalQueueService has.
+        /// </summary>
+        private readonly List<IPhysicalQueue> fakeQueueServicePhysicalQueues = new List<IPhysicalQueue>();
+
+        /// <summary>
         /// The instance under test.
         /// </summary>
         private readonly SlinqyQueueShardMonitor monitor;
+
+        /// <summary>
+        /// Keeps count of the number of fake physical queues that have been created.
+        /// </summary>
+        private int queueCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueShardMonitorTests"/> class.
@@ -35,6 +45,10 @@
         public
         SlinqyQueueShardMonitorTests()
         {
+            A.CallTo(() =>
+                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
+            ).Returns(this.fakeQueueServicePhysicalQueues);
+
             this.monitor = new SlinqyQueueShardMonitor(
                 ValidSlinqyQueueName,
                 this.fakeQueueService
@@ -51,20 +65,11 @@
         SlinqyQueueShardMonitor_PhysicalQueueShardsExists_MatchingSlinqyQueueShardsExist()
         {
             // Arrange
-            var fakePhysicalQueue1 = A.Fake<IPhysicalQueue>();
-            var fakePhysicalQueue2 = A.Fake<IPhysicalQueue>();
+            var fakePhysicalQueue1 = this.CreateFakePhysicalQueue();
+            var fakePhysicalQueue2 = this.CreateFakePhysicalQueue();
 
-            A.CallTo(() => fakePhysicalQueue1.Name).Returns(ValidSlinqyQueueName + "1");
-            A.CallTo(() => fakePhysicalQueue2.Name).Returns(ValidSlinqyQueueName + "2");
-
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakePhysicalQueue1,
-                fakePhysicalQueue2
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            this.fakeQueueServicePhysicalQueues.Add(fakePhysicalQueue1);
+            this.fakeQueueServicePhysicalQueues.Add(fakePhysicalQueue2);
 
             // Act
             await this.monitor.Start();                  // Start monitoring for shards.
@@ -73,7 +78,7 @@
 
             // Assert
             Assert.Equal(
-                physicalQueues.First().MaxSizeMegabytes,
+                this.fakeQueueServicePhysicalQueues.First().MaxSizeMegabytes,
                 slinqyQueueShards.First().PhysicalQueue.MaxSizeMegabytes
             );
         }
@@ -381,6 +386,23 @@
 
             // Assert
             Assert.Null(actual);
+        }
+
+        /// <summary>
+        /// Create a new fake instance of the IPhysicalQueue interface for testing.
+        /// </summary>
+        /// <returns>Returns a new fake instance.</returns>
+        private
+        IPhysicalQueue
+        CreateFakePhysicalQueue()
+        {
+            var fakePhysicalQueue = A.Fake<IPhysicalQueue>();
+
+            A.CallTo(() =>
+                fakePhysicalQueue.Name
+            ).Returns(ValidSlinqyQueueName + this.queueCount++);
+
+            return fakePhysicalQueue;
         }
     }
 }
