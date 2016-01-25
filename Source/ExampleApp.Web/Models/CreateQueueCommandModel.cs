@@ -10,7 +10,7 @@
         /// <summary>
         /// Gets or sets the name of the queue to create.
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [Display(Name = "Queue Name")]
         public string QueueName { get; set; }
 
