@@ -103,31 +103,17 @@
         }
 
         /// <summary>
-        /// Verifies that the WriteShard property reflects the current write shard.
+        /// Verifies that the SendShard property reflects the current send shard.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
         async Task
-        WriteShard_OneReceiveOneSendShardExists_SlinqyQueueSendShardIsReturned()
+        SendShard_OneReceiveOneSendShardExists_SlinqyQueueSendShardIsReturned()
         {
             // Arrange
-            var fakeReceivePhysicalQueue  = A.Fake<IPhysicalQueue>();
-            var fakeSendPhysicalQueue     = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() => fakeReceivePhysicalQueue.Name).Returns("shard0");
-            A.CallTo(() => fakeReceivePhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => fakeSendPhysicalQueue.Name).Returns("shard1");
-            A.CallTo(() => fakeSendPhysicalQueue.IsSendEnabled).Returns(true);
-
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakeReceivePhysicalQueue,
-                fakeSendPhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            this.AddNewReceiveOnlyQueue();
+            var fakeSendPhysicalQueue = this.AddNewSendOnlyQueue();
 
             // Act
             await this.monitor.Start();
@@ -381,6 +367,42 @@
 
             A.CallTo(() => fakeQueue.IsSendEnabled).Returns(true);
             A.CallTo(() => fakeQueue.IsReceiveEnabled).Returns(true);
+
+            this.fakeQueueServicePhysicalQueues.Add(fakeQueue);
+
+            return fakeQueue;
+        }
+
+        /// <summary>
+        /// Creates a new fake IPhysicalQueue and adds it to the fake IPhysicalQueueServices list of queues.
+        /// </summary>
+        /// <returns>Returns the instance that was created.</returns>
+        private
+        IPhysicalQueue
+        AddNewReceiveOnlyQueue()
+        {
+            var fakeQueue = this.CreateFakePhysicalQueue();
+
+            A.CallTo(() => fakeQueue.IsSendEnabled).Returns(false);
+            A.CallTo(() => fakeQueue.IsReceiveEnabled).Returns(true);
+
+            this.fakeQueueServicePhysicalQueues.Add(fakeQueue);
+
+            return fakeQueue;
+        }
+
+        /// <summary>
+        /// Creates a new fake IPhysicalQueue and adds it to the fake IPhysicalQueueServices list of queues.
+        /// </summary>
+        /// <returns>Returns the instance that was created.</returns>
+        private
+        IPhysicalQueue
+        AddNewSendOnlyQueue()
+        {
+            var fakeQueue = this.CreateFakePhysicalQueue();
+
+            A.CallTo(() => fakeQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeQueue.IsReceiveEnabled).Returns(false);
 
             this.fakeQueueServicePhysicalQueues.Add(fakeQueue);
 
