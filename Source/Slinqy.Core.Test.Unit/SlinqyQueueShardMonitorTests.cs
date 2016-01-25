@@ -65,8 +65,8 @@
         SlinqyQueueShardMonitor_PhysicalQueueShardsExists_MatchingSlinqyQueueShardsExist()
         {
             // Arrange
-            this.fakeQueueServicePhysicalQueues.Add(this.CreateFakePhysicalQueue());
-            this.fakeQueueServicePhysicalQueues.Add(this.CreateFakePhysicalQueue());
+            this.AddNewReceiveOnlyQueue();
+            this.AddNewSendOnlyQueue();
 
             // Act
             await this.monitor.Start();                  // Start monitoring for shards.
