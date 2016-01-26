@@ -4,6 +4,7 @@
     using System.Globalization;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
+    using Utilities.Selenium;
     using Utilities.Strings;
 
     /// <summary>
@@ -11,11 +12,6 @@
     /// </summary>
     public class CreateQueueForm : SeleniumWebBase
     {
-        /// <summary>
-        /// Specifies the full string to perform a Control+A keyboard command to do things like "select all".
-        /// </summary>
-        private static readonly string ControlA = Keys.Control + "a" + Keys.Control;
-
         /// <summary>
         /// The proxy reference to the AJAX request result message element on the web page.
         /// </summary>
@@ -103,9 +99,9 @@
                 createQueueName += StringUtilities.RandomString(4);
 
             // Enter parameters in to form.
-            this.queueName.SendKeys(ControlA + createQueueName);
-            this.maxQueueSizeMegabytes.SendKeys(ControlA + createQueueParameters.StorageCapacityMegabytes.ToString(CultureInfo.InvariantCulture));
-            this.storageCapacityScaleOutThresholdPercentage.SendKeys(ControlA + createQueueParameters.ScaleUpThresholdPercentage.ToString(CultureInfo.InvariantCulture));
+            this.queueName.SelectAndSendKeys(createQueueName);
+            this.maxQueueSizeMegabytes.SelectAndSendKeys(createQueueParameters.StorageCapacityMegabytes.ToString(CultureInfo.InvariantCulture));
+            this.storageCapacityScaleOutThresholdPercentage.SelectAndSendKeys(createQueueParameters.ScaleUpThresholdPercentage.ToString(CultureInfo.InvariantCulture));
 
             // Submit
             this.createQueueButton.Click();
