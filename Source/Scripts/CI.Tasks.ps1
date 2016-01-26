@@ -53,6 +53,9 @@ Task LoadSettings -description "Loads the environment specific settings." {
 }
 
 Task Build -depends Clean -description "Compiles all source code." {
+    # TODO: Temporary to see what resources are available in downstream CI systems.
+    Get-WmiObject -class Win32_processor | ft systemname,Name,DeviceID,NumberOfCores,NumberOfLogicalProcessors,Addresswidth
+    
     $BuildVersion = Get-BuildVersion
 
     exec { nuget restore $SolutionPath }
