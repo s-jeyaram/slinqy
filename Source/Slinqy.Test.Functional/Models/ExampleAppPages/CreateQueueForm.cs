@@ -12,6 +12,11 @@
     public class CreateQueueForm : SeleniumWebBase
     {
         /// <summary>
+        /// Specifies the full string to perform a Control+A keyboard command to do things like "select all".
+        /// </summary>
+        private static readonly string ControlA = Keys.Control + "a" + Keys.Control;
+
+        /// <summary>
         /// The proxy reference to the AJAX request result message element on the web page.
         /// </summary>
         private readonly AjaxIndicatorSection createQueueAjaxStatusSection;
@@ -97,15 +102,10 @@
             if (createQueueParameters.RandomizeQueueName)
                 createQueueName += StringUtilities.RandomString(4);
 
-            // Clear values to avoid appending to whatever may already be there.
-            this.queueName.Clear();
-            this.maxQueueSizeMegabytes.Clear();
-            this.storageCapacityScaleOutThresholdPercentage.Clear();
-
             // Enter parameters in to form.
-            this.queueName.SendKeys(createQueueName);
-            this.maxQueueSizeMegabytes.SendKeys(createQueueParameters.StorageCapacityMegabytes.ToString(CultureInfo.InvariantCulture));
-            this.storageCapacityScaleOutThresholdPercentage.SendKeys(createQueueParameters.ScaleUpThresholdPercentage.ToString(CultureInfo.InvariantCulture));
+            this.queueName.SendKeys(ControlA + createQueueName);
+            this.maxQueueSizeMegabytes.SendKeys(ControlA + createQueueParameters.StorageCapacityMegabytes.ToString(CultureInfo.InvariantCulture));
+            this.storageCapacityScaleOutThresholdPercentage.SendKeys(ControlA + createQueueParameters.ScaleUpThresholdPercentage.ToString(CultureInfo.InvariantCulture));
 
             // Submit
             this.createQueueButton.Click();
