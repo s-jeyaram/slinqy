@@ -25,9 +25,19 @@
         private readonly IPhysicalQueueService fakeQueueService = A.Fake<IPhysicalQueueService>();
 
         /// <summary>
+        /// The list of physical queues that the fake IPhysicalQueueService has.
+        /// </summary>
+        private readonly List<IPhysicalQueue> fakeQueueServicePhysicalQueues = new List<IPhysicalQueue>();
+
+        /// <summary>
         /// The instance under test.
         /// </summary>
         private readonly SlinqyQueueShardMonitor monitor;
+
+        /// <summary>
+        /// Keeps count of the number of fake physical queues that have been created.
+        /// </summary>
+        private int queueCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SlinqyQueueShardMonitorTests"/> class.
@@ -35,6 +45,10 @@
         public
         SlinqyQueueShardMonitorTests()
         {
+            A.CallTo(() =>
+                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
+            ).Returns(this.fakeQueueServicePhysicalQueues);
+
             this.monitor = new SlinqyQueueShardMonitor(
                 ValidSlinqyQueueName,
                 this.fakeQueueService
@@ -51,20 +65,8 @@
         SlinqyQueueShardMonitor_PhysicalQueueShardsExists_MatchingSlinqyQueueShardsExist()
         {
             // Arrange
-            var fakePhysicalQueue1 = A.Fake<IPhysicalQueue>();
-            var fakePhysicalQueue2 = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() => fakePhysicalQueue1.Name).Returns(ValidSlinqyQueueName + "1");
-            A.CallTo(() => fakePhysicalQueue2.Name).Returns(ValidSlinqyQueueName + "2");
-
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakePhysicalQueue1,
-                fakePhysicalQueue2
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            this.AddNewReceiveOnlyQueue();
+            this.AddNewSendOnlyQueue();
 
             // Act
             await this.monitor.Start();                  // Start monitoring for shards.
@@ -73,7 +75,7 @@
 
             // Assert
             Assert.Equal(
-                physicalQueues.First().MaxSizeMegabytes,
+                this.fakeQueueServicePhysicalQueues.First().MaxSizeMegabytes,
                 slinqyQueueShards.First().PhysicalQueue.MaxSizeMegabytes
             );
         }
@@ -85,26 +87,10 @@
         [Fact]
         public
         async Task
-        WriteShard_OneSendReceiveShardExists_SlinqyQueueSendShardIsReturned()
+        SendShard_OneSendReceiveShardExists_SlinqyQueueSendShardIsReturned()
         {
             // Arrange
-            var fakeSendReceivePhysicalQueue = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() =>
-                fakeSendReceivePhysicalQueue.Name
-            ).Returns(ValidSlinqyQueueName + "0");
-
-            A.CallTo(() =>
-                fakeSendReceivePhysicalQueue.IsSendEnabled
-            ).Returns(true);
-
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakeSendReceivePhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            var fakeSendReceivePhysicalQueue = this.AddNewSendReceiveQueue();
 
             // Act
             await this.monitor.Start();
@@ -117,31 +103,17 @@
         }
 
         /// <summary>
-        /// Verifies that the WriteShard property reflects the current write shard.
+        /// Verifies that the SendShard property reflects the current send shard.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public
         async Task
-        WriteShard_OneReceiveOneSendShardExists_SlinqyQueueSendShardIsReturned()
+        SendShard_OneReceiveOneSendShardExists_SlinqyQueueSendShardIsReturned()
         {
             // Arrange
-            var fakeReceivePhysicalQueue  = A.Fake<IPhysicalQueue>();
-            var fakeSendPhysicalQueue     = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() => fakeReceivePhysicalQueue.Name).Returns("shard0");
-            A.CallTo(() => fakeReceivePhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => fakeSendPhysicalQueue.Name).Returns("shard1");
-            A.CallTo(() => fakeSendPhysicalQueue.IsSendEnabled).Returns(true);
-
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakeReceivePhysicalQueue,
-                fakeSendPhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            this.AddNewReceiveOnlyQueue();
+            var fakeSendPhysicalQueue = this.AddNewSendOnlyQueue();
 
             // Act
             await this.monitor.Start();
@@ -163,31 +135,11 @@
         SendShard_OneReceiveManyDisabledOneSendShardExists_SlinqyQueueSendShardIsReturned()
         {
             // Arrange
-            var fakeReceivePhysicalQueue    = A.Fake<IPhysicalQueue>();
-            var fakeDisabled1PhysicalQueue  = A.Fake<IPhysicalQueue>();
-            var fakeDisabled2PhysicalQueue  = A.Fake<IPhysicalQueue>();
-            var fakeDisabled3PhysicalQueue  = A.Fake<IPhysicalQueue>();
-            var fakeSendPhysicalQueue       = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() => fakeReceivePhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => fakeReceivePhysicalQueue.Name).Returns("shard0");
-            A.CallTo(() => fakeDisabled1PhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => fakeDisabled1PhysicalQueue.Name).Returns("shard1");
-            A.CallTo(() => fakeDisabled2PhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => fakeDisabled2PhysicalQueue.Name).Returns("shard2");
-            A.CallTo(() => fakeDisabled3PhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => fakeDisabled3PhysicalQueue.Name).Returns("shard3");
-            A.CallTo(() => fakeSendPhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeSendPhysicalQueue.Name).Returns("shard4");
-
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakeReceivePhysicalQueue,
-                fakeSendPhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            this.AddNewReceiveOnlyQueue();
+            this.AddNewDisabledQueue();
+            this.AddNewDisabledQueue();
+            this.AddNewDisabledQueue();
+            var fakeSendPhysicalQueue = this.AddNewSendOnlyQueue();
 
             // Act
             await this.monitor.Start();
@@ -215,26 +167,9 @@
         SendShard_MultipleSendShardsExists_LastSlinqyQueueSendShardIsReturned()
         {
             // Arrange
-            var fakeReceivePhysicalQueue    = A.Fake<IPhysicalQueue>();
-            var fakeOldSendPhysicalQueue    = A.Fake<IPhysicalQueue>();
-            var fakeNewSendPhysicalQueue    = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() => fakeReceivePhysicalQueue.IsSendEnabled).Returns(false);
-            A.CallTo(() => fakeReceivePhysicalQueue.Name).Returns("shard0");
-            A.CallTo(() => fakeOldSendPhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeOldSendPhysicalQueue.Name).Returns("shard1");
-            A.CallTo(() => fakeNewSendPhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeNewSendPhysicalQueue.Name).Returns("shard2");
-
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakeReceivePhysicalQueue,
-                fakeOldSendPhysicalQueue,
-                fakeNewSendPhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            this.AddNewReceiveOnlyQueue();
+            this.AddNewSendOnlyQueue();
+            var fakeNewSendPhysicalQueue = this.AddNewSendOnlyQueue();
 
             // Act
             await this.monitor.Start();
@@ -256,19 +191,7 @@
         ReceiveShard_OneSendReceiveShardExists_SlinqyQueueReceiveShardIsReturned()
         {
             // Arrange
-            var fakeSendReceivePhysicalQueue = A.Fake<IPhysicalQueue>();
-
-            A.CallTo(() => fakeSendReceivePhysicalQueue.Name).Returns(ValidSlinqyQueueName + "0");
-            A.CallTo(() => fakeSendReceivePhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeSendReceivePhysicalQueue.IsReceiveEnabled).Returns(true);
-
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakeSendReceivePhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            var fakeSendReceivePhysicalQueue = this.AddNewSendReceiveQueue();
 
             await this.monitor.Start();
 
@@ -337,24 +260,15 @@
         SlinqyQueueShardMonitor_AgentQueueExistsInPhysicalQueueList_DoesNotAppearInShardsProperty()
         {
             // Arrange
-            var fakeSendReceivePhysicalQueue = A.Fake<IPhysicalQueue>();
+            this.AddNewSendReceiveQueue();
+
             var fakeSlinqyAgentPhysicalQueue = A.Fake<IPhysicalQueue>();
 
-            A.CallTo(() => fakeSendReceivePhysicalQueue.Name).Returns(ValidSlinqyQueueName + "0");
-            A.CallTo(() => fakeSendReceivePhysicalQueue.IsSendEnabled).Returns(true);
-            A.CallTo(() => fakeSendReceivePhysicalQueue.IsReceiveEnabled).Returns(true);
             A.CallTo(() => fakeSlinqyAgentPhysicalQueue.IsSendEnabled).Returns(true);
             A.CallTo(() => fakeSlinqyAgentPhysicalQueue.IsReceiveEnabled).Returns(true);
             A.CallTo(() => fakeSlinqyAgentPhysicalQueue.Name).Returns(ValidSlinqyQueueName + "-agent");
 
-            var physicalQueues = new List<IPhysicalQueue> {
-                fakeSlinqyAgentPhysicalQueue,
-                fakeSendReceivePhysicalQueue
-            };
-
-            A.CallTo(() =>
-                this.fakeQueueService.ListQueues(ValidSlinqyQueueName)
-            ).Returns(physicalQueues);
+            this.fakeQueueServicePhysicalQueues.Add(fakeSlinqyAgentPhysicalQueue);
 
             // Act
             await this.monitor.Start();
@@ -381,6 +295,95 @@
 
             // Assert
             Assert.Null(actual);
+        }
+
+        /// <summary>
+        /// Creates a new fake IPhysicalQueue and adds it to the fake IPhysicalQueueServices list of queues.
+        /// </summary>
+        /// <returns>Returns the instance that was created.</returns>
+        private
+        IPhysicalQueue
+        AddNewSendReceiveQueue()
+        {
+            var fakeQueue = this.CreateFakePhysicalQueue();
+
+            A.CallTo(() => fakeQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeQueue.IsReceiveEnabled).Returns(true);
+
+            this.fakeQueueServicePhysicalQueues.Add(fakeQueue);
+
+            return fakeQueue;
+        }
+
+        /// <summary>
+        /// Creates a new fake IPhysicalQueue and adds it to the fake IPhysicalQueueServices list of queues.
+        /// </summary>
+        /// <returns>Returns the instance that was created.</returns>
+        private
+        IPhysicalQueue
+        AddNewReceiveOnlyQueue()
+        {
+            var fakeQueue = this.CreateFakePhysicalQueue();
+
+            A.CallTo(() => fakeQueue.IsSendEnabled).Returns(false);
+            A.CallTo(() => fakeQueue.IsReceiveEnabled).Returns(true);
+
+            this.fakeQueueServicePhysicalQueues.Add(fakeQueue);
+
+            return fakeQueue;
+        }
+
+        /// <summary>
+        /// Creates a new fake IPhysicalQueue and adds it to the fake IPhysicalQueueServices list of queues.
+        /// </summary>
+        /// <returns>Returns the instance that was created.</returns>
+        private
+        IPhysicalQueue
+        AddNewSendOnlyQueue()
+        {
+            var fakeQueue = this.CreateFakePhysicalQueue();
+
+            A.CallTo(() => fakeQueue.IsSendEnabled).Returns(true);
+            A.CallTo(() => fakeQueue.IsReceiveEnabled).Returns(false);
+
+            this.fakeQueueServicePhysicalQueues.Add(fakeQueue);
+
+            return fakeQueue;
+        }
+
+        /// <summary>
+        /// Creates a new fake IPhysicalQueue and adds it to the fake IPhysicalQueueServices list of queues.
+        /// </summary>
+        /// <returns>Returns the instance that was created.</returns>
+        private
+        IPhysicalQueue
+        AddNewDisabledQueue()
+        {
+            var fakeQueue = this.CreateFakePhysicalQueue();
+
+            A.CallTo(() => fakeQueue.IsSendEnabled).Returns(false);
+            A.CallTo(() => fakeQueue.IsReceiveEnabled).Returns(false);
+
+            this.fakeQueueServicePhysicalQueues.Add(fakeQueue);
+
+            return fakeQueue;
+        }
+
+        /// <summary>
+        /// Create a new fake instance of the IPhysicalQueue interface for testing.
+        /// </summary>
+        /// <returns>Returns a new fake instance.</returns>
+        private
+        IPhysicalQueue
+        CreateFakePhysicalQueue()
+        {
+            var fakePhysicalQueue = A.Fake<IPhysicalQueue>();
+
+            A.CallTo(() =>
+                fakePhysicalQueue.Name
+            ).Returns(ValidSlinqyQueueName + this.queueCount++);
+
+            return fakePhysicalQueue;
         }
     }
 }

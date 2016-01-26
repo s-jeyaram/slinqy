@@ -7,6 +7,9 @@
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Net.Http.Formatting;
     using System.Threading.Tasks;
     using System.Web.Http;
     using Models;
@@ -82,12 +85,15 @@
         [HttpPost]
         [Route("api/slinqy-queue", Name = "CreateQueue")]
         public
-        async Task<QueueInformationViewModel>
+        async Task<HttpResponseMessage>
         CreateQueue(
             CreateQueueCommandModel createQueueModel)
         {
             if (createQueueModel == null)
                 throw new ArgumentNullException(nameof(createQueueModel));
+
+            if (!this.ModelState.IsValid)
+                return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, this.ModelState);
 
             var monitor = new SlinqyQueueShardMonitor(
                 createQueueModel.QueueName,
@@ -108,11 +114,18 @@
                 new SlinqyQueue(monitor)
             );
 
-            return new QueueInformationViewModel(
-                createQueueModel.QueueName,
-                createQueueModel.MaxQueueSizeMegabytes,
-                0
-            );
+            var response = new HttpResponseMessage(HttpStatusCode.Created) {
+                Content = new ObjectContent<QueueInformationViewModel>(
+                    new QueueInformationViewModel(
+                        queueName:              createQueueModel.QueueName,
+                        maxQueueSizeMegabytes:  createQueueModel.MaxQueueSizeMegabytes,
+                        currentQueueSizeBytes:  0
+                    ),
+                    new JsonMediaTypeFormatter()
+                )
+            };
+
+            return response;
         }
 
         /// <summary>
