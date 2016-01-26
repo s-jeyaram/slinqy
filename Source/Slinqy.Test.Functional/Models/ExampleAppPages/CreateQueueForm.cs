@@ -100,8 +100,8 @@
 
             // Enter parameters in to form.
             this.queueName.SelectAndSendKeys(createQueueName);
-            this.maxQueueSizeMegabytes.SelectAndSendKeys(createQueueParameters.StorageCapacityMegabytes.ToString(CultureInfo.InvariantCulture));
-            this.storageCapacityScaleOutThresholdPercentage.SelectAndSendKeys(createQueueParameters.ScaleUpThresholdPercentage.ToString(CultureInfo.InvariantCulture));
+            this.maxQueueSizeMegabytes.SelectAndSendKeys(createQueueParameters.StorageCapacityMegabytes);
+            this.storageCapacityScaleOutThresholdPercentage.SelectAndSendKeys(createQueueParameters.ScaleUpThresholdPercentage);
 
             // Submit
             this.createQueueButton.Click();

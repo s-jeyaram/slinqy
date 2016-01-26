@@ -23,7 +23,7 @@
         void
         SelectAndSendKeys(
             this IWebElement webElement,
-            string keys)
+            object keys)
         {
             webElement.SendKeys(ControlA + keys);
         }

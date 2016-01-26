@@ -5,6 +5,7 @@
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
     using Utilities.Polling;
+    using Utilities.Selenium;
     using Utilities.Strings;
 
     /// <summary>
@@ -169,8 +170,7 @@
         FillQueue(
             int sizeMegabytes)
         {
-            this.sizeMegabytesInput.Clear();
-            this.sizeMegabytesInput.SendKeys(sizeMegabytes.ToString(CultureInfo.InvariantCulture));
+            this.sizeMegabytesInput.SelectAndSendKeys(sizeMegabytes);
 
             this.fillQueueButton.Click();
 
