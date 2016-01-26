@@ -57,10 +57,10 @@
                 {
                     var statusStillExists = driver.FindElements(
                         By.Id(this.ajaxStatusElementId)
-                    ).Any(); // The status element is no longer on the page.
+                    ).Any();
 
                     if (!statusStillExists)
-                        return true;
+                        return true; // The status element is no longer on the page.
 
                     var statusClass = this.ajaxStatusElement.GetAttribute("class");
 
