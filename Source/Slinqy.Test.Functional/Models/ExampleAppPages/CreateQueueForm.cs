@@ -2,6 +2,7 @@
 {
     using System;
     using System.Globalization;
+    using System.Threading;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
     using Utilities.Strings;
@@ -97,12 +98,14 @@
             if (createQueueParameters.RandomizeQueueName)
                 createQueueName += StringUtilities.RandomString(4);
 
-            // Enter parameters in to form.
+            // Clear values to avoid appending to whatever may already be there.
             this.queueName.Clear();
-            this.queueName.SendKeys(createQueueName);
             this.maxQueueSizeMegabytes.Clear();
-            this.maxQueueSizeMegabytes.SendKeys(createQueueParameters.StorageCapacityMegabytes.ToString(CultureInfo.InvariantCulture));
             this.storageCapacityScaleOutThresholdPercentage.Clear();
+
+            // Enter parameters in to form.
+            this.queueName.SendKeys(createQueueName);
+            this.maxQueueSizeMegabytes.SendKeys(createQueueParameters.StorageCapacityMegabytes.ToString(CultureInfo.InvariantCulture));
             this.storageCapacityScaleOutThresholdPercentage.SendKeys(createQueueParameters.ScaleUpThresholdPercentage.ToString(CultureInfo.InvariantCulture));
 
             // Submit
