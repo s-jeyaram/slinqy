@@ -5,6 +5,7 @@
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
     using OpenQA.Selenium;
 
     /// <summary>
@@ -73,6 +74,8 @@
             this.webBrowserDriver
                 .Navigate()
                 .GoToUrl(fullyQualifiedUri);
+
+            Thread.Sleep(2000); // TODO: REMOVE (Temporary: This is to test if there are timing issues w/ filling out the form)
 
             return this.GetCurrentPageAs<TPage>();
         }

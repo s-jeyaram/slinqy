@@ -2,7 +2,6 @@
 {
     using System;
     using System.Globalization;
-    using System.Threading;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
     using Utilities.Strings;
@@ -103,14 +102,10 @@
             this.maxQueueSizeMegabytes.Clear();
             this.storageCapacityScaleOutThresholdPercentage.Clear();
 
-            Thread.Sleep(2000); // TODO: REMOVE (Temporary: This is to test if there are timing issues w/ filling out the form)
-
             // Enter parameters in to form.
             this.queueName.SendKeys(createQueueName);
             this.maxQueueSizeMegabytes.SendKeys(createQueueParameters.StorageCapacityMegabytes.ToString(CultureInfo.InvariantCulture));
             this.storageCapacityScaleOutThresholdPercentage.SendKeys(createQueueParameters.ScaleUpThresholdPercentage.ToString(CultureInfo.InvariantCulture));
-
-            Thread.Sleep(2000); // TODO: REMOVE (Temporary: This is to test if there are timing issues w/ filling out the form)
 
             // Submit
             this.createQueueButton.Click();
