@@ -1,7 +1,6 @@
 ﻿namespace Slinqy.Test.Functional.Models.ExampleAppPages
 {
     using System;
-    using System.Globalization;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
     using Utilities.Selenium;
