@@ -104,7 +104,8 @@
         {
             return await this.queueShardMonitor
                 .ReceiveShard
-                .Receive<T>();
+                .Receive<T>()
+                .ConfigureAwait(false);
         }
     }
 }
