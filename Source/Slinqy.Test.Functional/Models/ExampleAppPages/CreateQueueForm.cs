@@ -41,12 +41,6 @@
         private IWebElement createQueueButton = null;
 
         /// <summary>
-        /// The proxy reference to the AJAX request result message element on the web page.
-        /// </summary>
-        [FindsBy(How = How.Id, Using = "CreateQueueAjaxStatus")]
-        private IWebElement createQueueAjaxStatusSectionElement = null;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="CreateQueueForm"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">
@@ -59,7 +53,7 @@
         {
             this.createQueueAjaxStatusSection = new AjaxIndicatorSection(
                 webBrowserDriver,
-                this.createQueueAjaxStatusSectionElement
+                "CreateQueueAjaxStatus"
             );
         }
 

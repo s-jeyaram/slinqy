@@ -11,11 +11,6 @@
     public class AjaxIndicatorSection : SeleniumWebBase
     {
         /// <summary>
-        /// The proxy reference to the ajax indicator element on the web page.
-        /// </summary>
-        private readonly IWebElement ajaxStatusElement;
-
-        /// <summary>
         /// The CSS ID of the AJAX Status Element.
         /// </summary>
         private readonly string ajaxStatusElementId;
@@ -24,18 +19,14 @@
         /// Initializes a new instance of the <see cref="AjaxIndicatorSection"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the web driver to use for interacting with the web browser.</param>
-        /// <param name="ajaxStatusElement">Specifies the element where the AJAX status will be rendered.</param>
+        /// <param name="ajaxStatusElementId">Specifies the ID of the element where the AJAX status will be rendered.</param>
         public
         AjaxIndicatorSection(
             IWebDriver  webBrowserDriver,
-            IWebElement ajaxStatusElement)
+            string      ajaxStatusElementId)
             : base(webBrowserDriver)
         {
-            if (ajaxStatusElement == null)
-                throw new ArgumentNullException(nameof(ajaxStatusElement));
-
-            this.ajaxStatusElement = ajaxStatusElement;
-            this.ajaxStatusElementId = ajaxStatusElement.GetAttribute("id");
+            this.ajaxStatusElementId = ajaxStatusElementId;
         }
 
         /// <summary>
@@ -55,17 +46,17 @@
             ).Until(
                 driver =>
                 {
-                    var statusStillExists = driver.FindElements(
+                    var statusElement = driver.FindElements(
                         By.Id(this.ajaxStatusElementId)
-                    ).Any();
+                    ).SingleOrDefault();
 
-                    if (!statusStillExists)
+                    if (statusElement == null)
                         return true; // The status element is no longer on the page.
 
-                    var statusClass = this.ajaxStatusElement.GetAttribute("class");
+                    var statusClass = statusElement.GetAttribute("class");
 
                     if (statusClass.Contains("ajax-failed"))
-                        throw new InvalidOperationException(this.ajaxStatusElement.Text);
+                        throw new InvalidOperationException(statusElement.Text);
 
                     return !statusClass.Contains("ajax-running");
                 }
