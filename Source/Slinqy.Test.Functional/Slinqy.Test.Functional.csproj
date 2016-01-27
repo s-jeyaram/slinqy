@@ -131,6 +131,7 @@
     <Compile Include="Setup.cs" />
     <Compile Include="Utilities\Polling\Poll.cs" />
     <Compile Include="Utilities\Polling\PollTimeoutException.cs" />
+    <Compile Include="Utilities\Selenium\WebElementExtensions.cs" />
     <Compile Include="Utilities\Strings\StringUtilities.cs" />
   </ItemGroup>
   <ItemGroup>

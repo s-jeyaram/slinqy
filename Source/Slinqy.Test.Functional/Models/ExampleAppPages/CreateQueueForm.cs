@@ -1,10 +1,9 @@
 ﻿namespace Slinqy.Test.Functional.Models.ExampleAppPages
 {
     using System;
-    using System.Globalization;
-    using System.Threading;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
+    using Utilities.Selenium;
     using Utilities.Strings;
 
     /// <summary>
@@ -98,15 +97,10 @@
             if (createQueueParameters.RandomizeQueueName)
                 createQueueName += StringUtilities.RandomString(4);
 
-            // Clear values to avoid appending to whatever may already be there.
-            this.queueName.Clear();
-            this.maxQueueSizeMegabytes.Clear();
-            this.storageCapacityScaleOutThresholdPercentage.Clear();
-
             // Enter parameters in to form.
-            this.queueName.SendKeys(createQueueName);
-            this.maxQueueSizeMegabytes.SendKeys(createQueueParameters.StorageCapacityMegabytes.ToString(CultureInfo.InvariantCulture));
-            this.storageCapacityScaleOutThresholdPercentage.SendKeys(createQueueParameters.ScaleUpThresholdPercentage.ToString(CultureInfo.InvariantCulture));
+            this.queueName.SelectAndSendKeys(createQueueName);
+            this.maxQueueSizeMegabytes.SelectAndSendKeys(createQueueParameters.StorageCapacityMegabytes);
+            this.storageCapacityScaleOutThresholdPercentage.SelectAndSendKeys(createQueueParameters.ScaleUpThresholdPercentage);
 
             // Submit
             this.createQueueButton.Click();
