@@ -222,7 +222,7 @@
             this.receiveMessageButton.Click();
 
             // Wait for it to finish
-            this.receiveMessageAjaxStatusSection.WaitForResult(TimeSpan.FromSeconds(15));
+            this.receiveMessageAjaxStatusSection.WaitForResult(TimeSpan.FromSeconds(30));
 
             // Wait for the result value to appear
             new WebDriverWait(

@@ -16,6 +16,10 @@
     }
 
     function ReceiveMessageSucceeded(messageBody) {
+        if (!messageBody) {
+            messageBody = 'No Content Received';
+        }
+
         $('#ReceivedMessageBody')
             .text(messageBody);
     }
