@@ -2,8 +2,10 @@
 {
     using System;
     using System.Globalization;
+    using System.Linq;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
+    using OpenQA.Selenium.Support.UI;
     using Utilities.Polling;
     using Utilities.Selenium;
     using Utilities.Strings;
@@ -246,6 +248,14 @@
 
             // Wait for it to finish
             this.receiveMessageAjaxStatusSection.WaitForResult(TimeSpan.FromSeconds(15));
+
+            // Wait for the result value to appear
+            new WebDriverWait(
+                this.WebBrowserDriver,
+                TimeSpan.FromSeconds(15)
+            ).Until(
+                driver => !string.IsNullOrWhiteSpace(this.receivedMessageBody.Text)
+            );
 
             return this.receivedMessageBody.Text;
         }
