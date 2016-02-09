@@ -66,13 +66,6 @@
         /// A proxy reference to the element in the web browser.
         /// </summary>
         /// <remarks>This field is automatically populated by SpecFlow.</remarks>
-        [FindsBy(How = How.Id, Using = "ReceiveQueueMessagesReceived")]
-        private IWebElement receiveQueueMessagesReceived = null;
-
-        /// <summary>
-        /// A proxy reference to the element in the web browser.
-        /// </summary>
-        /// <remarks>This field is automatically populated by SpecFlow.</remarks>
         [FindsBy(How = How.Id, Using = "MessageBody")]
         private IWebElement messageBodyInput = null;
 
@@ -188,7 +181,11 @@
             );
 
             // Get the # of messages from the UI.
-            return int.Parse(this.receiveQueueMessagesReceived.Text, CultureInfo.InvariantCulture);
+            var receiveQueueMessagesReceivedElement = this.WebBrowserDriver.FindElement(
+                By.Id("ReceiveQueueMessagesReceived")
+            );
+
+            return int.Parse(receiveQueueMessagesReceivedElement.Text, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
