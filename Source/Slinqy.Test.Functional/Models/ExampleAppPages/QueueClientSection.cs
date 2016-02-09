@@ -4,6 +4,7 @@
     using System.Globalization;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.PageObjects;
+    using OpenQA.Selenium.Support.UI;
     using Utilities.Polling;
     using Utilities.Selenium;
     using Utilities.Strings;
@@ -97,30 +98,6 @@
         private IWebElement receivedMessageBody = null;
 
         /// <summary>
-        /// The proxy reference to the AJAX request result message element on the web page.
-        /// </summary>
-        [FindsBy(How = How.Id, Using = "FillQueueStatusAjaxStatus")]
-        private IWebElement fillQueueStatusAjaxStatusSectionElement = null;
-
-        /// <summary>
-        /// The proxy reference to the AJAX request result message element on the web page.
-        /// </summary>
-        [FindsBy(How = How.Id, Using = "SendMessageAjaxStatus")]
-        private IWebElement sendMessageAjaxStatusSectionElement = null;
-
-        /// <summary>
-        /// The proxy reference to the AJAX request result message element on the web page.
-        /// </summary>
-        [FindsBy(How = How.Id, Using = "ReceiveMessageAjaxStatus")]
-        private IWebElement receiveMessageAjaxStatusSectionElement = null;
-
-        /// <summary>
-        /// The proxy reference to the AJAX request result message element on the web page.
-        /// </summary>
-        [FindsBy(How = How.Id, Using = "ReceiveQueueAjaxStatus")]
-        private IWebElement receiveQueueAjaxStatusSectionElement = null;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="QueueClientSection"/> class.
         /// </summary>
         /// <param name="webBrowserDriver">Specifies the driver to use for interacting with the web browser.</param>
@@ -131,22 +108,22 @@
         {
             this.fillQueueAjaxStatusSection = new AjaxIndicatorSection(
                 webBrowserDriver,
-                this.fillQueueStatusAjaxStatusSectionElement
+                "FillQueueStatusAjaxStatus"
             );
 
             this.sendMessageAjaxStatusSection = new AjaxIndicatorSection(
                 webBrowserDriver,
-                this.sendMessageAjaxStatusSectionElement
+                "SendMessageAjaxStatus"
             );
 
             this.receiveMessageAjaxStatusSection = new AjaxIndicatorSection(
                 webBrowserDriver,
-                this.receiveMessageAjaxStatusSectionElement
+                "ReceiveMessageAjaxStatus"
             );
 
             this.receiveQueueAjaxStatusSection = new AjaxIndicatorSection(
                 webBrowserDriver,
-                this.receiveQueueAjaxStatusSectionElement
+                "ReceiveQueueAjaxStatus"
             );
         }
 
@@ -245,7 +222,15 @@
             this.receiveMessageButton.Click();
 
             // Wait for it to finish
-            this.receiveMessageAjaxStatusSection.WaitForResult(TimeSpan.FromSeconds(15));
+            this.receiveMessageAjaxStatusSection.WaitForResult(TimeSpan.FromSeconds(30));
+
+            // Wait for the result value to appear
+            new WebDriverWait(
+                this.WebBrowserDriver,
+                TimeSpan.FromSeconds(15)
+            ).Until(
+                driver => !string.IsNullOrWhiteSpace(this.receivedMessageBody.Text)
+            );
 
             return this.receivedMessageBody.Text;
         }
