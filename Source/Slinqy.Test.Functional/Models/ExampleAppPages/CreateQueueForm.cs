@@ -100,7 +100,7 @@
             this.createQueueButton.Click();
 
             // Wait for it to finish
-            this.createQueueAjaxStatusSection.WaitForResult(maxDuration: TimeSpan.FromSeconds(15));
+            this.createQueueAjaxStatusSection.WaitForResult(maxDuration: TimeSpan.FromSeconds(30));
 
             // Return queue info
             return new ManageQueueSection(this.WebBrowserDriver);
