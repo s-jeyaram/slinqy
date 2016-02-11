@@ -2,10 +2,13 @@
 {
     using System;
     using System.Configuration;
+    using System.Drawing.Imaging;
+    using System.IO;
     using BoDi;
     using Models;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Chrome;
+    using OpenQA.Selenium.Support.Extensions;
     using TechTalk.SpecFlow;
 
     /// <summary>
@@ -61,6 +64,34 @@
                 );
 
             this.objectContainer.RegisterInstanceAs(this.webBrowser);
+        }
+
+        /// <summary>
+        /// Takes a screen shot of the web browser if the current Selenium test failed.
+        /// </summary>
+        [AfterScenario]
+        public
+        void
+        AfterScenarioFailureScreenshot()
+        {
+            // Continue only if the current test didn't fail.
+            if (ScenarioContext.Current.TestError == null)
+                return;
+
+            var screenshot     = this.webDriver.TakeScreenshot();
+            var failedTestName = ScenarioContext.Current.ScenarioInfo.Title;
+
+            const string ScreenshotDirectoryName = "Screenshots";
+
+            if (!Directory.Exists(ScreenshotDirectoryName))
+                Directory.CreateDirectory(ScreenshotDirectoryName);
+
+            var screenshotPath = Path.Combine(
+                ScreenshotDirectoryName,
+                failedTestName + " - Failure.png"
+            );
+
+            screenshot.SaveAsFile(screenshotPath, ImageFormat.Png);
         }
 
         /// <summary>
