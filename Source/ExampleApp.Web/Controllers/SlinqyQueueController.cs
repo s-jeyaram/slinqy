@@ -12,6 +12,7 @@
     using System.Net.Http.Formatting;
     using System.Threading.Tasks;
     using System.Web.Http;
+    using Microsoft.Ajax.Utilities;
     using Models;
     using Slinqy.Core;
 
@@ -192,10 +193,6 @@
         StartReceiveQueue(
             string queueName)
         {
-            // Start the async task.
-            this.ReceiveQueue(queueName)
-                .ConfigureAwait(false);
-
             ReceiveOperations.AddOrUpdate(
                 key:                queueName,
                 addValueFactory:    name => new ReceiveQueueStatusViewModel { Status = ReceiveQueueStatus.Running },
@@ -207,6 +204,10 @@
                 }
 
             );
+
+            // Start the async task.
+            this.ReceiveQueue(queueName)
+                .ConfigureAwait(false);
 
             // Return while the task continues to run in the background.
         }
@@ -345,7 +346,7 @@
                 try
                 {
                     // Receive the batch of messages.
-                    var maxWaitTimeSpan = TimeSpan.FromSeconds(1);
+                    var maxWaitTimeSpan = TimeSpan.FromSeconds(30);
                     var receivedBatch   = await queue.ReceiveBatch<byte[]>(maxWaitTimeSpan)
                         .ConfigureAwait(false);
 
