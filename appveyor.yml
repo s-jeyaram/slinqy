@@ -19,4 +19,4 @@ cache:
   - C:\Users\appveyor\AppData\Roaming\Windows Azure Powershell\AzureDataCollectionProfile.json
 
 artifacts:
-  - path: .\Artifacts\Screenshots
+  - path: .\Artifacts
