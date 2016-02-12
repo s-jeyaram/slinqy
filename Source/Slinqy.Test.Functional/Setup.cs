@@ -97,9 +97,6 @@
             );
 
             screenshot.SaveAsFile(screenshotPath, ImageFormat.Png);
-
-            // TODO: Temporary, remove!
-            throw new AggregateException("Saved to " + screenshotPath);
         }
 
         /// <summary>
