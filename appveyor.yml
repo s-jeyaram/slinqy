@@ -18,5 +18,5 @@ cache:
   - .\Source\packages -> .\Source\ExampleApp.Web\packages.config
   - C:\Users\appveyor\AppData\Roaming\Windows Azure Powershell\AzureDataCollectionProfile.json
 
-artifacts:
-  - path: .\Artifacts
+on_failure:
+  - ps: if (Test-Path .\Artifacts\Screenshots) { Get-ChildItem .\Artifacts\Screenshots | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name } }
