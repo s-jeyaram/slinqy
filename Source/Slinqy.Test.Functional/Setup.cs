@@ -83,11 +83,16 @@
 
             const string ScreenshotDirectoryName = "Screenshots";
 
-            if (!Directory.Exists(ScreenshotDirectoryName))
-                Directory.CreateDirectory(ScreenshotDirectoryName);
+            var screenshotsPath = Path.Combine(
+                Environment.CurrentDirectory,
+                ScreenshotDirectoryName
+            );
+
+            if (!Directory.Exists(screenshotsPath))
+                Directory.CreateDirectory(screenshotsPath);
 
             var screenshotPath = Path.Combine(
-                ScreenshotDirectoryName,
+                screenshotsPath,
                 failedTestName + " - Failure.png"
             );
 
